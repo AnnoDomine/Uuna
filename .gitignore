@@ -5,14 +5,10 @@ __pycache__/
 *$py.class
 
 # WoW Data & DB (Huge files)
-Data/*.db
-Data/*.log
-Data/export_log.txt
+Data/dbs/*.db
+Data/logs/*.log
 Data/DB2_CSV/
 Data/DB2/
-
-# Tools & Exports
-wow-export/
 
 # Windows / OS
 Thumbs.db
@@ -31,9 +27,9 @@ Desktop.ini
 # Environment AI related
 ADDITIONAL_CONTEXT.md
 AGENT.md
+HISTORY.md
 *.jpg
 .venv
 Data
-wow-export
 .gemini
 addons

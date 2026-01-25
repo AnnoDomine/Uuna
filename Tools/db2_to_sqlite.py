@@ -4,31 +4,31 @@ import os
 import glob
 
 def create_db_from_csv(csv_dir, db_path):
-    """Konvertiert einen Ordner voller CSV-DB2-Exports in eine SQLite Datenbank."""
+    """Converts a folder full of CSV DB2 exports into a SQLite database."""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     csv_files = glob.glob(os.path.join(csv_dir, "*.csv"))
-    print(f"Gefundene Dateien: {len(csv_files)}")
+    print(f"Files found: {len(csv_files)}")
 
     for file_path in csv_files:
         table_name = os.path.basename(file_path).replace(".csv", "")
-        print(f"Verarbeite Tabelle: {table_name}...")
+        print(f"Processing table: {table_name}...")
         
         with open(file_path, 'r', encoding='utf-8') as f:
-            # wow.export nutzt normalerweise Komma als Trenner
+            # wow.export usually uses comma as a delimiter
             reader = csv.DictReader(f)
             columns = reader.fieldnames
             
             if not columns:
                 continue
 
-            # Spaltennamen säubern und Tabelle erstellen
+            # Clean column names and create table
             cols_str = ", ".join([f'"{c}"' for c in columns])
             cursor.execute(f'DROP TABLE IF EXISTS "{table_name}"')
             cursor.execute(f'CREATE TABLE "{table_name}" ({cols_str})')
             
-            # Daten blockweise einfügen für bessere Performance
+            # Insert data in batches for better performance
             placeholders = ", ".join(["?" for _ in columns])
             insert_query = f'INSERT INTO "{table_name}" ({cols_str}) VALUES ({placeholders})'
             
@@ -45,18 +45,19 @@ def create_db_from_csv(csv_dir, db_path):
             conn.commit()
 
     conn.close()
-    print("\nFertig! Datenbank erstellt unter: " + db_path)
+    print("\nDone! Database created at: " + db_path)
 
 if __name__ == "__main__":
     CSV_IMPORT_DIR = "Data/DB2_CSV"
-    SQLITE_DB_PATH = "Data/WoW_Data.db"
+    # Default to a generic path, but usually sync_wow_db is preferred
+    SQLITE_DB_PATH = "Data/dbs/WoW_Data_Local.db"
     
-    if not os.path.exists("Data"):
-        os.makedirs("Data")
+    if not os.path.exists("Data/dbs"):
+        os.makedirs("Data/dbs")
     
     if os.path.exists(CSV_IMPORT_DIR):
         create_db_from_csv(CSV_IMPORT_DIR, SQLITE_DB_PATH)
     else:
         if not os.path.exists(CSV_IMPORT_DIR):
             os.makedirs(CSV_IMPORT_DIR)
-        print(f"Bitte lege die CSV-Exports in den Ordner: {CSV_IMPORT_DIR}")
+        print(f"Please place the CSV exports in the folder: {CSV_IMPORT_DIR}")
