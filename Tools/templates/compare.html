@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <h2>Compare Builds</h2>
+        <form hx-get="/compare" hx-target="#results-area" class="card bg-dark border-secondary p-3">
+            <div class="mb-3">
+                <label class="form-label">Source Build (Old)</label>
+                <select name="old" class="form-select bg-dark text-light border-secondary">
+                    {% for d in downloaded %}
+                        <option value="{{ d }}" {{ 'selected' if d == old_ver }}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Target Build (New)</label>
+                <select name="new" class="form-select bg-dark text-light border-secondary">
+                    {% for d in downloaded %}
+                        <option value="{{ d }}" {{ 'selected' if d == new_ver }}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Compare Now</button>
+        </form>
+    </div>
+    <div class="col-md-8" id="results-area">
+        {% include "compare_results.html" %}
+    </div>
+</div>
+{% endblock %}

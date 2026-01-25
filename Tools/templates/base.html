@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ ui_theme or 'dark' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoW Datamine Toolkit</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root[data-bs-theme="dark"] {
+            --bg-sidebar: #1e1e1e;
+            --border-color: #333;
+        }
+        :root[data-bs-theme="light"] {
+            --bg-sidebar: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { height: calc(100vh - 70px); overflow-y: auto; border-right: 1px solid var(--border-color); background: var(--bg-sidebar); }
+        .table-container { border-radius: 8px; padding: 10px; overflow-x: auto; background: var(--bs-body-bg); border: 1px solid var(--border-color); }
+        
+        .badge-ref { font-size: 0.65rem; background: var(--bs-secondary-bg); color: var(--bs-info); border: 1px solid var(--bs-info); }
+        #sync-log { background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; height: 300px; overflow-y: auto; padding: 10px; border-radius: 4px; font-size: 0.85rem; }
+        
+        .ref-link { color: var(--bs-info); text-decoration: none; border-bottom: 1px dashed var(--bs-info); }
+        .ref-link:hover { color: var(--bs-primary); border-bottom: 1px solid var(--bs-primary); }
+        .name-preview { color: var(--bs-secondary-color); font-size: 0.8em; display: block; font-style: italic; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bs-secondary-bg); border-radius: 4px; }
+    </style>
+</head>
+<body hx-boost="true">
+    <nav class="navbar navbar-expand-lg border-bottom border-secondary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="fs-4 fw-bold text-info">WoW Datamine</span>
+                <span class="badge bg-secondary ms-2" style="font-size: 0.5em">v0.5.0</span>
+            </a>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link" href="/">Explorer</a>
+                <a class="nav-link" href="/builds">Builds / Sync</a>
+                <a class="nav-link" href="/compare">Compare</a>
+                <a class="nav-link" href="/settings">Settings</a>
+                <div class="ms-3 ps-3 border-start border-secondary">
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            hx-post="/settings/toggle-theme" 
+                            hx-target="html" 
+                            hx-select="html"
+                            hx-swap="outerHTML">
+                        {% if ui_theme == 'light' %} 🌙 Dark {% else %} ☀️ Light {% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+            if (document.getElementById('sync-log')) {
+                const logContainer = document.getElementById('sync-log');
+                const eventSource = new EventSource('/sync-stream');
+                eventSource.onmessage = function(event) {
+                    const div = document.createElement('div');
+                    div.textContent = event.data;
+                    logContainer.appendChild(div);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    if (event.data.includes("Sync for build") && event.data.includes("completed")) {
+                        eventSource.close();
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="mb-4">Available Builds (Wago.tools)</h2>
+        <div class="list-group">
+            {% for b in available_builds %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold">{{ b.version }}</span>
+                        {% if b.is_downloaded %}
+                            <span class="badge bg-success ms-2">Downloaded</span>
+                            {% if b.last_synced %}
+                                <div class="small text-muted" style="font-size: 0.75rem">Last Sync: {{ b.last_synced }}</div>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge bg-secondary ms-2">Downloadable</span>
+                        {% endif %}
+                    </div>
+                    <form hx-post="/sync" hx-target="#sync-log-area" hx-disabled-elt="button">
+                        <input type="hidden" name="build" value="{{ b.version }}">
+                        <button type="submit" 
+                                class="btn btn-sm {{ 'btn-outline-primary' if b.is_downloaded else 'btn-primary' }}"
+                                {{ 'disabled' if is_syncing }}>
+                            {% if is_syncing and current_sync_build == b.version %}
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            {% endif %}
+                            {{ 'Re-Sync' if b.is_downloaded else 'Sync Build' }}
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6" id="sync-log-area">
+        <h2 class="mb-4">Sync Status</h2>
+        <div id="sync-log">
+            <div class="text-muted italic">No active sync session. Start a sync to see logs...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
