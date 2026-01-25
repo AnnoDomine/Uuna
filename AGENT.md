@@ -4,13 +4,20 @@ Dieses Dokument dient als technischer Kontext für KI-Agenten und Entwickler, di
 
 ## Projekt-Struktur
 
-- **Core.lua**: Zentrale Logik, Event-Handling und Datenspeicherung.
-- **UI_Main.lua**: Hauptfenster (Story Log) und Slash-Befehl `/uuna`.
-- **UI_Aura.lua**: UI-Modul für das Aura-Tracking.
-- **UI_Debug.lua**: UI-Modul für das Event-Logging.
-- **UI_Quest.lua**: UI-Modul für den Quest-Status.
-- **UI_Minimap.lua**: Implementierung des Minimap-Buttons (LibDBIcon-ähnlich, aber nativ).
-- **UunaWantSomething.toc**: Addon-Metadaten und Dateireferenz.
+### Root-Verzeichnis
+- **AGENT.md**: Dieses Dokument (Technischer Guide).
+- **README.md**: Benutzerdokumentation und Feature-Übersicht.
+
+### Addon-Dateien (UunaWantSomething/)
+Die Quelldateien befinden sich im Unterverzeichnis `UunaWantSomething/`:
+
+- **UunaWantSomething/Core.lua**: Zentrale Logik, Event-Handling und Datenspeicherung.
+- **UunaWantSomething/UI_Main.lua**: Hauptfenster (Story Log) und Slash-Befehl `/uuna`.
+- **UunaWantSomething/UI_Aura.lua**: UI-Modul für das Aura-Tracking.
+- **UunaWantSomething/UI_Debug.lua**: UI-Modul für das Event-Logging.
+- **UunaWantSomething/UI_Quest.lua**: UI-Modul für den Quest-Status.
+- **UunaWantSomething/UI_Minimap.lua**: Implementierung des Minimap-Buttons.
+- **UunaWantSomething/UunaWantSomething.toc**: Addon-Metadaten und Dateireferenzen.
 
 ## Datenmodell (SavedVariables)
 
