@@ -10,60 +10,63 @@ def fetch_versions():
     try:
         r = requests.get(API_URL, timeout=10)
         r.raise_for_status()
-        data = r.json()
-        # The API returns a list of dictionaries with version information
-        return data
+        return r.json()
     except Exception as e:
         print(f"Error fetching versions: {e}")
     return []
 
-def update_registry(builds_dict):
+def update_registry(builds_dict=None):
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
+    # Advanced schema
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS builds (
             id INTEGER PRIMARY KEY,
             version TEXT,
             product TEXT,
-            last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            is_downloaded INTEGER DEFAULT 0,
+            last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_synced TIMESTAMP
         )
     ''')
     
-    count = 0
-    # builds_dict is { "product_name": [ {build_info}, ... ], ... }
-    for product_name, entries in builds_dict.items():
-        for entry in entries:
-            ver_str = entry.get('version')
-            
-            if ver_str:
-                parts = ver_str.split('.')
-                if len(parts) >= 1:
+    if builds_dict:
+        count = 0
+        for product_name, entries in builds_dict.items():
+            for entry in entries:
+                ver_str = entry.get('version')
+                if ver_str:
                     try:
-                        build_num = int(parts[-1])
-                        # We use build_num as ID, but different products might have the same build number?
-                        # In WoW, build numbers are usually unique across versions, but let's be safe.
-                        # If we want unique per version string:
+                        build_num = int(ver_str.split('.')[-1])
+                        # Check if file exists locally to mark as downloaded
+                        is_dl = 1 if os.path.exists(f'Data/dbs/WoW_Data_{ver_str}.db') else 0
+                        
                         cursor.execute('''
-                            INSERT INTO builds (id, version, product) 
-                            VALUES (?, ?, ?)
+                            INSERT INTO builds (id, version, product, is_downloaded) 
+                            VALUES (?, ?, ?, ?)
                             ON CONFLICT(id) DO UPDATE SET 
                                 version = excluded.version,
                                 product = excluded.product,
+                                is_downloaded = MAX(is_downloaded, excluded.is_downloaded),
                                 last_seen = CURRENT_TIMESTAMP
-                        ''', (build_num, ver_str, product_name))
+                        ''', (build_num, ver_str, product_name, is_dl))
                         count += 1
-                    except ValueError:
-                        continue
-                
+                    except ValueError: continue
+        conn.commit()
+        print(f"Registry updated: {count} entries processed.")
+    
+    # Final pass: Verify all local files match the DB state
+    cursor.execute("SELECT version FROM builds")
+    rows = cursor.fetchall()
+    for (ver,) in rows:
+        is_dl = 1 if os.path.exists(f'Data/dbs/WoW_Data_{ver}.db') else 0
+        cursor.execute("UPDATE builds SET is_downloaded = ? WHERE version = ?", (is_dl, ver))
+    
     conn.commit()
     conn.close()
-    print(f"Registry updated. Processed {count} entries across all products.")
 
 if __name__ == "__main__":
-    builds_data = fetch_versions()
-    if builds_data:
-        update_registry(builds_data)
-    else:
-        print("No build data received.")
+    data = fetch_versions()
+    update_registry(data)
