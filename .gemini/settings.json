@@ -1,0 +1,14 @@
+{
+    "context": {
+        "fileName": "AGENT.md"
+    },
+    "mcpServers": {
+        "wow-addon-api": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "wow-dev-mcp@latest"
+            ]
+        }
+    }
+}
