@@ -59,6 +59,10 @@ import time
 import re
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from project_init import init_all
+
+# Ensure environment is ready
+init_all()
 
 CSV_DIR = 'Data/DB2_CSV'
 LOG_FILE = 'Data/logs/import_errors.log'
@@ -197,6 +201,16 @@ def fetch_and_import(version, tables=None, progress_callback=None):
 
     finish_msg = f"\nSync for build {version} completed."
     print(finish_msg)
+    
+    # Update Registry with sync status
+    try:
+        reg_conn = sqlite3.connect('Data/dbs/Build_Registry.db')
+        reg_cursor = reg_conn.cursor()
+        reg_cursor.execute("UPDATE builds SET is_downloaded = 1, last_synced = CURRENT_TIMESTAMP WHERE version = ?", (version,))
+        reg_conn.commit()
+        reg_conn.close()
+    except: pass
+
     if progress_callback: progress_callback(finish_msg)
 
 if __name__ == "__main__":
