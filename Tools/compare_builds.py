@@ -26,12 +26,38 @@ def get_tables(db_path):
     conn.close()
     return tables
 
+def get_available_builds():
+    db_reg = 'Data/dbs/Build_Registry.db'
+    if not os.path.exists(db_reg):
+        return []
+    conn = sqlite3.connect(db_reg)
+    cursor = conn.cursor()
+    # Get versions sorted by build number (id)
+    cursor.execute("SELECT version FROM builds ORDER BY id ASC")
+    versions = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return versions
+
+def ensure_build_local(version):
+    path = get_db_path(version)
+    if os.path.exists(path):
+        return True
+    
+    print(f"\nBuild {version} is missing locally.")
+    choice = input(f"Do you want to download build {version} now? (y/n): ").lower()
+    if choice == 'y':
+        from sync_wow_db import fetch_and_import
+        print(f"Starting import for {version}...")
+        fetch_and_import(version)
+        return os.path.exists(path)
+    return False
+
 def compare_builds(version_old, version_new):
     path_old = get_db_path(version_old)
     path_new = get_db_path(version_new)
     
     if not os.path.exists(path_old) or not os.path.exists(path_new):
-        return {"error": "One or both databases are missing."}
+        return {"error": f"Missing database files: {version_old if not os.path.exists(path_old) else ''} {version_new if not os.path.exists(path_new) else ''}"}
     
     tables_old = get_tables(path_old)
     tables_new = get_tables(path_new)
@@ -72,7 +98,7 @@ def compare_builds(version_old, version_new):
                 if removed_cols: changes.append(f"Removed columns: {', '.join(removed_cols)}")
             
             if changes:
-                diff["modified_tables"].append(changes)
+                diff["modified_tables"][table] = changes
                 
     return diff
 
@@ -80,17 +106,14 @@ def get_version_tuple(v):
     return tuple(map(int, (re.sub(r'[^0-9.]', '', v).split('.'))))
 
 def run_diff_chain(start_version, end_version, include_intermediate=False):
-    from sync_wow_db import fetch_available_builds
+    available_online = get_available_builds()
     
-    available_online = fetch_available_builds()
-    # Sort builds by version
-    try:
-        available_online.sort(key=get_version_tuple)
-    except:
-        available_online.sort()
-        
+    if not available_online:
+        print("Error: Build registry is empty. Run update_build_registry.py first.")
+        return
+
     if start_version not in available_online or end_version not in available_online:
-        print(f"Error: One of the versions ({start_version}, {end_version}) is not in the official build list.")
+        print(f"Error: One of the versions ({start_version}, {end_version}) is not in the build registry.")
         return
 
     idx_start = available_online.index(start_version)
@@ -101,24 +124,25 @@ def run_diff_chain(start_version, end_version, include_intermediate=False):
         
     build_range = available_online[idx_start:idx_end+1]
     
-    print(f"Comparing build chain: {' -> '.join(build_range)}")
+    print(f"Comparing build range: {start_version} to {end_version}")
     
     if not include_intermediate:
         # Direct comparison
-        res = compare_builds(start_version, end_version)
-        print_diff(start_version, end_version, res)
+        if ensure_build_local(start_version) and ensure_build_local(end_version):
+            res = compare_builds(start_version, end_version)
+            print_diff(start_version, end_version, res)
     else:
         # Step by step
+        print(f"Intermediate chain: {' -> '.join(build_range)}")
         for i in range(len(build_range) - 1):
             v1 = build_range[i]
             v2 = build_range[i+1]
             
-            if not os.path.exists(get_db_path(v1)) or not os.path.exists(get_db_path(v2)):
-                print(f"\n--- Skipping {v1} -> {v2} (Local DB missing) ---")
-                continue
-                
-            res = compare_builds(v1, v2)
-            print_diff(v1, v2, res)
+            if ensure_build_local(v1) and ensure_build_local(v2):
+                res = compare_builds(v1, v2)
+                print_diff(v1, v2, res)
+            else:
+                print(f"\n--- Skipping {v1} -> {v2} (Build data missing) ---")
 
 def print_diff(v1, v2, diff):
     if "error" in diff:
