@@ -1,20 +1,37 @@
-# Windows
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# WoW Data & DB (Huge files)
+Data/*.db
+Data/*.log
+Data/export_log.txt
+Data/DB2_CSV/
+Data/DB2/
+
+# Tools & Exports
+wow-export/
+
+# Windows / OS
 Thumbs.db
 Desktop.ini
+.DS_Store
 
 # VS Code
 .vscode/*
 !.vscode/settings.json
 
 # WoW Addon Specific
-# Ignore backups created by some editors
 *.bak
 *.old
-
-# Ignore SavedVariables during local development if needed 
-# (But usually they are in the WTF folder, not the Addon folder)
-# However, sometimes people copy them for debugging
 *.lua.bak
 
-# Git
-.git/
+# Environment AI related
+ADDITIONAL_CONTEXT.md
+AGENT.md
+*.jpg
+.venv
+Data
+wow-export
