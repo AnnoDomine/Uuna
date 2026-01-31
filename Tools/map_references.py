@@ -10,6 +10,8 @@ SETTINGS_DB = 'Data/dbs/Settings.db'
 
 # Session state to skip all remaining questions
 session_skip_all = False
+headless_mode = False
+pending_mappings = {}
 
 def get_setting(key, default):
     try:
@@ -48,7 +50,7 @@ def save_json(path, data):
         json.dump(data, f, indent=2)
 
 def resolve_table_name(potential_name, tables, user_mappings, global_mappings, mapping_path, current_table, current_col, use_global=True):
-    global session_skip_all
+    global session_skip_all, headless_mode, pending_mappings
     mapping_key = f"{current_table}.{current_col}"
     
     # 0. Check session skip
@@ -92,16 +94,35 @@ def resolve_table_name(potential_name, tables, user_mappings, global_mappings, m
         for t in tables:
             if t.lower() == variant.lower(): return t
 
-    # 6. Interactive Input or Auto-Skip
+    # 6. High Confidence Auto-Mapping
+    suggestions = difflib.get_close_matches(potential_name, tables, n=15, cutoff=0.2)
+    # Re-check with high cutoff for auto-pick
+    auto_suggestions = difflib.get_close_matches(potential_name, tables, n=1, cutoff=0.85)
+    if auto_suggestions and (headless_mode or get_setting('map_references_auto_accept_high_confidence', '1') == '1'):
+        target_result = auto_suggestions[0]
+        print(f"  [AUTO] {mapping_key} -> {target_result} (Confidence > 0.85)")
+        user_mappings[mapping_key] = target_result
+        if use_global: global_mappings[current_col] = target_result
+        return target_result
+
+    # 7. Headless Mode / Auto-Skip
+    if headless_mode:
+        if mapping_key not in pending_mappings:
+            pending_mappings[mapping_key] = {
+                "base": potential_name,
+                "suggestions": suggestions[:5]
+            }
+        return None
+
     auto_skip_setting = get_setting('map_references_auto_skip_unidentifiable', '0') == '1'
     if auto_skip_setting:
         print(f"[!] Auto-skipping ambiguous reference: {current_table}.{current_col}")
         session_skip_all = True
         return None
 
+    # 8. Interactive Input
     print(f"\n[?] Ambiguous: {current_table}.{current_col} (Base: '{potential_name}')")
     
-    suggestions = difflib.get_close_matches(potential_name, tables, n=15, cutoff=0.2)
     for t in tables:
         if p_low in t.lower() and t not in suggestions:
             suggestions.append(t)
@@ -242,11 +263,22 @@ if __name__ == "__main__":
     elif "--g" in args:
         use_global = True
         args.remove("--g")
+        
+    if "--headless" in args:
+        headless_mode = True
+        args.remove("--headless")
     
     build = args[0] if args else None
     db = f"Data/dbs/WoW_Data_{build}.db" if build else get_latest_local_db()
     
     if db and os.path.exists(db):
         map_references(db, use_global)
+        
+        # Save pending mappings if in headless mode
+        if headless_mode and pending_mappings:
+            pending_path = db.replace('.db', '_pending_map.json')
+            save_json(pending_path, pending_mappings)
+            print(f"\n[!] {len(pending_mappings)} pending mappings saved to: {pending_path}")
+            print("Run with interactive mode or use an AI to resolve these.")
     else:
         print("No DB found.")
