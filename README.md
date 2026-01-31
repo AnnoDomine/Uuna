@@ -62,6 +62,31 @@ Das Toolkit ist für die effiziente Steuerung über das Terminal optimiert. Alle
 ```
 Nutze im Web-Interface die **Command Palette** (Strg+K) für extrem schnelle Navigation zwischen Tabellen und Funktionen.
 
+## AI-Powered Research (Experimental)
+
+Das Toolkit beinhaltet eine KI-gestützte Analyse-Engine (basierend auf Qwen 3), die automatisch Spielsysteme identifiziert und Datenbank-Referenzen mappt.
+
+### 1. KI-Konfiguration
+Verwalte KI-Parameter wie Threads, Pausen und Limits:
+```bash
+# Zeige aktuelle Einstellungen
+.venv/bin/python3 Tools/ai_control.py list
+
+# Setze Parameter (z.B. GPU-Threads)
+.venv/bin/python3 Tools/ai_control.py set threads 6
+
+# Zeige Wissensstand der KI
+.venv/bin/python3 Tools/ai_control.py status
+```
+
+### 2. Autonomes Training & Research
+Lasse die KI über mehrere Builds hinweg lernen:
+```bash
+# Starte Forschungs-Lauf (z.B. für die Legion-Ära)
+# AI_DEBUG=1 aktiviert detaillierte Logs inkl. Prompts
+AI_DEBUG=1 .venv/bin/python3 Tools/ai_researcher_agent.py --start 7.3.5.25600 --end 7.3.5.26972
+```
+
 ## Project Structure
 - `Tools/`: Python scripts for datamining.
 - `Data/`: SQLite databases and import logs.
