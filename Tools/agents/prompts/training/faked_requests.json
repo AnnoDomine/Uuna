@@ -1,0 +1,28 @@
+[
+  {
+    "scenario_id": 1,
+    "query": "Find the Gold cost of Spell 'Shadow Bolt' in Build 1.12.1",
+    "faked_events": [
+      {
+        "role": "Archivist",
+        "output": "{\"cost\": 500, \"currency\": \"Gold\"}",
+        "confidence": 1.0,
+        "logs": ["Querying Spell table...", "Found ID 686", "Mapped cost column to value 500"]
+      }
+    ],
+    "expected_issue": "Wrong table mapping. Gold costs are usually in SpellLevel or specialized cost tables, not the main Spell table."
+  },
+  {
+    "scenario_id": 2,
+    "query": "Who is the NPC that gives the quest 'The Missing Diplomat'?",
+    "faked_events": [
+      {
+        "role": "ExpeditionGroup",
+        "output": "{\"npc\": \"Jaina Proudmoore\", \"location\": \"Theramore\"}",
+        "confidence": 0.9,
+        "logs": ["Searching Wowhead...", "Context check completed."]
+      }
+    ],
+    "expected_issue": "Correct NPC, but confidence is too low for a definitive lore fact."
+  }
+]

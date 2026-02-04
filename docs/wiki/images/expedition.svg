@@ -1,0 +1,13 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#1e3799"/>
+  <!-- Explorer Hat (Wide Brim) -->
+  <path d="M30 80 Q100 60 170 80 L170 95 Q100 85 30 95 Z" fill="#78e08f"/>
+  <path d="M60 80 Q100 20 140 80" fill="#38ada9"/>
+  <!-- Face -->
+  <path d="M75 95 Q100 140 125 95 L125 130 Q100 155 75 130 Z" fill="#ffdbac"/>
+  <!-- Weathered Eyes -->
+  <path d="M85 110 Q90 105 95 110" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+  <path d="M105 110 Q110 105 115 110" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+  <!-- Feather in Hat -->
+  <path d="M130 60 Q150 20 160 50" fill="none" stroke="#eb4d4b" stroke-width="4" stroke-linecap="round"/>
+</svg>

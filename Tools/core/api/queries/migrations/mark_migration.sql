@@ -1,0 +1,1 @@
+INSERT INTO registry.migrations (model_name, version) VALUES (?, ?);

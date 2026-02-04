@@ -1,0 +1,1 @@
+UPDATE registry.builds SET is_downloaded = TRUE WHERE id = ?;

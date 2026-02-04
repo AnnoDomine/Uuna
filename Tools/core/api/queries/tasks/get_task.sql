@@ -1,0 +1,1 @@
+SELECT * FROM research.tasks WHERE task_id = ?;

@@ -1,0 +1,13 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#2c3e50"/>
+  <!-- Helmet (Full Plate) -->
+  <path d="M60 40 Q100 20 140 40 L150 140 L100 170 L50 140 Z" fill="#95a5a6"/>
+  <!-- Helmet Detail (Visor Slit) -->
+  <rect x="70" y="80" width="60" height="8" rx="2" fill="#2c3e50"/>
+  <rect x="70" y="92" width="60" height="8" rx="2" fill="#2c3e50"/>
+  <!-- Glowing Eyes -->
+  <circle cx="85" cy="84" r="2" fill="#3498db"/>
+  <circle cx="115" cy="84" r="2" fill="#3498db"/>
+  <!-- Crest -->
+  <path d="M100 20 Q110 -10 120 20" fill="none" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>
+</svg>

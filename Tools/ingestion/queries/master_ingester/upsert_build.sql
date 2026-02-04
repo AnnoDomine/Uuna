@@ -1,0 +1,1 @@
+INSERT OR IGNORE INTO registry.builds (version, product) VALUES (?, 'wow');

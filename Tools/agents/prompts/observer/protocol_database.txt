@@ -1,0 +1,5 @@
+CRITERIA FOR DATABASE SPECIALIST:
+1. ID Accuracy: Are all Row IDs verified against the Master Archive?
+2. Relational Logic: Are the links between tables documented in the Chronicle?
+3. Formatting: Is the JSON/Output structure valid and clean?
+4. Efficiency: Did the agent avoid redundant joins or full table scans if a direct ID lookup was possible?

@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#1a1a2e"/>
+  <!-- Wizard Hat -->
+  <path d="M40 80 L100 10 L160 80 Z" fill="#3d3d6b"/>
+  <path d="M30 80 Q100 90 170 80 L170 95 Q100 105 30 95 Z" fill="#2d2d4d"/>
+  <!-- Face -->
+  <path d="M70 90 Q100 130 130 90 L130 140 Q100 160 70 140 Z" fill="#ffdbac"/>
+  <!-- Beard -->
+  <path d="M70 120 Q100 195 130 120" fill="none" stroke="#f0f0f0" stroke-width="12" stroke-linecap="round"/>
+  <path d="M80 130 Q100 180 120 130" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="110" r="3" fill="#1a1a2e"/>
+  <circle cx="115" cy="110" r="3" fill="#1a1a2e"/>
+  <!-- Eyebrows -->
+  <path d="M75 102 Q85 95 95 102" fill="none" stroke="#ffffff" stroke-width="3"/>
+  <path d="M105 102 Q115 95 125 102" fill="none" stroke="#ffffff" stroke-width="3"/>
+</svg>

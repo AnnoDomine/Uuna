@@ -1,0 +1,1 @@
+SELECT assigned_builds FROM research.tasks WHERE task_id = ?;

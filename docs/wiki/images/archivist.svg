@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#2f3640"/>
+  <!-- Face -->
+  <path d="M60 80 Q100 120 140 80 L140 130 Q100 160 60 130 Z" fill="#e0ac69"/>
+  <!-- Engineering Goggles -->
+  <circle cx="80" cy="90" r="18" fill="#444" stroke="#7f8c8d" stroke-width="3"/>
+  <circle cx="120" cy="90" r="18" fill="#444" stroke="#7f8c8d" stroke-width="3"/>
+  <rect x="95" y="88" width="10" height="4" fill="#7f8c8d"/>
+  <!-- Goggle Glass -->
+  <circle cx="80" cy="90" r="12" fill="#3498db" opacity="0.6"/>
+  <circle cx="120" cy="90" r="12" fill="#3498db" opacity="0.6"/>
+  <!-- Short Bearded Chin -->
+  <path d="M70 130 Q100 155 130 130" fill="none" stroke="#7f8c8d" stroke-width="8" stroke-linecap="round"/>
+</svg>

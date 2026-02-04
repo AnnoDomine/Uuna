@@ -1,0 +1,1 @@
+SELECT version, id FROM registry.builds WHERE is_downloaded = FALSE ORDER BY id ASC

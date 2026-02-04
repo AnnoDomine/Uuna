@@ -1,0 +1,1 @@
+UPDATE registry.builds SET indexed = TRUE WHERE id = ?;

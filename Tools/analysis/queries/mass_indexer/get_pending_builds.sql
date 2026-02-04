@@ -1,0 +1,1 @@
+SELECT version FROM registry.builds WHERE is_downloaded = TRUE AND indexed = FALSE ORDER BY id ASC;

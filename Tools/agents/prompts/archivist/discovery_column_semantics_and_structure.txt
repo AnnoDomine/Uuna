@@ -1,0 +1,5 @@
+Analyze column: {table}.{col}
+Stats: {v_min}-{v_max}
+Samples: {samples}
+{memory_section}{online_info}
+Return JSON: {{"discovery": "...", "type": "structure"|"content", "confidence": 0.9}}

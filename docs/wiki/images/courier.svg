@@ -1,0 +1,12 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#006266"/>
+  <!-- Cap / Mask -->
+  <path d="M60 60 Q100 30 140 60 L140 100 L60 100 Z" fill="#833471"/>
+  <!-- Face -->
+  <path d="M70 100 Q100 140 130 100 L130 130 Q100 150 70 130 Z" fill="#ffdbac"/>
+  <!-- Scarf (Flowing) -->
+  <path d="M60 130 Q100 140 140 130 L160 160 Q100 180 40 160 Z" fill="#EA2027"/>
+  <!-- Focused Eyes -->
+  <path d="M80 110 L95 110" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M105 110 L120 110" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round"/>
+</svg>

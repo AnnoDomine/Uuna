@@ -1,0 +1,13 @@
+TASK: Create a single, comprehensive erDiagram representing ALL confirmed relationships for WoW Build {build_version}.
+CONFIRMED MAPPINGS:
+{mapping_str}
+
+CONTEXT:
+{mmd_docs}
+
+INSTRUCTIONS:
+- Group multiple columns between the same tables into one link if possible.
+- Focus on clarity and structural overview.
+- Return ONLY raw JSON.
+
+Return JSON: {{"mermaid": "erDiagram ...", "description": "..."}}

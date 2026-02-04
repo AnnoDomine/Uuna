@@ -1,0 +1,16 @@
+Map WoW column: {table}.{col}.
+Samples: {samples}
+Suggestions: {preds}
+{memory_section}{online_info}
+AVAILABLE TABLES:
+{all_tables}
+
+### STRATEGY:
+- Column names ending in 'ID' usually map to a table named without 'ID' (e.g., QuestID -> Quest).
+- Watch for pluralization (SpellID -> Spells, CategoryID -> Categories, AbilityID -> Abilities).
+- PATTERN CONSISTENCY: Columns with similar names (e.g., FriendConditionID, EnemyConditionID, SelfConditionID) almost always point to the SAME target table (e.g., UnitCondition). Use this logic to ensure consistent mapping across related fields.
+- Watch for naming variants (TargetID -> UnitCondition, DisplayID -> CreatureDisplayInfo).
+- Watch for versioning (QuestID -> QuestV2).
+- Return ONLY the exact table name from the list.
+
+Return JSON: {{"target": "ExactNameFromList", "confidence": 0.9, "reasoning": "..."}}

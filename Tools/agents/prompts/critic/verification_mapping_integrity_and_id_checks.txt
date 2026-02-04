@@ -1,0 +1,3 @@
+Verify mapping: {table}.{col} -> {target}.
+{proof}
+Return JSON: {{"decision": "confirm" or "veto", "reasoning": "..."}}

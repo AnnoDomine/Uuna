@@ -1,0 +1,8 @@
+Analyze VALUE column: {table}.{col}
+Stats: {v_min}-{v_max}
+Samples: {samples}
+{memory_section}{online_info}
+
+This column was skipped for direct mapping because it represents a metric or flag (Value-Suffix). 
+TASK: Explain the semantic use of this value based on samples and context.
+Return JSON: {{"discovery": "Detailed explanation of what this count/msec/amount represents", "type": "content", "confidence": 0.9}}
