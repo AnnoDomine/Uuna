@@ -19,8 +19,21 @@ class MigrationManager:
                 if query.strip(): con.execute(query)
 
     def apply_model(self, model_class):
-        """Generates and applies the SQL for a given model."""
+        """Generates and applies the SQL for a given model, if not already applied."""
         name = model_class.__name__
+        
+        # Check if migration was already applied
+        with duckdb.connect(self.db_path) as con:
+            try:
+                res = con.execute("SELECT version FROM registry.migrations WHERE model_name = ?", [name]).fetchone()
+                if res:
+                    # For now, we assume version 1 is current. 
+                    # Later we can implement incremental versions.
+                    logger.debug(f"Migration for {name} already applied. Skipping.")
+                    return
+            except:
+                pass # Table might not exist yet, proceed to apply
+
         sql = model_class.to_sql()
         mark_sql = self._load_query("mark_migration")
         

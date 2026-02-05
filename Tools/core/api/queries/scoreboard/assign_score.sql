@@ -1,0 +1,1 @@
+INSERT INTO research.score_board (task_id, event_id, final_percent) VALUES (?, ?, ?);

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, Type
+from typing import Optional, List, Dict, Any, Type, ClassVar
 from datetime import datetime
 from uuid import UUID
 import json
@@ -8,7 +8,7 @@ class DBModel(BaseModel):
     """Base class for all internal toolkit tables."""
     
     # Type mapping: Python -> DuckDB
-    TYPE_MAP = {
+    TYPE_MAP: ClassVar[Dict[Type, str]] = {
         str: "VARCHAR",
         int: "INTEGER",
         float: "DOUBLE",
@@ -34,26 +34,43 @@ class DBModel(BaseModel):
         table = cls.get_table_name()
         
         columns = []
-        for name, field in cls.__fields__.items():
-            # Get the base type (handling Optional)
-            base_type = field.type_
+        for name, field in cls.model_fields.items():
+            # Get the base type
+            base_type = field.annotation
+            # Handle Optional/Union
+            if hasattr(base_type, "__args__"):
+                base_type = base_type.__args__[0]
+            
             db_type = cls.TYPE_MAP.get(base_type, "VARCHAR")
             
-            # Special handling for Primary Keys (we assume 'id' or '{model}_id' is PK)
+            # Special handling for Primary Keys
             pk_suffix = ""
-            if name.endswith("_id") and (name.startswith(cls.__name__.lower()) or name == "task_id" or name == "event_id"):
+            # Logic: A column is a PK if it's {model}_id, {table_singular}_id, or just 'id'
+            model_prefix = cls.__name__.lower()
+            table_prefix = cls.get_table_name().lower().rstrip('s')
+            
+            is_pk_candidate = (
+                name == f"{model_prefix}_id" or 
+                name == f"{table_prefix}_id" or 
+                name == "id" or
+                (name == "task_id" and cls.__name__ == "Task") or
+                (name == "event_id" and cls.__name__ == "TaskEvent") or
+                (name == "log_id" and cls.__name__ == "EventLog") or
+                (name == "score_id" and cls.__name__ == "ScoreBoard")
+            )
+
+            if is_pk_candidate:
                 if db_type == "UUID":
                     pk_suffix = " PRIMARY KEY"
                 elif db_type == "INTEGER":
-                    # For integers we use sequences by default
                     pk_suffix = f" PRIMARY KEY DEFAULT nextval('{schema}.{table}_seq')"
 
             columns.append(f'"{name}" {db_type}{pk_suffix}')
 
-        # Add Standard timestamps if not already in model
-        if "created_at" not in cls.__fields__:
+        # Add Standard timestamps
+        if "created_at" not in cls.model_fields:
             columns.append('"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
-        if "updated_at" not in cls.__fields__:
+        if "updated_at" not in cls.model_fields:
             columns.append('"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
 
         # Generate sequence if we have an integer PK
