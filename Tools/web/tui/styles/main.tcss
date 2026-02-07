@@ -1,0 +1,55 @@
+Screen {
+    background: #1a1b26;
+}
+
+#sidebar {
+    width: 25;
+    background: #24283b;
+    border-right: tall #414868;
+    padding: 1;
+}
+
+#main-content {
+    width: 1fr;
+    padding: 1;
+}
+
+#interface-area {
+    width: 60%;
+    padding: 1;
+}
+
+#log-area {
+    width: 40%;
+    padding: 1;
+    border-left: solid #414868;
+}
+
+#log-area:disabled {
+    opacity: 0.3;
+}
+
+.section-title {
+    text-style: bold;
+    color: #7aa2f7;
+    margin-bottom: 1;
+}
+
+#status-bar {
+    height: 3;
+    background: #24283b;
+    border-top: tall #414868;
+    padding-left: 2;
+    padding-right: 2;
+}
+
+#log-view {
+    height: 1fr;
+    border: solid #414868;
+    background: #16161e;
+}
+
+#log-view:disabled {
+    background: #1a1b26;
+    border: solid #24283b;
+}
