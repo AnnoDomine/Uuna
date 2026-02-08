@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.9] - 2026-02-08
+### Added
+- **Full-Screen Dynamic Layout**: Implemented `useTerminalDimensions` hook to automatically adapt the TUI to any terminal window size in real-time.
+- **Enterprise Layout Engine**: Switched to a "Fixed-Fluid" architecture using explicit dimensions (`width`/`height`) and percentages for maximum structural stability.
+- **Vector Memory Explorer**: Fully functional semantic search interface with dual-column layout, role-based filtering, and real-time similarity score visualization.
+- **Improved Scoring Board**: Redesigned side-by-side view for agent performance metrics and historical scoring logs.
+- **Enhanced Wiki System**: Integrated focus-enabled scrolling for markdown content and semantic link parsing within the documentation.
+- **Static Help Page**: Dedicated help system with topic navigation and keybinding reference (Global vs. Contextual keys).
+- **Backend API Sync**: Synchronized Python backend (`VectorManager`) with TypeScript frontend types (id, role, score fields).
+
+### Changed
+- Refactored `index.tsx` to use a robust container-based layout with proportional sizing.
+- Renamed "Help" menu to "Wiki" and created a separate "Help" system for CLI usage.
+- Optimized `ScrollableSelection` to support 100% parent container filling.
+
+### Fixed
+- **Layout Stability**: Eliminated unpredictable shifting by using strict box dimensioning.
+- **Scrolling Sync**: Fixed issues where focused items didn't automatically scroll into view within lists.
+- **Focus Collisions**: Improved `useScopedInput` to handle complex nested focus scenarios (e.g., inside ScrollViews).
+
 ## [0.9.8] - 2026-02-08
 ### Added
 - **React-powered TUI**: Complete migration from Python Textual to a Node.js/React (Ink) stack for superior layout stability and developer experience.
