@@ -1,9 +1,26 @@
 Screen {
     background: #1a1b26;
+    layout: vertical;
+}
+
+#header {
+    height: 3;
+    background: #24283b;
+}
+
+#footer {
+    height: 1;
+}
+
+#app-body {
+    height: 1fr;
+    width: 100%;
+    layout: horizontal;
 }
 
 #sidebar {
-    width: 25;
+    width: 30;
+    height: 100%;
     background: #24283b;
     border-right: tall #414868;
     padding: 1;
@@ -11,45 +28,57 @@ Screen {
 
 #main-content {
     width: 1fr;
-    padding: 1;
+    height: 100%;
+    layout: vertical;
 }
 
-#interface-area {
-    width: 60%;
+#view-title {
+    text-style: bold;
+    color: #7aa2f7;
     padding: 1;
+    height: 3;
+}
+
+#content-area {
+    height: 1fr;
+    width: 100%;
+    padding: 1;
+    border-top: solid #414868;
 }
 
 #log-area {
-    width: 40%;
-    padding: 1;
+    width: 60;
+    height: 100%;
+    background: #16161e;
     border-left: solid #414868;
-}
-
-#log-area:disabled {
-    opacity: 0.3;
-}
-
-.section-title {
-    text-style: bold;
-    color: #7aa2f7;
-    margin-bottom: 1;
 }
 
 #status-bar {
     height: 3;
     background: #24283b;
     border-top: tall #414868;
-    padding-left: 2;
-    padding-right: 2;
+    layout: horizontal;
+}
+
+#status-bar Label {
+    padding: 0 2;
+    margin-top: 1;
 }
 
 #log-view {
     height: 1fr;
-    border: solid #414868;
-    background: #16161e;
+    width: 100%;
 }
 
-#log-view:disabled {
-    background: #1a1b26;
-    border: solid #24283b;
+/* Settings Styles */
+#settings-list {
+    height: 1fr;
+    border: solid #414868;
+}
+
+SettingItem {
+    height: auto;
+    padding: 1;
+    border-bottom: solid #24283b;
+    layout: horizontal;
 }

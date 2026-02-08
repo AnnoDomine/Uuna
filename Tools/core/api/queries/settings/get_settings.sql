@@ -1,0 +1,1 @@
+SELECT "key", "value", "description" FROM registry.settings;

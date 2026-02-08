@@ -8,7 +8,7 @@ from .models.task_event import TaskEvent
 from .models.event_log import EventLog
 from .models.score_board import ScoreBoard
 from .models.build import Build
-from .routers import memory, tasks, scoreboard
+from .routers import memory, tasks, scoreboard, logs, settings
 
 app = FastAPI(title="Grand Library API")
 DB_PATH = 'Data/WoW_Master.duckdb'
@@ -21,6 +21,8 @@ logger.add(db_sink.write, level="INFO")
 app.include_router(memory.router)
 app.include_router(tasks.router)
 app.include_router(scoreboard.router)
+app.include_router(logs.router)
+app.include_router(settings.router)
 
 @app.on_event("startup")
 async def startup_event():

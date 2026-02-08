@@ -1,0 +1,1 @@
+UPDATE registry.settings SET "value" = ? WHERE "key" = ?;
