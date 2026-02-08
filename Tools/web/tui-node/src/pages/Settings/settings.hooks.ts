@@ -3,7 +3,7 @@ import { useInput } from "ink";
 import type { ControlledScrollViewRef } from "ink-scroll-view";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { API_BASE_URL } from "../../utils/constants/globals.js";
 import type { ISetting, ISettingsResponse } from "./settings.types.js";
@@ -56,7 +56,10 @@ const useSettings = () => {
             process: "useSettings",
         });
         try {
-            await axios.post(`${API_BASE_URL}/settings/update`, { key, value: newValue });
+            await axios.post(`${API_BASE_URL}/settings/update`, {
+                key,
+                value: newValue,
+            });
             updateSettings((draft) => {
                 const setting = draft.find((s) => s.key === key);
                 if (setting) {

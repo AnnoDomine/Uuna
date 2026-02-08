@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useImmer } from "use-immer";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import MemoryService from "../../utils/services/memory.service.js";
 import type { IMemoryResult } from "./memory.types.js";

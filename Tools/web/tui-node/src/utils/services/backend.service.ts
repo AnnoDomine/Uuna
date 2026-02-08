@@ -1,7 +1,7 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
 import axios from "axios";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { API_BASE_URL } from "../constants/globals.js";
 
@@ -29,7 +29,9 @@ class BackendService {
                 message: "Performing backend health check",
                 process: "BackendService",
             });
-            const response = await axios.get(`${API_BASE_URL}/health`, { timeout: 1000 });
+            const response = await axios.get(`${API_BASE_URL}/health`, {
+                timeout: 1000,
+            });
             const isAlive = response.status === 200;
             if (isAlive) {
                 addLog({
@@ -112,7 +114,11 @@ class BackendService {
                 this.process.kill("SIGTERM");
             }
             this.process = null;
-            addLog({ type: ELogTypes.INFO, message: "Backend stopped", process: "BackendService" });
+            addLog({
+                type: ELogTypes.INFO,
+                message: "Backend stopped",
+                process: "BackendService",
+            });
         }
     }
 

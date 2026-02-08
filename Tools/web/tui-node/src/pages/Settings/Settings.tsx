@@ -5,15 +5,12 @@ import useBackend from "../../hooks/useBackend.js";
 import { useScopedInput } from "../../hooks/useScopedInput.js";
 import SettingsListItem from "../../molecules/SettingsListItem/SettingsListItem.js";
 import ScrollArea from "../../organisms/ScrollArea/ScrollArea.js";
-import useDebugStore from "../../store/useDebbugStore.js";
 import { EFocusAreal } from "../../store/useFocusStore.js";
 import { useStore } from "../../store/useStore.js";
 import useSettings from "./settings.hooks.js";
 
 const Settings: FC = () => {
     const { settings, isLoading, error, handleUpdateSetting, fetchSettings } = useSettings();
-
-    const { enabled: isDebugEnabled, setEnabled: setDebugEnabled } = useDebugStore();
 
     const { restartBackend } = useBackend();
     const { isRestarting } = useStore();
@@ -40,17 +37,6 @@ const Settings: FC = () => {
         },
     });
 
-    // DEBUG TOGGLE: Scoped Focus + Return logic
-    const { isFocused: isDebugFocused } = useScopedInput({
-        id: "btn-enable-debug",
-        areal: EFocusAreal.CONTENT,
-        keyMap: (_input, key) => {
-            if (key.return) {
-                setDebugEnabled(!isDebugEnabled);
-            }
-        },
-    });
-
     return (
         <Box flexDirection="column" flexGrow={1} padding={1}>
             <Box marginBottom={1} justifyContent="space-between" width="100%">
@@ -69,12 +55,6 @@ const Settings: FC = () => {
                         onPress={fetchSettings}
                         color={isReloadFocused ? "white" : "yellow"}
                         isActive={isReloadFocused}
-                    />
-                    <Button
-                        label={isDebugEnabled ? "DISABLE DEBUG" : "ENABLE DEBUG"}
-                        onPress={() => setDebugEnabled(!isDebugEnabled)}
-                        color={isDebugFocused ? "white" : "yellow"}
-                        isActive={isDebugFocused}
                     />
                 </Box>
             </Box>

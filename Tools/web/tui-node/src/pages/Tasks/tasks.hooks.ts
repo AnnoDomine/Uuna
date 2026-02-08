@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useImmer } from "use-immer";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { REFRESH_INTERVAL } from "../../utils/constants/globals.js";
 import TaskService from "../../utils/services/task.service.js";
@@ -30,7 +30,11 @@ const useTasks = () => {
             });
         } catch (_err) {
             setError("Failed to sync tasks with central archive.");
-            addLog({ type: ELogTypes.ERROR, message: "Task sync failed", process: "useTasks" });
+            addLog({
+                type: ELogTypes.ERROR,
+                message: "Task sync failed",
+                process: "useTasks",
+            });
         } finally {
             setIsLoading(false);
         }

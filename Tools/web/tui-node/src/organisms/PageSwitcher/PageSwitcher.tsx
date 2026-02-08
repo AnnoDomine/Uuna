@@ -8,6 +8,7 @@ import Home from "../../pages/Home/Home.js";
 import Memory from "../../pages/Memory/Memory.js";
 import Settings from "../../pages/Settings/Settings.js";
 import Tasks from "../../pages/Tasks/Tasks.js";
+import WikiPage from "../../pages/Wiki/WikiPage.js";
 import { usePageSwitcher } from "./page_switcher.hooks.js";
 
 const PageSwitcher: FC = () => {
@@ -18,6 +19,8 @@ const PageSwitcher: FC = () => {
             return <Home />;
         case ENavigationItems.SETTINGS:
             return <Settings />;
+        case ENavigationItems.WIKI:
+            return <WikiPage />;
         case ENavigationItems.HELP:
             return <Help />;
         case ENavigationItems.TASKS:

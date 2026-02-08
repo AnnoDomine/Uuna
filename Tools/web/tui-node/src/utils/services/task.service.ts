@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { ITask, ITasksResponse } from "../../pages/Tasks/tasks.types.js";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { API_BASE_URL } from "../constants/globals.js";
 

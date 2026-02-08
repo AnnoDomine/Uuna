@@ -37,19 +37,21 @@ const Wiki: FC = () => {
 	}
 
 	return (
-		<Box flexDirection="row" flexGrow={1} height={100}>
-			<Box flexDirection="column" flexGrow={1} padding={1}>
+		<Box flexDirection="row" flexGrow={1} height="100%" width="100%">
+			<Box flexDirection="column" flexGrow={1}>
 				<Box marginBottom={1}>
 					<Text color="#7aa2f7" bold underline>
 						WIKI: {currentLink.toLocaleUpperCase()}
 					</Text>
 				</Box>
 				{/* Wrap Markdown in a focusable ScrollArea */}
-				<ScrollArea id="wiki-content-scroll">
-					<Box paddingX={1} flexDirection="column">
-						<Markdown>{currentPage}</Markdown>
-					</Box>
-				</ScrollArea>
+				<Box flexDirection="column" flexGrow={1} height="100%" width="100%">
+					<ScrollArea id="wiki-content-scroll">
+						<Box paddingX={1} flexDirection="column">
+							<Markdown>{currentPage}</Markdown>
+						</Box>
+					</ScrollArea>
+				</Box>
 			</Box>
 			<ScrollableSelection
 				items={linkMapping.map((item) => ({
@@ -61,7 +63,7 @@ const Wiki: FC = () => {
 				options={{
 					mark_first_item_after_select: true,
 					width: 30,
-					height: 30,
+					height: "100%",
 					areal: EFocusAreal.CONTENT,
 				}}
 			/>

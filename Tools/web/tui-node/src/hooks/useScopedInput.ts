@@ -1,6 +1,6 @@
 import { type Key, useFocus, useInput } from "ink";
 import { useEffect } from "react";
-import useDebugStore from "../store/useDebbugStore.js";
+import useDebugStore from "../store/useDebugStore.js";
 import { type EFocusAreal, useFocusStore } from "../store/useFocusStore.js";
 import { ELogTypes } from "../types/global.enums.js";
 import quitApplication from "../utils/helpers/quitApplication.js";
@@ -22,7 +22,7 @@ interface UseScopedInputOptions {
  */
 export const useScopedInput = ({ id, areal, keyMap, autoFocus = false }: UseScopedInputOptions) => {
     const { activeAreal, setActiveAreal } = useFocusStore();
-    const { addLog } = useDebugStore();
+    const { addLog, setEnabled, enabled } = useDebugStore();
 
     // 1. Manage Ink Focus
     const { isFocused } = useFocus({
@@ -52,6 +52,15 @@ export const useScopedInput = ({ id, areal, keyMap, autoFocus = false }: UseScop
                     process: "useScopedInput",
                 });
                 quitApplication();
+            }
+            if ((key.ctrl || key.meta) && input === "l") {
+                addLog({
+                    type: ELogTypes.DEBUG,
+                    message: `${enabled ? "Disabling" : "Enabling"} debug console`,
+                    process: "useScopedInput",
+                });
+                // Toggle debug console
+                setEnabled(!enabled);
             }
             if (keyMap) {
                 keyMap(input, key as Key);

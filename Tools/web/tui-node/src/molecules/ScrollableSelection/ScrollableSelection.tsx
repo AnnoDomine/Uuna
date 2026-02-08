@@ -17,8 +17,8 @@ type Overrides = Partial<{
 
 type Options = Partial<{
     mark_first_item_after_select: boolean;
-    width: number;
-    height: number;
+    width: number | string;
+    height: number | string;
     areal: EFocusAreal;
 }>;
 
@@ -57,8 +57,8 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
 }: Props<IM>) => {
     const usedOptions: Required<Options> = {
         mark_first_item_after_select: false,
-        width: 30,
-        height: 30,
+        width: "100%", // Default to full width of parent
+        height: "100%", // Default to full height of parent
         areal: EFocusAreal.CONTENT,
         ...options,
     };
@@ -66,29 +66,16 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
     const listRef = useRef<ScrollListRef>(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    // Use our enterprise scoped input hook
     const { isFocused } = useScopedInput({
         id,
         areal: usedOptions.areal,
         keyMap: (_input, key) => {
-            if (key.upArrow) {
-                setSelectedIndex((prev) => Math.max(prev - 1, 0));
-            }
-            if (key.downArrow) {
-                setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
-            }
-            if (key.pageUp) {
-                setSelectedIndex((prev) => Math.max(prev - 10, 0));
-            }
-            if (key.pageDown) {
-                setSelectedIndex((prev) => Math.min(prev + 10, items.length - 1));
-            }
-            if (key.home) {
-                setSelectedIndex(0);
-            }
-            if (key.end) {
-                setSelectedIndex(items.length - 1);
-            }
+            if (key.upArrow) setSelectedIndex((prev) => Math.max(prev - 1, 0));
+            if (key.downArrow) setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
+            if (key.pageUp) setSelectedIndex((prev) => Math.max(prev - 10, 0));
+            if (key.pageDown) setSelectedIndex((prev) => Math.min(prev + 10, items.length - 1));
+            if (key.home) setSelectedIndex(0);
+            if (key.end) setSelectedIndex(items.length - 1);
             if (key.return) {
                 if (items[selectedIndex]) {
                     onSelect(items[selectedIndex].id);
@@ -127,9 +114,7 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
                 default:
                     return value;
             }
-            if (parser) {
-                return parser(value);
-            }
+            if (parser) return parser(value);
             return value;
         },
         [parsers],
@@ -145,7 +130,7 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
             unselected_item_suffix: "",
             un_focused_color: "white",
             focused_color: "green",
-            ...overrides, // Override constants
+            ...overrides,
         }),
         [overrides],
     );
@@ -170,37 +155,27 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
             width={usedOptions.width}
             height={usedOptions.height}
         >
-            {
-                // If items are above view-point, show arrow above the list
-                selectedIndex > 0 ? <Text>----- ↑ -----</Text> : <Text>-------------</Text>
-            }
-            <Newline />
-            <ScrollList ref={listRef} selectedIndex={selectedIndex}>
-                {items.map((item, index) => (
-                    <Box key={item.id}>
-                        <Text
-                            color={
-                                index === selectedIndex
-                                    ? constants.selected_item_color
-                                    : constants.unselected_item_color
-                            }
-                        >
-                            {index === selectedIndex
-                                ? getItemValue(item, true)
-                                : getItemValue(item)}
-                        </Text>
-                    </Box>
-                ))}
-            </ScrollList>
-            <Newline />
-            {
-                // If items are below view-point, show arrow below the list
-                selectedIndex < items.length - 1 ? (
-                    <Text>----- ↓ -----</Text>
-                ) : (
-                    <Text>-------------</Text>
-                )
-            }
+            <Text>{selectedIndex > 0 ? "----- ↑ -----" : "-------------"}</Text>
+            <Box flexGrow={1} marginTop={0} marginBottom={0}>
+                <ScrollList ref={listRef} selectedIndex={selectedIndex}>
+                    {items.map((item, index) => (
+                        <Box key={item.id}>
+                            <Text
+                                color={
+                                    index === selectedIndex
+                                        ? constants.selected_item_color
+                                        : constants.unselected_item_color
+                                }
+                            >
+                                {index === selectedIndex
+                                    ? getItemValue(item, true)
+                                    : getItemValue(item)}
+                            </Text>
+                        </Box>
+                    ))}
+                </ScrollList>
+            </Box>
+            <Text>{selectedIndex < items.length - 1 ? "----- ↓ -----" : "-------------"}</Text>
         </Box>
     );
 };

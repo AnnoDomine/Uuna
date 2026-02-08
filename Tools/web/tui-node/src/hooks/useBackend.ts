@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import useDebugStore from "../store/useDebbugStore.js";
+import useDebugStore from "../store/useDebugStore.js";
 import { useStore } from "../store/useStore.js";
 import { ELogTypes } from "../types/global.enums.js";
 import { REFRESH_INTERVAL } from "../utils/constants/globals.js";

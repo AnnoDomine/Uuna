@@ -4,6 +4,7 @@ export enum ENavigationItems {
     MEMORY = "memory",
     SCORING = "scoring",
     SETTINGS = "settings",
+    WIKI = "wiki",
     HELP = "help",
     QUIT = "quit",
 }

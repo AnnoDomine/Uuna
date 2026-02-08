@@ -4,7 +4,7 @@ import type {
     IMemorySearchRequest,
     IMemorySearchResponse,
 } from "../../pages/Memory/memory.types.js";
-import useDebugStore from "../../store/useDebbugStore.js";
+import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { API_BASE_URL } from "../constants/globals.js";
 
