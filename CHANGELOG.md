@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.8] - 2026-02-08
+### Added
+- **React-powered TUI**: Complete migration from Python Textual to a Node.js/React (Ink) stack for superior layout stability and developer experience.
+- **Enterprise Architecture**: Implementation of a strict Atomic Design pattern (Atoms, Molecules, Organisms, Pages) with separated logic (hooks, types, constants).
+- **Global State Management**: Integration of **Zustand** for global app state and **Immer** for safe, immutable local state updates.
+- **TypeScript Integration**: 100% type-safety across the frontend with a strict prohibition of `@ts-ignore`.
+- **Scoped Focus & Input**: Developed a custom `useScopedInput` hook to eliminate keyboard collisions and manage area-specific interactions (Navigation vs. Content).
+- **Backend Lifecycle Orchestration**: Automated starting, stopping, and health-checking of the Python FastAPI backend directly from the TUI.
+- **Virtualized Scrolling**: Implemented robust `ScrollArea` and `ControlledScrollView` components for high-performance terminal scrolling.
+- **Local Patch System**: Established a `Patches/` directory for hosting and fixing unmaintained or CJS-based Ink addons (e.g., `ink-markdown`).
+- **Biome Tooling**: Integrated **Biome** for lightning-fast linting and formatting, replacing Prettier and ESLint.
+- **Markdown Wiki Support**: Integration of the project's internal wiki into the TUI with semantic link parsing and focused scrolling.
+
+### Changed
+- Refactored `StatusBar` into a dynamic, data-driven organism.
+- Migrated `Settings` and `Tasks` monitoring to the new React-based architecture.
+- Optimized backend communication using typised Axios services.
+
+### Fixed
+- **Input Collisions**: Resolved issues where multiple UI components reacted to the same key presses.
+- **Layout Corruption**: Fixed terminal rendering issues by moving to a Flexbox-based layout engine (Yoga).
+- **Memory Leaks**: Resolved `MaxListenersExceededWarning` by optimizing input listener registration.
+
 ## [0.6.0] - 2026-01-25
 ### Added
 - **FastAPI + HTMX GUI**: Migrated the web interface from Flask to FastAPI for better performance and async support.
