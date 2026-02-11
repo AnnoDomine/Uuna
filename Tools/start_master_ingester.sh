@@ -1,18 +1,21 @@
 #!/bin/bash
 # start_master_ingester.sh
-# Startet den Batch-Lauf für eine definierte Anzahl an Builds
+# Startet den Batch-Lauf robust im Hintergrund
 
 PYTHON=".venv/bin/python3"
 SCRIPT="Tools/ingestion/master_ingester.py"
 LOG="Data/logs/master_ingester.log"
 LIMIT=${1:-100}
+WORKERS=${2:-4}
 
-# Kill existing
+mkdir -p Data/logs
 pkill -9 -f master_ingester.py
 sleep 1
 
-echo "--- New Master Ingestion Batch Started: $(date) (Limit: $LIMIT) ---" >> "$LOG"
-nohup env MAX_BUILDS=$LIMIT $PYTHON -u "$SCRIPT" >> "$LOG" 2>&1 &
+echo "--- Master Ingestion Batch Robust Start: $(date) (Limit: $LIMIT, Workers: $WORKERS) ---" >> "$LOG"
 
-PID=$!
-echo "Master Ingester gestartet mit PID: $PID (Limit: $LIMIT)"
+# Wir übergeben MAX_BUILDS, MAX_WORKERS und PYTHONPATH via env im Popen call
+$PYTHON -c "import subprocess, os; env = os.environ.copy(); env['MAX_BUILDS'] = '$LIMIT'; env['MAX_WORKERS'] = '$WORKERS'; env['PYTHONPATH'] = os.getcwd(); subprocess.Popen(['$PYTHON', '-u', '$SCRIPT'], stdout=open('$LOG', 'a'), stderr=subprocess.STDOUT, start_new_session=True, env=env)"
+
+echo "Master Ingester gestartet (Limit: $LIMIT, Workers: $WORKERS)."
+echo "Log: $LOG"

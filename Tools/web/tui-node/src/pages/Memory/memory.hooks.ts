@@ -13,9 +13,23 @@ const useMemory = () => {
     const { addLog } = useDebugStore();
 
     const handleSearch = useCallback(async () => {
-        if (!query.trim()) return;
+        if (!query.trim()) {
+            addLog({
+                type: ELogTypes.WARN,
+                message: "Empty search query ignored",
+                process: "useMemory",
+            });
+            return;
+        }
 
         setIsLoading(true);
+        updateResults(() => []); // Clear previous results
+        addLog({
+            type: ELogTypes.INFO,
+            message: `Searching memory for "${query}" as role ${role}`,
+            process: "useMemory",
+        });
+
         try {
             const data = await MemoryService.search({
                 query,

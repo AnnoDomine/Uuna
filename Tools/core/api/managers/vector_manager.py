@@ -66,7 +66,7 @@ class VectorManager:
                 conn.execute("INSTALL vss; LOAD vss;")
                 # Using cosine distance for similarity
                 sql = """
-                    SELECT content, metadata, array_cosine_similarity(embedding, ?::FLOAT[4096]) as score
+                    SELECT id, role, content, metadata, array_cosine_similarity(embedding, ?::FLOAT[4096]) as score
                     FROM memory
                     WHERE role = ?
                     ORDER BY score DESC
@@ -77,9 +77,11 @@ class VectorManager:
                 results = []
                 for row in res:
                     results.append({
-                        "content": row[0],
-                        "metadata": json.loads(row[1]),
-                        "score": row[2]
+                        "id": row[0],
+                        "role": row[1],
+                        "content": row[2],
+                        "metadata": json.loads(row[3]),
+                        "score": row[4]
                     })
                 return results
         except Exception as e:

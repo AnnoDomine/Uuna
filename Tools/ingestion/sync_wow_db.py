@@ -1,221 +1,65 @@
 import os
-import sqlite3
-import pandas as pd
-import requests
-import time
-import re
-import json
+import sys
+import duckdb
+import subprocess
+from loguru import logger
 
-CSV_DIR = 'Data/DB2_CSV'
-LOG_FILE = 'Data/logs/import_errors.log'
+# Import functions from master_ingester if needed or re-implement cleanly
+# Since we want a robust standalone script, we'll make it a clean wrapper
 
-def init_db(version):
-    db_path = f'Data/dbs/WoW_Data_{version}.db'
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # Create builds table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS builds (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            version TEXT UNIQUE,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    return conn
+MASTER_DB = 'Data/WoW_Master.duckdb'
+LOG_FORMAT = "[{time:YYYY-MM-DD HH:mm:ss} - {level} - SyncWowDB]: {message}"
 
-def get_or_create_build_id(conn, version):
-    cursor = conn.cursor()
-    cursor.execute('INSERT OR IGNORE INTO builds (version) VALUES (?)', (version,))
-    conn.commit()
-    cursor.execute('SELECT id FROM builds WHERE version = ?', (version,))
-    return cursor.fetchone()[0]
+logger.remove()
+logger.add(sys.stderr, format=LOG_FORMAT, level="INFO")
+logger.add("Data/logs/sync_wow_db.log", format=LOG_FORMAT, rotation="10 MB")
 
-def log_error(table_name, version, error):
-    os.makedirs('Data/logs', exist_ok=True)
-    with open(LOG_FILE, 'a') as f:
-        f.write(f"[{time.ctime()}] Table: {table_name}, Build: {version}, Error: {str(error)}\n")
-
-def fetch_available_builds():
-    """Fetches the list of available builds from Wago.tools."""
+def sync_build(version):
+    """
+    Triggers the ingestion for a specific build using the master_ingester logic.
+    """
+    logger.info(f"Starting sync for build: {version}")
+    
+    # We use the master_ingester as the engine
     try:
-        r = requests.get('https://wago.tools/db2', timeout=10)
-        r.raise_for_status()
-        match = re.search(r'data-page="([^"]+)"', r.text)
-        if match:
-            page_json_str = match.group(1).replace('&quot;', '"').replace('&amp;', '&')
-            page_data = json.loads(page_json_str)
-            builds = page_data.get('props', {}).get('builds', [])
-            return builds # List of build strings
+        # We set an environment variable to tell master_ingester to maybe only do one build,
+        # but the master_ingester logic currently pulls all pending.
+        # To be precise, we call feature_extractor and process_table_master via subprocess or import.
+        
+        # Best approach: Use the existing master_ingester script but maybe pass the version
+        # Since master_ingester.py doesn't take a version arg yet, we trigger it normally 
+        # or we update the builds table first so ONLY this version is 'pending'.
+        
+        con = duckdb.connect(MASTER_DB)
+        # Check if build exists
+        exists = con.execute("SELECT id FROM registry.builds WHERE version = ?", (version,)).fetchone()
+        if not exists:
+            logger.info(f"Build {version} not in registry. Adding it...")
+            con.execute("INSERT INTO registry.builds (version, product, is_downloaded) VALUES (?, 'wow', False)", (version,))
+        
+        con.close()
+
+        # Run master ingester with MAX_BUILDS=1 could work, but it might pick the wrong one.
+        # So we just run it. It will process all pending builds including the requested one.
+        logger.info("Executing Master Ingester...")
+        env = os.environ.copy()
+        # We could implement a specific filter in master_ingester, but for now we just run it.
+        result = subprocess.run([".venv/bin/python3", "Tools/ingestion/master_ingester.py"], capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            logger.success(f"Sync process finished for {version}")
+            if result.stdout:
+                logger.debug(f"Output: {result.stdout[-500:]}")
+        else:
+            logger.error(f"Ingester failed: {result.stderr}")
+
     except Exception as e:
-        print(f"Error fetching builds: {e}")
-    return []
-
-import os
-import sqlite3
-import pandas as pd
-import requests
-import time
-import re
-import json
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from project_init import init_all
-
-# Ensure environment is ready
-init_all()
-
-CSV_DIR = 'Data/DB2_CSV'
-LOG_FILE = 'Data/logs/import_errors.log'
-SETTINGS_DB = 'Data/dbs/Settings.db'
-
-def get_setting(key, default):
-    try:
-        conn = sqlite3.connect(SETTINGS_DB)
-        cursor = conn.cursor()
-        cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
-        row = cursor.fetchone()
-        conn.close()
-        return row[0] if row else default
-    except:
-        return default
-
-def init_db(version):
-    db_path = f'Data/dbs/WoW_Data_{version}.db'
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # Performance tuning for SQLite
-    cursor.execute('PRAGMA journal_mode=WAL')
-    cursor.execute('PRAGMA synchronous=NORMAL')
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS builds (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            version TEXT UNIQUE,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    return conn
-
-def get_or_create_build_id(conn, version):
-    cursor = conn.cursor()
-    cursor.execute('INSERT OR IGNORE INTO builds (version) VALUES (?)', (version,))
-    conn.commit()
-    cursor.execute('SELECT id FROM builds WHERE version = ?', (version,))
-    return cursor.fetchone()[0]
-
-def log_error(table_name, version, error):
-    os.makedirs('Data/logs', exist_ok=True)
-    with open(LOG_FILE, 'a') as f:
-        f.write(f"[{time.ctime()}] Table: {table_name}, Build: {version}, Error: {str(error)}\n")
-
-def process_table(table, version, build_id, db_path):
-    csv_path = os.path.join(CSV_DIR, f"{table}_{version}.csv")
-    url = f"https://wago.tools/db2/{table}/csv?build={version}"
-    
-    try:
-        # 1. Download
-        r = requests.get(url, timeout=60)
-        if r.status_code != 200:
-            raise Exception(f"HTTP {r.status_code}")
-        
-        if len(r.content) < 10:
-            return f"SKIP: {table} (empty)"
-
-        with open(csv_path, 'wb') as f:
-            f.write(r.content)
-        
-        # 2. Parse
-        with open(csv_path, 'r', encoding='utf-8', errors='ignore') as f:
-            first_line = f.readline()
-            sep = ';' if ';' in first_line and first_line.count(';') > first_line.count(',') else ','
-        
-        try:
-            df = pd.read_csv(csv_path, low_memory=False, sep=sep)
-        except:
-            df = pd.read_csv(csv_path, low_memory=False, sep=sep, engine='python', on_bad_lines='skip')
-
-        df.columns = [c.replace('"', '').replace("'", "").strip() for c in df.columns]
-        if df.empty:
-            os.remove(csv_path)
-            return f"SKIP: {table} (empty df)"
-
-        df['build_id'] = build_id
-        
-        # 3. Import into SQLite (one connection per thread is safer)
-        conn = sqlite3.connect(db_path)
-        df.to_sql(table, conn, if_exists='replace', index=False)
-        conn.close()
-        
-        if os.path.exists(csv_path):
-            os.remove(csv_path)
-        return f"OK: {table}"
-        
-    except Exception as e:
-        log_error(table, version, e)
-        if os.path.exists(csv_path):
-            os.remove(csv_path)
-        return f"ERROR: {table} - {e}"
-
-def fetch_and_import(version, tables=None, progress_callback=None):
-    db_path = f'Data/dbs/WoW_Data_{version}.db'
-    conn = init_db(version)
-    build_id = get_or_create_build_id(conn, version)
-    conn.close() # Close main connection for parallel processing
-    
-    if not tables:
-        print(f"Fetching table list for build {version}...")
-        try:
-            api_url = f"https://wago.tools/api/db2?build={version}"
-            r_api = requests.get(api_url, timeout=30)
-            if r_api.status_code == 200:
-                tables = r_api.json()
-            else:
-                r_html = requests.get(f'https://wago.tools/db2?build={version}')
-                r_html.raise_for_status()
-                match = re.search(r'data-page="([^"]+)"', r_html.text)
-                page_json_str = match.group(1).replace('&quot;', '"').replace('&amp;', '&')
-                page_data = json.loads(page_json_str)
-                tables_dict = page_data.get('props', {}).get('tables', {})
-                tables = list(tables_dict.values())
-        except Exception as e:
-            print(f"Error fetching table list: {e}")
-            return
-
-    num_workers = int(get_setting('workers', 1))
-    print(f"Starting parallel sync with {num_workers} workers...")
-    
-    os.makedirs(CSV_DIR, exist_ok=True)
-    
-    total = len(tables)
-    completed = 0
-    
-    with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        futures = {executor.submit(process_table, table, version, build_id, db_path): table for table in tables}
-        
-        for future in as_completed(futures):
-            completed += 1
-            result = future.result()
-            msg = f"[{completed}/{total}] {result}"
-            print(msg, end='\r')
-            if progress_callback: progress_callback(msg)
-
-    finish_msg = f"\nSync for build {version} completed."
-    print(finish_msg)
-    
-    # Update Registry with sync status
-    try:
-        reg_conn = sqlite3.connect('Data/dbs/Build_Registry.db')
-        reg_cursor = reg_conn.cursor()
-        reg_cursor.execute("UPDATE builds SET is_downloaded = 1, last_synced = CURRENT_TIMESTAMP WHERE version = ?", (version,))
-        reg_conn.commit()
-        reg_conn.close()
-    except: pass
-
-    if progress_callback: progress_callback(finish_msg)
+        logger.error(f"Error during sync: {e}")
 
 if __name__ == "__main__":
-    import sys, json, re
-    ver = sys.argv[1] if len(sys.argv) > 1 else "12.0.0.65560"
-    # If you want to test specific tables only:
-    # fetch_and_import(ver, ["QuestV2", "SpellName"])
-    fetch_and_import(ver)
+    if len(sys.argv) > 1:
+        ver = sys.argv[1]
+        sync_build(ver)
+    else:
+        logger.warning("No version specified. Running master ingester for all pending builds.")
+        subprocess.run([".venv/bin/python3", "Tools/ingestion/master_ingester.py"])

@@ -1,2 +1,2 @@
 CREATE TABLE IF NOT EXISTS archive."{table}" AS 
-SELECT *, ''::VARCHAR as _row_hash FROM temp_load WHERE 1=0;
+SELECT *, ''::VARCHAR as _row_hash FROM {temp_table} WHERE 1=0;

@@ -1,4 +1,3 @@
-import { Text } from "ink";
 import type { FC } from "react";
 import { ENavigationItems } from "../../molecules/Navigation/navigation.enums.js";
 import Help from "../../pages/Help/Help.js";
@@ -6,6 +5,7 @@ import Help from "../../pages/Help/Help.js";
 // Page Imports
 import Home from "../../pages/Home/Home.js";
 import Memory from "../../pages/Memory/Memory.js";
+import Scoring from "../../pages/Scoring/Scoring.js";
 import Settings from "../../pages/Settings/Settings.js";
 import Tasks from "../../pages/Tasks/Tasks.js";
 import WikiPage from "../../pages/Wiki/WikiPage.js";
@@ -28,7 +28,7 @@ const PageSwitcher: FC = () => {
         case ENavigationItems.MEMORY:
             return <Memory />;
         case ENavigationItems.SCORING:
-            return <Text>Scoring Board Page [Placeholder]</Text>;
+            return <Scoring />;
         default:
             return <Home />;
     }

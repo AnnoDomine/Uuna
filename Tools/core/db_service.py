@@ -39,9 +39,13 @@ async def run_query(req: QueryRequest):
     if con is None:
         return JSONResponse(status_code=503, content={"detail": "Database not initialized"})
     try:
-        res = con.execute(req.sql, req.params).fetchall()
-        return {"results": res}
+        cursor = con.cursor()
+        cursor.execute(req.sql, req.params)
+        cols = [desc[0] for desc in cursor.description] if cursor.description else []
+        res = cursor.fetchall()
+        return {"columns": cols, "results": res}
     except Exception as e:
+        traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
 @app.post("/execute")
@@ -50,11 +54,13 @@ async def run_execute(req: QueryRequest):
     if con is None:
         return JSONResponse(status_code=503, content={"detail": "Database not initialized"})
     try:
-        con.execute(req.sql, req.params)
+        cursor = con.cursor()
+        cursor.execute(req.sql, req.params)
         return {"status": "success"}
     except Exception as e:
+        traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
 if __name__ == "__main__":
-    # Use string import for better stability
-    uvicorn.run("db_service:app", host="127.0.0.1", port=8002, log_level="debug", reload=False)
+    # Use the app object directly to avoid module resolution issues
+    uvicorn.run(app, host="127.0.0.1", port=8002, log_level="debug")

@@ -2,7 +2,7 @@ export interface IMemoryResult {
     id: string;
     content: string;
     role: string;
-    similarity: number;
+    score: number; // Corrected field name from similarity to score
     metadata: Record<string, any>;
 }
 

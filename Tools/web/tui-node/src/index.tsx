@@ -22,20 +22,26 @@ const App: React.FC = () => {
 
 	return (
 		<Box flexDirection="column" width={width} height={height}>
-			<Header
-				title={APP_NAME}
-				subtitle="Multi-Agent Orchestration & Vector Memory"
-			/>
+			<Box height={4} width="100%">
+				<Header
+					title={APP_NAME}
+					subtitle="Multi-Agent Orchestration & Vector Memory"
+				/>
+			</Box>
 
-			<Box flexDirection="row" flexGrow={1}>
+			<Box flexDirection="row" flexGrow={1} width="100%" height="100%">
 				{/* Sidebar: Statische Breite */}
-				<Navigation />
+				<Box width={30} height="100%">
+					<Navigation />
+				</Box>
 
 				{/* Page Content: Dynamisch (nimmt den Rest) */}
 				<Box
 					flexDirection="column"
 					paddingX={2}
 					flexGrow={1}
+					height="100%"
+					width="100%"
 					borderStyle="single"
 					borderColor="#414868"
 				>
@@ -58,7 +64,9 @@ const App: React.FC = () => {
 				)}
 			</Box>
 
-			<StatusBar />
+			<Box height={3} width="100%">
+				<StatusBar />
+			</Box>
 		</Box>
 	);
 };

@@ -44,11 +44,13 @@ def update_registry(builds_dict=None):
                         INSERT INTO registry.builds (id, version, product, last_seen) 
                         VALUES (?, ?, ?, CURRENT_TIMESTAMP)
                         ON CONFLICT (version) DO UPDATE SET 
-                            last_seen = CURRENT_TIMESTAMP,
+                            last_seen = excluded.last_seen,
                             product = excluded.product
                     ''', (build_num, ver_str, product_name))
                     count += 1
-                except: continue
+                except Exception as e:
+                    log.error(f"Error processing {ver_str}: {e}")
+                    continue
     
     con.commit()
     log.success(f"Registry updated: {count} entries processed in Master DB.")

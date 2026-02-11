@@ -1,10 +1,10 @@
-import duckdb
 import os
 import time
 import sys
 import json
 import traceback
 from loguru import logger
+from Tools.core.db_client import DBClient
 
 MASTER_DB = 'Data/WoW_Master.duckdb'
 QUERIES_DIR = 'Tools/analysis/queries/feature_extractor'
@@ -16,7 +16,7 @@ logger.add(sys.stderr, format=LOG_FORMAT, level="INFO")
 logger.add("Data/logs/migration.log", format=LOG_FORMAT, rotation="10 MB", level="DEBUG")
 
 def get_con():
-    return duckdb.connect(MASTER_DB)
+    return DBClient()
 
 def load_query(name):
     path = os.path.join(QUERIES_DIR, f"{name}.sql")
