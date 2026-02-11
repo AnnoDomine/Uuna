@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.10] - 2026-02-11
+### Added
+- **API-First Database Architecture**: Introduced `db_service.py` as a centralized FastAPI gateway for all database operations, eliminating file-locking issues.
+- **Unified DB Client**: New `DBClient` class in `Tools/core/db_client.py` providing a standardized interface for Python tools (Ingester, Indexer) to communicate via API.
+- **Multi-Worker Ingestion Engine**: Refactored `master_ingester.py` to support parallel table ingestion with configurable `MAX_WORKERS`.
+- **Race-Condition Protection**: Implemented unique temporary table naming (`tmp_table_build_version`) and case-insensitive schema evolution checks.
+- **Robust CSV Parsing**: Enhanced `read_csv_auto` calls with `ignore_errors=True` and `null_padding=True` to handle malformed data from remote sources.
+- **Process Management 2.0**: Updated background start scripts (`start_db_service.sh`, `start_master_ingester.sh`) using `start_new_session=True` for terminal-independent execution.
+
+### Changed
+- Migrated `feature_extractor.py` and `master_ingester.py` from direct DuckDB connections to `DBClient` API access.
+- Optimized `PYTHONPATH` handling in start scripts to ensure proper module resolution for the `Tools` package.
+
+### Fixed
+- **Schema Evolution Crashes**: Fixed `CatalogError` caused by case-sensitive column name mismatches (e.g., `CornerStonePosition_0` vs `CornerstonePosition_0`).
+- **Logger Syntax**: Corrected `base_logger.log` calls to `base_logger.info` in the ingestion pipeline.
+- **API Stability**: Improved error handling in `db_service.py` with explicit traceback printing for `/execute` endpoint.
+
 ## [0.9.9] - 2026-02-08
 ### Added
 - **Full-Screen Dynamic Layout**: Implemented `useTerminalDimensions` hook to automatically adapt the TUI to any terminal window size in real-time.
