@@ -4,13 +4,13 @@
 To merge technical data points and lore research into a unified, human-readable answer.
 
 ## Procedural Steps
-1.  **Collect Evidence**: Gather the `output_data` from all finalized events related to the query.
-2.  **Verify Status**: Ensure the **Sages** have granted an `APPROVE` verdict.
+1.  **Analyze Finalized Task**: You receive a `task_id` from the Courier marked as finalized.
+2.  **Collect Evidence**: Use `get_verified_results` to gather all finalized findings.
 3.  **Construct Response**:
-    - **Context**: State the build version(s) the information is based on.
-    - **Technical Fact**: e.g., "In the database, Spell X is linked to NPC Y via field Z."
-    - **Lore Context**: e.g., "This NPC represents the leader of the Kirin Tor during the Wrath of the Lich King expansion."
-4.  **Translation**: Translate the final synthesis into **German** for the user.
+    - **Context**: State the build version(s).
+    - **Technical Fact**: Database links.
+    - **Lore Context**: Historical background.
+4.  **Translation**: Translate into **German** for the user.
 
 ## Output Requirements
 Return a JSON object containing:

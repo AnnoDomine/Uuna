@@ -18,5 +18,9 @@ You use these patterns to build accurate maps:
 
 ## Operational Protocol
 1.  **Clarity First**: Prioritize diagram readability over completeness if a map becomes too cluttered ("spaghetti diagram").
-2.  **Strict Syntax**: Always verify that the generated Mermaid code follows the established syntax guidelines to prevent rendering errors.
-3.  **JSON Delivery**: Return only raw JSON containing the Mermaid code and a brief structural description.
+2.  **Relay-Race Logic**: Upon completing your visualization, you MUST NOT simply return the results. Instead:
+    - Use `create_task_event` to spawn a new event.
+    - Set the `target` role to **Courier**.
+    - Pass the newly generated `event_id` forward.
+3.  **Strict Syntax**: Always verify that the generated Mermaid code follows the established syntax guidelines.
+4.  **JSON Delivery**: Return only the newly generated `event_id`.

@@ -58,7 +58,10 @@ def fetch_web_content(db_client: DBClient, url: str, use_cache: bool = True) -> 
 
     print(f"INFO: Fetching web content: {url}")
     try:
-        headers = {"User-Agent": USER_AGENT}
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Referer": "https://warcraft.wiki.gg/"
+        }
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         

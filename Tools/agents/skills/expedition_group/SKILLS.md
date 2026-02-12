@@ -19,5 +19,8 @@ You identify and interpret patterns in external data:
 
 ## Operational Protocol
 1.  **Source Verification**: Prefer the official Warcraft Wiki over general search results.
-2.  **Strict Sanitization**: Never pass raw HTML back to the system; always use the `sanitize_html` utility via `fetch_web_content`.
+2.  **Relay-Race Logic**: Upon completing your research, you MUST NOT simply return the results. Instead:
+    - Use `create_task_event` to spawn a new event.
+    - Set the `target` role to **Sentinel**.
+    - Pass the newly generated `event_id` forward.
 3.  **Fact Tagging**: Always include the source URL for every lore claim made.

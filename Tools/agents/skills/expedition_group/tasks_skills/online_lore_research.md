@@ -4,21 +4,17 @@
 To find and extract relevant historical and gameplay context for specific WoW entities (NPCs, Spells, Quests, Items) from trusted external wikis.
 
 ## Procedural Steps
-1.  **Search Strategy**: Use the `search_wow_wiki` tool with specific keywords (e.g., "Quest: The Missing Diplomat" instead of just "The Missing Diplomat").
-2.  **Content Retrieval**: Fetch the top 1-2 search results using the `fetch_web_content` tool.
-3.  **Entity Identification**: Scan the retrieved text for key entities:
-    - Primary NPC/Actor
-    - Location/Zone
-    - Faction requirement
-    - Expansion of introduction
-4.  **Verification**: If the data contradicts the Archivist's findings (e.g., wiki says Quest is in Northrend, but Archivist found it in a Vanilla build), flag the conflict for the **Sages**.
-
-## Constraints
-- **Sanitization**: Only use text that has been passed through the project's HTML sanitizer.
-- **Source Link**: Every finding must be attributed to a specific URL.
+1.  **Analyze Assignment**: Use `get_event_data` to understand the research objective assigned by the Courier.
+2.  **Search Strategy**: Use the `search_wow_wiki` tool with specific keywords (e.g., "Quest: The Missing Diplomat").
+3.  **Content Retrieval**: Fetch the top 1-2 search results using the `fetch_web_content` tool.
+4.  **Relay to Sentinel**: 
+    - Compile findings into a structured dictionary.
+    - Call `create_task_event` with `target="Sentinel"` and the findings as `input_data`.
+    - Provide the newly created `event_id` as your final output to the system.
 
 ## Output Requirements
 Return a JSON object containing:
-- `lore_facts`: List of confirmed context points.
-- `source_urls`: List of URLs used.
-- `confidence`: Confidence based on the clarity of the source.
+- `event_id`: The ID of the event you created for the Sentinel.
+- `target`: "Sentinel"
+- `summary`: Short text of what was found.
+- `confidence`: Numeric value.
