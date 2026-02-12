@@ -1,5 +1,11 @@
 import unittest
-from online_researcher import sanitize_html
+import sys
+import os
+
+# Add Tools to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from toolsets.tools.research.fetch_web_content import sanitize_html
 
 class TestSanitization(unittest.TestCase):
     def test_script_removal(self):

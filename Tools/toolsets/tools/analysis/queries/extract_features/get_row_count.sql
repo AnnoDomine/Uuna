@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM archive.build_data_map WHERE build_id = ? AND table_name = ?;

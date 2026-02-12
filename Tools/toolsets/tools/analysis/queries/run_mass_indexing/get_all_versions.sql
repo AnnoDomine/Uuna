@@ -1,0 +1,1 @@
+SELECT version FROM registry.builds ORDER BY id ASC;

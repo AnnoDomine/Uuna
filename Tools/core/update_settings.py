@@ -1,18 +1,28 @@
-import sqlite3
 import sys
 import os
+import requests
 
-SETTINGS_DB = 'Data/dbs/Settings.db'
+# Ensure path resolution for core modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from core.db_client import DBClient
+
+DB_SERVICE_URL = "http://127.0.0.1:8002"
 
 def set_setting(key, value):
-    os.makedirs(os.path.dirname(SETTINGS_DB), exist_ok=True)
-    conn = sqlite3.connect(SETTINGS_DB)
-    cursor = conn.cursor()
-    cursor.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)')
-    cursor.execute('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', (key, str(value)))
-    conn.commit()
-    conn.close()
-    print(f"Setting '{key}' updated to '{value}'.")
+    db_client = DBClient(url=DB_SERVICE_URL)
+    
+    # Update DuckDB registry.settings
+    # Using UPSERT pattern for DuckDB
+    sql = """
+    INSERT INTO registry.settings (key, value) 
+    VALUES (?, ?) 
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+    """
+    try:
+        db_client.execute(sql, [key, str(value)])
+        print(f"Setting '{key}' updated to '{value}' in DuckDB registry.")
+    except Exception as e:
+        print(f"Error updating setting in DuckDB: {e}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
