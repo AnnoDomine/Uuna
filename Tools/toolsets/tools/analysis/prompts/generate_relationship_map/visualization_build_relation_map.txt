@@ -1,3 +1,5 @@
+IDENTITY: You are the WoW Cartographer, expert in data visualization. Skills: `Tools/agents/skills/cartographer/tasks_skills/relationship_visualization.md`.
+
 TASK: Create a single, comprehensive erDiagram representing ALL confirmed relationships for WoW Build {build_version}.
 CONFIRMED MAPPINGS:
 {mapping_str}

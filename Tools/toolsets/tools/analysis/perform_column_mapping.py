@@ -20,17 +20,11 @@ def _load_query(name: str) -> str:
     with open(QUERY_DIR / f"{name}.sql", 'r') as f:
         return f.read().strip()
 
-def _load_prompt(role: str, name: str) -> str:
-    # Try tool-specific prompt first
-    local_path = PROMPT_DIR / f"{name}.txt"
-    if local_path.exists():
-        with open(local_path, 'r') as f:
-            return f.read().strip()
-            
-    # Fallback to legacy
-    legacy_path = Path("Tools/agents/prompts") / role / f"{name}.txt"
-    if legacy_path.exists():
-        with open(legacy_path, 'r') as f:
+def _load_prompt(name: str) -> str:
+    """Loads a prompt template from the tool's local prompt directory."""
+    path = PROMPT_DIR / f"{name}.txt"
+    if path.exists():
+        with open(path, 'r') as f:
             return f.read().strip()
     return ""
 
@@ -54,7 +48,7 @@ def perform_column_mapping(
     **kwargs
 ) -> Dict[str, Any]:
     """
-    Workflow to map a column to a target table using Data Engineer and Senior Critic.
+    Workflow to map a column to a target table using the Archivist and Sages.
     """
     f_id, table, col, d_type, v_min, v_max = col_info
     ai_full_response = discovery_result.get("ai_full_response", {})
@@ -71,7 +65,7 @@ def perform_column_mapping(
     if not should_map:
         return {"status": "skipped", "reason": "Not a candidate for mapping"}
 
-    # 2. Data Engineer: Propose Mapping
+    # 2. Archivist: Propose Mapping
     all_tables_res = db_client.execute(_load_query("get_available_tables"))
     all_tables = [r[0] for r in all_tables_res.fetchall()]
     
@@ -81,30 +75,28 @@ def perform_column_mapping(
     memory_section = context.get("memory_section", "")
     online_info = context.get("online_info", "")
 
-    engineer_template = _load_prompt("engineer", "mapping_references_between_tables_and_columns")
-    identity_eng = "IDENTITY: You are the WoW Data Engineer, expert in relational database structures. Role details: `docs/wiki/roles/DataEngineer.md`.\n\n"
-    p_map = identity_eng + engineer_template.format(
+    archivist_template = _load_prompt("mapping_references_between_tables_and_columns")
+    p_map = archivist_template.format(
         table=table, col=col, samples=samples, preds=preds,
         memory_section=memory_section, online_info=online_info,
         all_tables=all_tables[:100]
     )
     
-    prop = ask_ai_func("WoW Data Engineer", p_map, build_version, kwargs.get('run_info', 'N/A'), "Mapping")
+    prop = ask_ai_func("WoW Lore Archivist", p_map, build_version, kwargs.get('run_info', 'N/A'), "Mapping")
     target = _clean_target(prop.get("target", "NONE"), all_tables=all_tables)
     
     if target == "NONE":
-        return {"status": "skipped", "reason": "No target proposed by Engineer"}
+        return {"status": "skipped", "reason": "No target proposed by Archivist"}
 
     # 3. ID Check: Empirical Proof
     match_count = check_ids(db_client, target, samples)
     proof = f"ID Check: {match_count} of {len(samples)} samples found in target '{target}'."
 
-    # 4. Senior Critic: Verify
-    critic_template = _load_prompt("critic", "verification_mapping_integrity_and_id_checks")
-    identity_crit = "IDENTITY: You are the Senior Critic, quality controller for WoW data mappings. Role details: `docs/wiki/roles/SeniorCritic.md`.\n\n"
-    p_crit = identity_crit + critic_template.format(table=table, col=col, target=target, proof=proof)
+    # 4. Sages: Verify
+    sages_template = _load_prompt("verification_mapping_integrity_and_id_checks")
+    p_crit = sages_template.format(table=table, col=col, target=target, proof=proof)
     
-    crit = ask_ai_func("Senior Critic", p_crit, build_version, kwargs.get('run_info', 'N/A'), "Critic")
+    crit = ask_ai_func("The Sages", p_crit, build_version, kwargs.get('run_info', 'N/A'), "Verification")
     decision = str(crit.get("decision", "")).lower()
     reasoning = crit.get("reasoning", "No reason provided")
 

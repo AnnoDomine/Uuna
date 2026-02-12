@@ -40,7 +40,7 @@ def evaluate_agent_output(
     full_prompt = f"{system_prompt}\n\nEVALUATION PROTOCOL:\n{protocol}\n\nAGENT OUTPUT:\n{json.dumps(agent_output)}\nCONFIDENCE: {reported_confidence}"
     
     # For now, we assume ask_ai_func takes (role, prompt, build_version, run_info, process_name)
-    ai_result = ask_ai_func("THE OBSERVER", full_prompt, "N/A", f"Task: {task_id[:8]}", "Evaluation")
+    ai_result = ask_ai_func("The Observer", full_prompt, "N/A", f"Task: {task_id[:8]}", "Evaluation")
     
     # 3. Apply the "Bad Boy" Observer logic
     awarded_points = float(ai_result.get("quality_score", 0))

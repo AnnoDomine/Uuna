@@ -24,16 +24,10 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 def _load_prompt(name: str) -> str:
-    # First check local tool prompts
-    local_path = PROMPT_DIR / f"{name}.txt"
-    if local_path.exists():
-        with open(local_path, 'r') as f:
-            return f.read().strip()
-    
-    # Fallback to legacy agent prompts if not yet migrated
-    legacy_path = Path("Tools/agents/prompts/archivist") / f"{name}.txt"
-    if legacy_path.exists():
-        with open(legacy_path, 'r') as f:
+    """Loads a prompt template from the tool's local prompt directory."""
+    path = PROMPT_DIR / f"{name}.txt"
+    if path.exists():
+        with open(path, 'r') as f:
             return f.read().strip()
     return ""
 
@@ -100,9 +94,7 @@ def perform_column_discovery(
     template_name = "value_research_metrics_and_enums" if is_value_col else "discovery_column_semantics_and_structure"
     template = _load_prompt(template_name)
     
-    # Add Identity Header if not present in legacy template
-    identity_header = f"IDENTITY: You are the WoW Lore Archivist, an expert in Azeroth's history and game mechanics. Your role is described in `docs/wiki/roles/Archivist.md`.\n\n"
-    full_prompt = identity_header + template.format(
+    full_prompt = template.format(
         table=table, col=col, v_min=v_min, v_max=v_max, 
         samples=samples, memory_section=memory_section, online_info=online_info
     )
