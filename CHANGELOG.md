@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.11] - 2026-02-12
+### Added
+- **Multi-Agent Skill-Sets**: Implemented atomic Markdown-based procedural knowledge for all 9 agent roles in `Tools/agents/skills/`.
+- **Event-Relay Orchestration**: Transitioned the entire system from direct calls to a robust "Relay-Race" protocol using Event IDs.
+- **Semantic Vector Memory**: Integrated a dedicated DuckDB VSS database for long-term pattern recognition and lore storage.
+- **Dynamic Localisation**: Introduced a global `localisation` setting allowing the Librarian to communicate in any language (German, Japanese, etc.) while maintaining English for internal logic.
+- **Standardized Identity Headers**: All KI prompts now include a persistent identity block referencing their specific skill-sets.
+- **New Infrastructure Tools**:
+    - Global: `get_my_skills`, `get_task_context`, `get_event_data`, `log_event_reasoning`.
+    - Courier: `create_task_event`, `update_task_status`, `get_role_capabilities`.
+    - Audit: `check_logical_consistency`, `grant_final_verdict`, `assess_complexity`.
+
+### Changed
+- **Unified Agent Identities**: Integrated legacy "Data Engineer" and "Senior Critic" roles into the Archivist and Sages specialists.
+- **Information Isolation**: Implemented "Blind Scoring" where agents never see absolute points, only success percentages.
+- **Tool-Prompt Locality**: Prompts are now stored directly within their respective tool directories for better modularity.
+
+### Fixed
+- **Wiki Access (403)**: Fixed 403 Forbidden errors when fetching data from Warcraft Wiki by implementing proper Referer headers.
+- **Scoring Manipulation**: Decoupled potential score calculation from the orchestration layer to prevent incentive gaming.
+- **DuckDB Path Resolution**: Improved absolute path handling in the API layer to prevent database initialization errors in sub-processes.
+
 ## [0.9.10] - 2026-02-11
 ### Added
 - **API-First Database Architecture**: Introduced `db_service.py` as a centralized FastAPI gateway for all database operations, eliminating file-locking issues.

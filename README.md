@@ -1,120 +1,80 @@
-# WoW Datamine Toolkit (Retail 12.0 "Midnight")
+# Grand Library - WoW Datamine Toolkit
 
-Welcome to the **WoW Datamine Toolkit**, a high-performance, AI-enhanced platform specialized in extracting, analyzing, and decoding World of Warcraft data. Optimized for **Patch 12.0 (Midnight Prepatch)**, this toolkit bridges the gap between raw DB2 files and semantic game intelligence.
+Welcome to the **Grand Library**, a high-performance, AI-orchestrated research platform for World of Warcraft data analysis. This toolkit transforms raw database files (DB2) from Classic to Midnight into semantically meaningful game intelligence using a multi-agent "Relay-Race" system.
 
----
-
-## 🚀 The Vision
-This project has evolved from a simple data extractor into an **Autonomous Research Engine**. By leveraging local Large Language Models (LLMs), the toolkit doesn't just read data—it learns the architecture of Azeroth. It identifies new game systems (like the upcoming Housing features), maps complex database references, and preserves lore discoveries across thousands of game builds.
+📖 **[Visit the Internal Wiki](docs/wiki/Home.md)** - Comprehensive documentation on roles, architecture, and guides.
 
 ---
 
-## 💻 System Requirements
+## 🏛️ How the System Works (The Relay Race)
 
-To run the toolkit effectively, especially the AI components, the following hardware is recommended:
+The Grand Library utilizes a **Hub-and-Spoke Orchestration** model. No agent works in isolation; instead, they pass a "torch" (Event ID) along a chain of specialists.
 
-*   **Operating System**: Linux (Ubuntu/Debian recommended) or macOS.
-*   **Python**: v3.10 or higher.
-*   **Memory**: 16GB RAM minimum (32GB+ recommended for parallel AI tasks).
-*   **GPU (Optional but Recommended)**: NVIDIA RTX 3060 or higher (8GB+ VRAM) for local AI acceleration.
-*   **Storage**: SSD with at least 50GB free space (for SQLite databases and AI models).
-*   **AI Engine**: [Ollama](https://ollama.com/) installed and running.
-
----
-
-## 🛠️ Initialization
-
-Follow these steps to set up your local research environment:
-
-1.  **Clone & Environment**:
-    ```bash
-    git clone https://github.com/AnnoDomine/Uuna.git
-    cd Uuna
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    ```
-
-2.  **System Init**:
-    Initialize the directory structure and core settings:
-    ```bash
-    python3 Tools/project_init.py
-    ```
-
-3.  **Sync Registry**:
-    Fetch the latest build list from Wago.tools:
-    ```bash
-    python3 Tools/update_build_registry.py
-    ```
-
-4.  **AI Setup**:
-    Ensure Ollama is running and pull the required models:
-    ```bash
-    ollama pull qwen3:8b
-    ollama pull qwen3-embedding
-    ```
+1.  **Librarian**: Receives the user query and spawns a **Task ID**.
+2.  **Courier**: The central heart. It decides the "path" and creates **Event IDs** for specialists.
+3.  **Specialists**:
+    *   **Archivist**: Mines the DuckDB Master for technical relations.
+    *   **Expedition Group**: Researches lore context from Wikis and Wowhead.
+    *   **Cartographer**: Visualizes findings as Mermaid ER-diagrams.
+4.  **Sentinel**: Automatically injected between research and delivery to ensure data sanitization and SQL security.
+5.  **Sages**: The final gatekeepers. They logically validate facts before granting an `APPROVE` verdict.
 
 ---
 
-## 🕹️ Controlling the System
+## ⚙️ The Scoring System (Blind Wisdom)
 
-The toolkit is designed with a **CLI-First** philosophy, allowing for powerful automation.
+To ensure absolute integrity and prevent AI agents from "gaming the system," we utilize a **Blind Scoring** mechanism:
 
-### 1. Data Management
+*   **The Tinker**: Analyzes task complexity and sets a `max_potential` score directly in the database.
+*   **Specialist Agents**: Perform their work without knowing the points available.
+*   **The Observer**: Blindly loads the potential from the DB and awards a `quality_score`.
+*   **Isolation**: Agents only receive a **Success Percentage** (e.g., 95%). Absolute points remain hidden within the validation layer (Tinker/Observer).
+
+---
+
+## 💻 Technical Architecture
+
+*   **WoW_Master.duckdb**: Centralized columnar database utilizing MD5 row-level deduplication across 1500+ game builds.
+*   **role_memory.duckdb**: Dedicated long-term memory utilizing **DuckDB VSS** (Vector Similarity Search) for semantic pattern recognition.
+*   **AI Engine**: Local LLM orchestration via **Ollama** (Optimized for Qwen 3 8B).
+*   **API Gateway**: All database operations are proxied through a FastAPI middleware (`db_service.py`) to prevent concurrency locks.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Installation
 ```bash
-# Sync a specific build (Download CSV -> Convert to SQLite)
-python3 Tools/sync_wow_db.py 12.0.0.65655
+# Clone and setup environment
+git clone https://github.com/AnnoDomine/Uuna.git
+cd Uuna
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-# Perform a mass-sync of all available historical builds
-bash get_all_builds.sh
+# Start the DB Service
+bash Tools/start_db_service.sh
 ```
 
-### 2. AI-Powered Research (The "Archivist")
-The AI Agent analyzes statistical signatures to decode unknown columns:
+### 2. Fetching Builds
 ```bash
-# Configure AI parameters (Threads, Cooldown, Limits)
-python3 Tools/ai_control.py set threads 6
-python3 Tools/ai_control.py list
+# Update the registry from Wago.tools
+.venv/bin/python3 Tools/ingestion/update_build_registry.py
 
-# Start an autonomous research session
-python3 Tools/ai_researcher_agent.py --start 7.3.5.25600 --end 12.0.0.65655
+# Start the Master Ingester (Syncs DB2 to DuckDB)
+bash Tools/start_master_ingester.sh
 ```
 
-### 3. Exploration & Comparison
+### 3. Running Research
 ```bash
-# Global Search: Find any ID or Text across all tables
-python3 Tools/find_val.py "Kun Lai"
-
-# Compare Builds: See what Blizzard changed between versions
-python3 Tools/compare_builds.py 12.0.0.65560 12.0.0.65655
-
-# Web UI: Browse data with a modern FastAPI + HTMX interface
-python3 Tools/db_gui.py
+# Trigger an autonomous research run
+.venv/bin/python3 Tools/agents/ai_researcher_agent.py --start 7.3.5.25600 --limit 10
 ```
-*Note: In the Web UI, use **Ctrl+K** to open the Command Palette for rapid navigation.*
 
 ---
 
-## 🧪 Integrated Technologies
-
-*   **Language**: Python 3 (Pandas, SQLite3, FastAPI).
-*   **Frontend**: HTMX & Jinja2 (Zero-JS feel, real-time SSE streaming).
-*   **Database**: SQLite (WAL-mode optimized for high concurrency).
-*   **AI/ML**: Ollama API, Qwen 3 (8B) LLM, Vector Embeddings.
-*   **Data Source**: Wago.tools API.
+## 🌍 Dynamic Localisation
+The Grand Library is language-agnostic. By changing the `localisation` setting in the DuckDB registry, the Librarian will communicate in your preferred language (German, English, Japanese, etc.) while the internal technical logic remains precise in English.
 
 ---
-
-## ❤️ Acknowledgments
-
-This project is a tribute to the passion of the World of Warcraft datamining community. 
-
-Special thanks to:
-*   **Wago.tools** for providing the essential data pipes.
-*   The developers of **Ollama** and **Meta/Qwen** for making high-end AI accessible on local hardware.
-*   Every explorer who ever looked at a `Field_xxx` and wondered, *"What does this do?"*
-
-*Datamining is more than just looking at files; it's about preserving the history of a digital world. Thank you for being part of this journey.*
-
----
-*Created with ❤️ by AnnoDomine & The Archivist Agent.*
+*Created with ❤️ for the WoW Datamining Community.*
