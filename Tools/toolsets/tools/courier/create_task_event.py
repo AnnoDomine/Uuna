@@ -27,10 +27,13 @@ def create_task_event(
     """
     Creates a new event in the task chain. This is how the Courier hands off 
     work to a specialist agent.
+    The Max_Potential score is NOT part of this tool to maintain role isolation.
     """
     try:
         event_id = str(uuid.uuid4())
-        sql = _load_query("insert_event")
+        # We use a query that does NOT include max_potential
+        # because the Courier doesn't (and shouldn't) know it.
+        sql = "INSERT INTO research.task_events (event_id, task_id, initiator_role, target_role, input_data, agent_confidence) VALUES (?, ?, ?, ?, ?, ?)"
         
         db_client.execute(sql, [
             event_id, 

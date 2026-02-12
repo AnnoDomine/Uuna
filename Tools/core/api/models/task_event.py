@@ -10,6 +10,7 @@ class TaskEvent(DBModel):
     input_data: Dict[str, Any]
     output_data: Optional[Dict[str, Any]] = None
     agent_confidence: float = 0.0
+    max_potential: int = 0
 
     @classmethod
     def get_table_name(cls) -> str:
