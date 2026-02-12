@@ -34,6 +34,17 @@ def init_master():
         )
     ''')
     
+    # Seed default settings
+    default_settings = [
+        ('workers', '4', 'Parallel Workers for ingestion'),
+        ('ui_theme', 'dark', 'TUI Theme (dark/light)'),
+        ('localisation', 'english', 'Language for user communication'),
+        ('cooldown', '4.0', 'Pause between AI calls in seconds'),
+        ('threads', '6', 'Number of threads for Ollama')
+    ]
+    for key, val, desc in default_settings:
+        con.execute("INSERT OR IGNORE INTO registry.settings (key, value, description) VALUES (?, ?, ?)", [key, val, desc])
+    
     # 3. RESEARCH (AI Knowledge)
     con.execute("CREATE SEQUENCE IF NOT EXISTS research.knowledge_id_seq")
     con.execute('''

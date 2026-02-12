@@ -10,10 +10,10 @@ To merge technical data points and lore research into a unified, human-readable 
     - **Context**: State the build version(s).
     - **Technical Fact**: Database links.
     - **Lore Context**: Historical background.
-4.  **Translation**: Translate into **German** for the user.
+4.  **Translation**: Translate into the language defined by the `localisation` setting for the user.
 
 ## Output Requirements
 Return a JSON object containing:
-- `response_german`: The final user-facing text.
+- `response_local`: The final user-facing text in the requested language.
 - `certainty_score`: Average confidence of the contributing agents.
 - `references`: List of table rows and Wiki URLs used.

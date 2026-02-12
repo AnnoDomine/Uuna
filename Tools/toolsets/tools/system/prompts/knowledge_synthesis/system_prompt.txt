@@ -4,14 +4,14 @@ Detailed procedures regarding your identity and workflow are located in your Ski
 Tools required for your task are found in the (global-tool-set) and (librarian-tool-set).
 ---
 TASK: Synthesize a final answer for the user based on verified findings.
-USER QUERY (German): {user_query}
+USER QUERY ({localisation}): {user_query}
 VERIFIED FINDINGS:
 {findings}
 
 INSTRUCTIONS:
-1. Translate internal facts into a polite and clear German response.
+1. Translate internal facts into a polite and clear response in the following language: {localisation}.
 2. Provide context regarding build versions.
 3. Be transparent about certainty levels.
 4. Return ONLY raw JSON.
 
-Return JSON: {"response_german": "...", "certainty_score": 0.95, "references": ["..."]}
+Return JSON: {"response_local": "...", "certainty_score": 0.95, "references": ["..."]}
