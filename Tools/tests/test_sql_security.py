@@ -74,7 +74,7 @@ def test_sql_files():
                 print(f"⚠️  WARNING: DB Service not reachable. Skipping live syntax check for {file_path}")
 
     print(f"\nSummary: {files_checked} files checked, {errors} errors found.")
-    return errors == 0
+    assert errors == 0
 
 
 if __name__ == "__main__":

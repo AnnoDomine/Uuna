@@ -8,7 +8,7 @@ interface ButtonProps {
     isActive?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({ label, onPress, color = "cyan", isActive = false }) => {
+const Button: FC<ButtonProps> = ({ label, color = "cyan", isActive = false }) => {
     return (
         <Text
             color={isActive ? "white" : color}

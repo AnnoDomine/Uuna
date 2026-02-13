@@ -50,8 +50,21 @@ function generateHeaders(data: ScalarDict[]): ScalarDict {
     return headers;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: See header
-type RowProps = { row: ScalarDict; columns: Column[]; textStyles?: any };
+// Helper function to render a row with separators
+type RowProps = {
+    row: ScalarDict;
+    columns: Column[];
+    textStyles?: {
+        color?: string;
+        backgroundColor?: string;
+        bold?: boolean;
+        italic?: boolean;
+        underline?: boolean;
+        inverse?: boolean;
+        strikethrough?: boolean;
+        dimColor?: boolean;
+    };
+};
 
 // Helper function to render a row with separators
 const Row: FC<RowProps> = ({ row, columns, textStyles }) => {
