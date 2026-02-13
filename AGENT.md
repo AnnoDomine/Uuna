@@ -49,6 +49,7 @@ This document serves as the technical context for AI agents and developers. The 
 11. **Strict Quality Policies**: 
     - **No `any` Typed Policy**: The use of `any` is strictly prohibited in TypeScript and Python (use `object`, `unknown` or specific generics instead).
     - **Zero Warning Policy**: Code MUST NOT produce any warnings in `pytest`, `vitest`, `ruff`, or `biome`. All warnings are treated as errors.
+    - **No-Force-Push Policy**: `git push --force` or `git push --force-with-lease` are strictly forbidden on shared branches (`main`, `master`, `dev`, `stage`). Rebase and merge conflicts MUST be resolved locally.
 
 ## Frontend Guidelines (Node.js/React)
 
