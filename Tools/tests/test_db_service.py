@@ -11,26 +11,40 @@ TEST_DB_PATH = "Data/WoW_Test.duckdb"
 
 @pytest.fixture(scope="module", autouse=True)
 def db_service():
+    # Force kill any existing service to ensure we use the test DB
+    subprocess.run(["pkill", "-f", "db_service.py"])
+    time.sleep(1)
+
     # Ensure test DB is clean
     if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
+        try:
+            os.remove(TEST_DB_PATH)
+        except Exception:
+            pass
 
     # Start service
     print("\nStarting DB Service for tests (MOCKED DB)...")
     script_path = os.path.join(os.getcwd(), "Tools/core/db_service.py")
+    log_path = os.path.join(os.getcwd(), "Data/logs/api_test.log")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd()
     env["WOW_DB_PATH"] = TEST_DB_PATH
 
+    # Open log file
+    log_file = open(log_path, "a")
+    log_file.write(f"\n--- TEST RUN START: {time.ctime()} ---\n")
+
     # Use uv run if available, otherwise python3
     cmd = ["uv", "run", "python", "-u", script_path]
     try:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, start_new_session=True)
+        proc = subprocess.Popen(cmd, stdout=log_file, stderr=subprocess.STDOUT, env=env, start_new_session=True)
     except FileNotFoundError:
         proc = subprocess.Popen(
             ["python3", "-u", script_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
             env=env,
             start_new_session=True,
         )
@@ -49,14 +63,16 @@ def db_service():
 
     if not ready:
         proc.terminate()
+        log_file.close()
         pytest.fail("DB Service failed to start or initialize database within timeout")
 
     yield
     proc.terminate()
     try:
         proc.wait(timeout=5)
-    except subprocess.TimeoutExpired:
+    except Exception:
         proc.kill()
+    log_file.close()
 
     # Cleanup test DB
     if os.path.exists(TEST_DB_PATH):

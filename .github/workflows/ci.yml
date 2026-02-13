@@ -63,15 +63,14 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
-          cd Tools/web/tui-node
+          # Build local ink-markdown patch first
+          cd Patches/ink-addons/ink-markdown
+          npm install
+          npm run build
+          
+          # Install TUI dependencies
+          cd ../../../Tools/web/tui-node
           pnpm install --no-frozen-lockfile
-
-      - name: Start DB Service in background
-        run: |
-          mkdir -p Data/logs
-          PYTHONPATH=. uv run python -u Tools/core/db_service.py &
-          echo "Waiting for DB Service to start..."
-          sleep 5
 
       - name: Run Stability Tests (3x)
         env:
