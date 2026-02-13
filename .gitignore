@@ -18,6 +18,7 @@ Desktop.ini
 # VS Code
 .vscode/*
 !.vscode/settings.json
+!.vscode/extensions.json
 
 # WoW Addon Specific
 *.bak

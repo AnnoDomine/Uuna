@@ -78,6 +78,11 @@ uv run python Tools/agents/ai_researcher_agent.py --start 7.3.5.25600 --limit 10
 
 ---
 
+## 🤝 Contributing
+We welcome contributions! Please read our **[Contributing Guide](docs/CONTRIBUTING.md)** to learn about our development process, coding standards, and how to get started.
+
+---
+
 ## 🌍 Dynamic Localisation
 The Grand Library is language-agnostic. By changing the `localisation` setting in the DuckDB registry, the Librarian will communicate in your preferred language (German, English, Japanese, etc.) while the internal technical logic remains precise in English.
 

@@ -26,7 +26,7 @@ const SettingsListItem: FC<SettingsListItemProps & { index: number }> = ({
     const { isFocused: isButtonFocused } = useScopedInput({
         id: `btn-${index}`,
         areal: EFocusAreal.CONTENT,
-        keyMap: (input, key) => {
+        keyMap: (_input, key) => {
             if (key.return) {
                 onSave(setting.key, currentValue);
             }

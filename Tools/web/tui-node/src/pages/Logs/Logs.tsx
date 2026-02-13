@@ -3,11 +3,11 @@ import type { FC } from "react";
 import LogTable from "../../organisms/LogTable/LogTable.js";
 
 const Logs: FC = () => {
-	return (
-		<Box flexDirection="column" flexGrow={1} padding={0}>
-			<LogTable />
-		</Box>
-	);
+    return (
+        <Box flexDirection="column" flexGrow={1} padding={0}>
+            <LogTable />
+        </Box>
+    );
 };
 
 export default Logs;

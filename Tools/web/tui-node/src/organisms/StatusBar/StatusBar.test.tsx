@@ -1,8 +1,7 @@
 import { render } from "ink-testing-library";
-import React from "react";
 import { beforeEach, describe, expect, it } from "vitest";
-import StatusBar from "./StatusBar.js";
 import { useStore } from "../../store/useStore.js";
+import StatusBar from "./StatusBar.js";
 
 describe("StatusBar", () => {
     beforeEach(() => {
@@ -25,21 +24,21 @@ describe("StatusBar", () => {
 
         // Manually update store
         useStore.getState().setApiOnline(true);
-        
+
         // Wait for re-render
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         expect(lastFrame()).toContain("API Health: Online");
     });
 
     it("should display active agent count", async () => {
         const { lastFrame } = render(<StatusBar />);
-        
+
         useStore.getState().setAgents(5);
-        
+
         // Wait for re-render
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         expect(lastFrame()).toContain("Agents: 5");
     });
 });

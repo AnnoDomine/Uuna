@@ -1,6 +1,5 @@
 import { Text } from "ink";
 import type { FC } from "react";
-import React from "react";
 
 interface ButtonProps {
     label: string;
