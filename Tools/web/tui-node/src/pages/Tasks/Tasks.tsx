@@ -34,7 +34,7 @@ const Tasks: FC = () => {
 
             {tasks.length > 0 && (
                 <Box borderStyle="single" borderColor="#414868">
-                    <Table data={tableData} headerStyles={{ color: "magenta" }} />
+                    <Table id="tasks-table" data={tableData} headerStyles={{ color: "magenta" }} />
                 </Box>
             )}
         </Box>

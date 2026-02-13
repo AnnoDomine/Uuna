@@ -14,7 +14,6 @@ const Button: FC<ButtonProps> = ({ label, onPress, color = "cyan", isActive = fa
             color={isActive ? "white" : color}
             backgroundColor={isActive ? color : undefined}
             bold
-            onPress={onPress}
         >
             {` [ ${label} ] `}
         </Text>
