@@ -8,7 +8,7 @@ SCRIPT="Tools/core/db_service.py"
 LOG="Data/logs/api.log"
 
 mkdir -p Data/logs
-pkill -f db_service.py
+pkill -f "Tools/core/db_service.py"
 sleep 1
 
 echo "--- DB Service Robust Start: $(date) ---" >> "$LOG"

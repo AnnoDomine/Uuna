@@ -12,9 +12,10 @@ TEST_DB_PATH = "Data/WoW_Test.duckdb"
 
 @pytest.fixture(scope="module", autouse=True)
 def db_service():
-    # Force kill any existing service to ensure we use the test DB
+    # Force kill any existing service instance. 
+    # We use a very specific pattern to avoid killing the test process itself!
     try:
-        subprocess.run(["pkill", "-f", "db_service.py"], capture_output=True)
+        subprocess.run(["pkill", "-f", "Tools/core/db_service.py"], capture_output=True)
     except Exception as e:
         print(f"Note: pkill failed (normal if no process running): {e}")
     time.sleep(1)
