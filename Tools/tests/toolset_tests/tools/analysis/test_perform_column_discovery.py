@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 from toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
 from core.db_client import DBResult
 
-import toolsets.tools.analysis.perform_column_discovery
 import sys
 pcd_module = sys.modules["toolsets.tools.analysis.perform_column_discovery"]
 

@@ -1,5 +1,4 @@
 # Tools/tests/test_update_build_registry.py
-import pytest
 import responses
 import duckdb
 from Tools.ingestion.update_build_registry import fetch_versions, update_registry

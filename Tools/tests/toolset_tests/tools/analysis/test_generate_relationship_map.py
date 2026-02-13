@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 from toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
 from core.db_client import DBResult
 
-import toolsets.tools.analysis.generate_relationship_map
 import sys
 grm_module = sys.modules["toolsets.tools.analysis.generate_relationship_map"]
 

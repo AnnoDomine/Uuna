@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 from toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
 from core.db_client import DBResult
 
-import toolsets.tools.analysis.run_mass_indexing
 import sys
 rmi_module = sys.modules["toolsets.tools.analysis.run_mass_indexing"]
 

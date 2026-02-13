@@ -1,5 +1,4 @@
 # Tools/tests/test_sync_wow_db.py
-import pytest
 import duckdb
 from unittest.mock import patch, MagicMock
 from Tools.ingestion.sync_wow_db import sync_build

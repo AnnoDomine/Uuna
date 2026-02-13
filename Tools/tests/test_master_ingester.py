@@ -1,8 +1,7 @@
 # Tools/tests/test_master_ingester.py
 import pytest
 import responses
-import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from Tools.ingestion.master_ingester import fetch_tables_for_build, process_table_master
 
 @responses.activate

@@ -1,8 +1,6 @@
 # Tools/tests/test_db_client_unit.py
 import pytest
 import responses
-import json
-import pandas as pd
 from Tools.core.db_client import DBClient, DBResult
 
 @pytest.fixture

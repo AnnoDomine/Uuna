@@ -1,6 +1,5 @@
 # Tools/tests/test_update_settings.py
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from Tools.core.update_settings import set_setting
 
 @patch("Tools.core.update_settings.DBClient")

@@ -1,6 +1,5 @@
 # Tools/tests/test_feature_extractor.py
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from Tools.analysis.feature_extractor import process_build_features
 
 @patch("Tools.analysis.feature_extractor.DBClient")

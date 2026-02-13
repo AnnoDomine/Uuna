@@ -1,7 +1,5 @@
 # Tools/tests/test_sync_registry.py
-import pytest
 import duckdb
-import os
 from Tools.core.sync_registry import sync_registry
 
 def test_sync_registry_flow(tmp_path, monkeypatch):
