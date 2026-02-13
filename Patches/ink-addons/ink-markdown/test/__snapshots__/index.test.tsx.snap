@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Renders markdown 1`] = `
+"# Hello
+
+This is markdown printed in the terminal"
+`;

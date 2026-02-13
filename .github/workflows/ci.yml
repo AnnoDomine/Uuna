@@ -65,8 +65,8 @@ jobs:
         run: |
           # Build local ink-markdown patch first
           cd Patches/ink-addons/ink-markdown
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
           
           # Install TUI dependencies
           cd ../../../Tools/web/tui-node
