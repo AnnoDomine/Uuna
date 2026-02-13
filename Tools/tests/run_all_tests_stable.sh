@@ -47,11 +47,21 @@ do
         VITEST_ARGS="$VITEST_ARGS --reporter=junit --outputFile=$REPORTS_DIR/tui-run-$i.xml"
     fi
 
-    if npx vitest $VITEST_ARGS; then
-        echo "✅ TUI tests successful."
+    # Use pnpm if available, otherwise npx
+    if command -v pnpm > /dev/null 2>&1; then
+        if pnpm exec vitest $VITEST_ARGS; then
+            echo "✅ TUI tests successful."
+        else
+            echo "❌ TUI tests failed. Aborting."
+            exit 1
+        fi
     else
-        echo "❌ TUI tests failed. Aborting."
-        exit 1
+        if npx vitest $VITEST_ARGS; then
+            echo "✅ TUI tests successful."
+        else
+            echo "❌ TUI tests failed. Aborting."
+            exit 1
+        fi
     fi
     cd "$PROJECT_ROOT"
 done
