@@ -92,7 +92,7 @@ def process_build_features(build_version):
                         sql_save_feature,
                         (build_id, table, col, stats[0], str(stats[2]), str(stats[3]), stats[4], json.dumps(samples)),
                     )
-                except:
+                except Exception:
                     continue
 
         except Exception as e:

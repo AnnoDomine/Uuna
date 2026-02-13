@@ -31,7 +31,7 @@ def search_in_db(db_path, value):
                 if count > 0:
                     print(f"  FOUND in '{table}': {count} matches")
                     found_any = True
-            except:
+            except Exception:
                 continue
 
         if not found_any:

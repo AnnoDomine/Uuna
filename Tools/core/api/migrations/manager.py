@@ -33,7 +33,7 @@ class MigrationManager:
                     # Later we can implement incremental versions.
                     logger.debug(f"Migration for {name} already applied. Skipping.")
                     return
-            except:
+            except Exception:
                 pass  # Table might not exist yet, proceed to apply
 
         sql = model_class.to_sql()

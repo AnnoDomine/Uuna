@@ -184,7 +184,7 @@ def main():
             r.raise_for_status()
             print("DB Service is ready!", flush=True)
             break
-        except:
+        except Exception:
             if i == max_retries - 1:
                 print("DB Service unreachable. Exiting.", flush=True)
                 sys.exit(1)
@@ -217,7 +217,7 @@ def main():
             db_client.execute("SELECT value FROM registry.settings WHERE key = 'cooldown'").fetchone()[0]
         )
         AI_THREADS = int(db_client.execute("SELECT value FROM registry.settings WHERE key = 'threads'").fetchone()[0])
-    except:
+    except Exception:
         AI_COOLDOWN, AI_THREADS = 4.0, 6  # Fallback
     AI_DEBUG = os.getenv("AI_DEBUG", "1") == "1"
     AI_CONCURRENCY = int(os.getenv("AI_CONCURRENCY", "1"))

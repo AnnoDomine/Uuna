@@ -52,7 +52,7 @@ def get_table_name_col(cursor, table):
         for name in ["Name_lang", "Text_lang", "Title_lang", "Name", "Text", "Title"]:
             if name in cols:
                 return name
-    except:
+    except Exception:
         pass
     return None
 
@@ -67,7 +67,7 @@ def save_setting(key, value):
         )
         conn.commit()
         conn.close()
-    except:
+    except Exception:
         pass
 
 
@@ -124,7 +124,7 @@ async def index(request: Request, db: Optional[str] = None, table: Optional[str]
                                 name_res = cursor.fetchone()
                                 if name_res:
                                     row_dict[col + "_name"] = name_res[0]
-                            except:
+                            except Exception:
                                 pass
                 rows.append(row_dict)
         except Exception as e:

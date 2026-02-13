@@ -16,7 +16,7 @@ def penalize_agent():
                 return
             else:
                 logger.warning(f"API returned {r.status_code}: {r.text}")
-        except:
+        except Exception:
             pass
         time.sleep(2)
     logger.error("Failed to apply penalty after multiple retries.")

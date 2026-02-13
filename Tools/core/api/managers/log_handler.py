@@ -42,7 +42,7 @@ class DatabaseLogHandler:
                     if isinstance(builds, str):
                         builds = json.loads(builds)
                     return ", ".join(builds)
-        except:
+        except Exception:
             pass
         return "N/A"
 
@@ -74,7 +74,7 @@ class DatabaseLogHandler:
         try:
             with open(self.log_file, "a", encoding="utf-8") as f:
                 f.write(full_log_entry + "\n")
-        except:
+        except Exception:
             pass
 
         # 4. Write to Terminal

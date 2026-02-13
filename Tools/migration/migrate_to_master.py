@@ -123,7 +123,7 @@ def migrate():
             logger.error(f"  [FAIL] {version}: {e}")
             try:
                 con.execute(f"DETACH {alias}")
-            except:
+            except Exception as e:
                 pass
 
     con.close()

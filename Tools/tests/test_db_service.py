@@ -160,7 +160,7 @@ if __name__ == "__main__":
     service_proc.terminate()
     try:
         service_proc.wait(timeout=5)
-    except:
+    except Exception:
         service_proc.kill()
 
     if os.path.exists(TEST_DB_PATH):

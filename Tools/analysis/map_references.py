@@ -21,7 +21,7 @@ def get_setting(key, default):
         row = cursor.fetchone()
         conn.close()
         return row[0] if row else default
-    except:
+    except Exception:
         return default
 
 
@@ -194,7 +194,7 @@ def get_previous_build(current_version):
         row = cursor.fetchone()
         conn.close()
         return row[0] if row else None
-    except:
+    except Exception:
         return None
 
 
@@ -266,7 +266,7 @@ def map_references(db_path, use_global=True):
                         val_count = cursor.fetchone()[0]
                         references[table].append({"column": col, "target_table": match, "active_entries": val_count})
                         print(f"  LINK: {table}.{col} -> {match} ({val_count})")
-                    except:
+                    except Exception:
                         pass
 
     ref_path = db_path.replace(".db", "_refs.json")
