@@ -11,5 +11,5 @@ WOW_EXPANSIONS = {
     "10.x": "Dragonflight",
     "11.x": "The War Within (TWW)",
     "12.x": "Midnight (Current)",
-    "13.x": "The Last Titan"
+    "13.x": "The Last Titan",
 }

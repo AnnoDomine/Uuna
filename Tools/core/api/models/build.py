@@ -1,6 +1,7 @@
 from datetime import datetime
 from .base import DBModel
 
+
 class Build(DBModel):
     id: int
     version: str

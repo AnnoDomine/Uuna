@@ -5,17 +5,19 @@ import os
 from pathlib import Path
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "find_value"
 
+
 def _load_query(name: str) -> str:
     """Loads a SQL query from the tool's query directory."""
-    with open(QUERY_DIR / name, 'r') as f:
+    with open(QUERY_DIR / name, "r") as f:
         return f.read().strip()
+
 
 def find_value(db_client: DBClient, search_term: str, build_version: Optional[str] = None) -> Dict[str, int]:
     """
@@ -60,26 +62,26 @@ def find_value(db_client: DBClient, search_term: str, build_version: Optional[st
             # We search for exact match as string or number
             clauses = [f'"{col}" = ?' for col in columns]
             where_clause = " OR ".join(clauses)
-            
+
             params = [search_term] * len(columns)
-            
+
             if build_id:
-                if 'build_id' in [c.lower() for c in columns]:
+                if "build_id" in [c.lower() for c in columns]:
                     query = count_with_build_template.format(table_name=table, where_clause=where_clause)
                     params.append(build_id)
                 else:
                     continue
             else:
                 query = count_template.format(table_name=table, where_clause=where_clause)
-            
+
             # 3. Execute the count query
             count_res = db_client.execute(query, params)
             count = count_res.fetchone()[0]
-            
+
             if count > 0:
                 found_in[table] = count
         except Exception as e:
             print(f"Skipping table '{table}' due to error: {e}")
             continue
-            
+
     return found_in

@@ -5,15 +5,17 @@ from typing import Dict, Any
 import sys
 
 # Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 
 QUERY_DIR = Path(__file__).parent / "queries" / "log_event_reasoning"
 
+
 def _load_query(name: str) -> str:
-    with open(QUERY_DIR / f"{name}.sql", 'r') as f:
+    with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
+
 
 def log_event_reasoning(db_client: DBClient, event_id: str, task_id: str, role: str, message: str) -> Dict[str, Any]:
     """

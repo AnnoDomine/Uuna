@@ -10,7 +10,7 @@ from .models.build import Build
 from .routers import memory, tasks, scoreboard, logs, settings
 
 app = FastAPI(title="Grand Library API")
-DB_PATH = 'Data/WoW_Master.duckdb'
+DB_PATH = "Data/WoW_Master.duckdb"
 
 # 1. Setup Logging to Database
 db_sink = DatabaseLogHandler(DB_PATH, "api")
@@ -23,18 +23,20 @@ app.include_router(scoreboard.router)
 app.include_router(logs.router)
 app.include_router(settings.router)
 
+
 @app.on_event("startup")
 async def startup_event():
     # 2. Run Migrations
     mm = MigrationManager(DB_PATH)
     mm.initialize_registry()
-    
+
     # Register all our models
     models = [Task, TaskEvent, EventLog, ScoreBoard, Build]
     for model in models:
         mm.apply_model(model)
-    
+
     logger.info("Library API and Database Schemas are ready.")
+
 
 @app.get("/health")
 async def health():

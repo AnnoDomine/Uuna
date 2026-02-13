@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 FORBIDDEN_KEYWORDS = ["DROP", "TRUNCATE", "GRANT", "REVOKE", "ALTER", "DELETE"]
 
+
 def sql_security_audit(sql_query: str) -> Dict[str, Any]:
     """
     Scans a SQL query for forbidden keywords and potential injection patterns.
@@ -25,7 +26,7 @@ def sql_security_audit(sql_query: str) -> Dict[str, Any]:
     # Looking for -- or ; which are common in injections
     if "--" in sql_query or ";" in sql_query.split("--")[0]:
         if ";" in sql_query and not sql_query.strip().endswith(";"):
-             forbidden_found.append("Multiple statements (semi-colon)")
+            forbidden_found.append("Multiple statements (semi-colon)")
 
     # 3. Threat Level Assessment
     threat_level = "Low"
@@ -36,5 +37,5 @@ def sql_security_audit(sql_query: str) -> Dict[str, Any]:
         "audit_passed": len(forbidden_found) == 0,
         "forbidden_detected": forbidden_found,
         "threat_level": threat_level,
-        "checked_query": sql_query[:100] + ("..." if len(sql_query) > 100 else "")
+        "checked_query": sql_query[:100] + ("..." if len(sql_query) > 100 else ""),
     }

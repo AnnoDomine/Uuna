@@ -14,23 +14,26 @@ from toolsets.tools.tinker.assign_potential_score import assign_potential_score
 from toolsets.tools.courier.create_task_event import create_task_event
 from toolsets.tools.audit.evaluate_agent_output import evaluate_agent_output
 
+
 # Mock DB Client that uses a local connection for the demo
 class LocalDBClient:
     def __init__(self, db_path):
         self.con = duckdb.connect(db_path)
+
     def execute(self, sql, params=None):
         return self.con.execute(sql, params or [])
 
+
 def run_research():
-    db = LocalDBClient('Data/WoW_Master.duckdb')
+    db = LocalDBClient("Data/WoW_Master.duckdb")
     ai = AIClient(ollama_url="http://localhost:11434/api/chat")
-    
+
     # Fetch localisation setting
     loc_res = db.execute("SELECT value FROM registry.settings WHERE key = 'localisation'").fetchone()
     loc = loc_res[0] if loc_res else "english"
-    
+
     print(f"\n[1. LIBRARIAN] Query: 'Demon Hunter in Legion' (Localisation: {loc})")
-    
+
     # 1. Check Status
     status = check_build_status(db, "7.3.5.25600")
     print(f" Build 7.3.5.25600: {status.get('message')}")
@@ -65,12 +68,13 @@ def run_research():
     # Using the new template logic
     prompt = f"Lore: {lore}. DB Tables: {db_tables}. Construct a response in {loc}."
     final = ai.ask("The Librarian", f"JSON Format {{'response_local': '...'}}: {prompt}")
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print(f"FINAL ANSWER (Grand Library - {loc}):")
     print("-" * 60)
     print(final.get("response_local", "Error generating response."))
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
+
 
 if __name__ == "__main__":
     run_research()

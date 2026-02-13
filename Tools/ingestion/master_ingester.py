@@ -38,9 +38,7 @@ def fetch_wago_builds():
         r.raise_for_status()
         match = re.search(r'data-page="([^"]+)"', r.text)
         if match:
-            page_data = json.loads(
-                match.group(1).replace("&quot;", '"').replace("&amp;", "&")
-            )
+            page_data = json.loads(match.group(1).replace("&quot;", '"').replace("&amp;", "&"))
             return page_data.get("props", {}).get("builds", [])
     except Exception as e:
         base_logger.error(f"Failed to fetch Wago builds: {e}")
@@ -68,17 +66,13 @@ def fetch_tables_for_build(version):
         r.raise_for_status()
         match = re.search(r'data-page="([^"]+)"', r.text)
         if match:
-            page_data = json.loads(
-                match.group(1).replace("&quot;", '"').replace("&amp;", "&")
-            )
+            page_data = json.loads(match.group(1).replace("&quot;", '"').replace("&amp;", "&"))
             tables_dict = page_data.get("props", {}).get("tables", {})
             # Depending on page structure, it's either a list or a dict
             if isinstance(tables_dict, dict):
                 return list(tables_dict.values())
             elif isinstance(tables_dict, list):
-                return [
-                    t.get("name") if isinstance(t, dict) else t for t in tables_dict
-                ]
+                return [t.get("name") if isinstance(t, dict) else t for t in tables_dict]
     except Exception as e:
         base_logger.error(f"Scraping failed for {version}: {e}")
 
@@ -124,11 +118,7 @@ def process_table_master(table, version, build_id):
         with open(csv_path, "r", encoding="utf-8", errors="ignore") as f:
             t_log.info("Reading first line...")
             first_line = f.readline()
-            sep = (
-                ";"
-                if ";" in first_line and first_line.count(";") > first_line.count(",")
-                else ","
-            )
+            sep = ";" if ";" in first_line and first_line.count(";") > first_line.count(",") else ","
             t_log.info(f"Detected separator: {sep}")
 
         con = get_con()
@@ -136,13 +126,9 @@ def process_table_master(table, version, build_id):
         # Unique table name for multi-worker support
         temp_table = f"archive.tmp_{table}_{version.replace('.', '_')}"
 
-        sql_init_temp = load_query("init_temp_table").format(
-            csv_path=csv_path, sep=sep, temp_table=temp_table
-        )
+        sql_init_temp = load_query("init_temp_table").format(csv_path=csv_path, sep=sep, temp_table=temp_table)
         t_log.info("Ensuring table exists...")
-        sql_ensure_table = load_query("ensure_archive_table").format(
-            table=table, temp_table=temp_table
-        )
+        sql_ensure_table = load_query("ensure_archive_table").format(table=table, temp_table=temp_table)
         t_log.info("Inserting rows...")
         load_query("insert_unique_rows")
         t_log.info("Inserting build map...")
@@ -158,14 +144,14 @@ def process_table_master(table, version, build_id):
         # Schema Evolution: Add missing columns (case-insensitive check)
         existing_cols_real = con.execute(f"PRAGMA table_info('archive.\"{table}\"')").df()["name"].tolist()
         existing_cols_lower = {c.lower() for c in existing_cols_real}
-        
+
         temp_cols_df = con.execute(f"PRAGMA table_info('{temp_table}')").df()
         temp_cols = temp_cols_df["name"].tolist()
 
         for c in temp_cols:
             if c.lower() not in existing_cols_lower:
-                t_log.info(f"Schema Evolution: Adding column {c} to archive.\"{table}\"")
-                con.execute(f"ALTER TABLE archive.\"{table}\" ADD COLUMN \"{c}\" VARCHAR")
+                t_log.info(f'Schema Evolution: Adding column {c} to archive."{table}"')
+                con.execute(f'ALTER TABLE archive."{table}" ADD COLUMN "{c}" VARCHAR')
             elif c not in existing_cols_real:
                 t_log.warning(f"Column casing mismatch for {c}. Existing: {existing_cols_real}. Skipping.")
 

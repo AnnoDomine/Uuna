@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from toolsets.tools.database.get_last_attempt import get_last_attempt
 from core.db_client import DBClient, DBResult
 
-class TestGetLastAttempt(unittest.TestCase):
 
+class TestGetLastAttempt(unittest.TestCase):
     def setUp(self):
         self.mock_db_client = MagicMock(spec=DBClient)
 
@@ -34,5 +34,6 @@ class TestGetLastAttempt(unittest.TestCase):
         result = get_last_attempt(self.mock_db_client, "Table", "Column")
         self.assertIsNone(result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

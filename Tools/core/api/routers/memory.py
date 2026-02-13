@@ -6,15 +6,18 @@ from ..managers.vector_manager import VectorManager
 router = APIRouter(prefix="/memory", tags=["memory"])
 vm = VectorManager()
 
+
 class MemoryAddRequest(BaseModel):
     role: str
     content: str
     metadata: Optional[Dict[str, Any]] = {}
 
+
 class MemorySearchRequest(BaseModel):
     role: str
     query: str
     limit: Optional[int] = 5
+
 
 @router.post("/add")
 async def add_memory(req: MemoryAddRequest):
@@ -22,6 +25,7 @@ async def add_memory(req: MemoryAddRequest):
     if not mem_id:
         raise HTTPException(status_code=500, detail="Failed to store memory")
     return {"status": "success", "id": mem_id}
+
 
 @router.post("/search")
 async def search_memory(req: MemorySearchRequest):

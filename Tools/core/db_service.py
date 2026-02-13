@@ -8,8 +8,9 @@ import traceback
 import os
 
 app = FastAPI(title="WoW Datamine DB Service")
-DB_PATH = os.getenv("WOW_DB_PATH", 'Data/WoW_Master.duckdb')
+DB_PATH = os.getenv("WOW_DB_PATH", "Data/WoW_Master.duckdb")
 con = None
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -19,7 +20,7 @@ async def startup_event():
         abs_db_path = os.path.abspath(DB_PATH)
         # Ensure directory exists
         os.makedirs(os.path.dirname(abs_db_path), exist_ok=True)
-        
+
         con = duckdb.connect(abs_db_path)
         con.execute("CREATE SCHEMA IF NOT EXISTS archive")
         con.execute("CREATE SCHEMA IF NOT EXISTS registry")
@@ -29,9 +30,11 @@ async def startup_event():
         print(f"STARTUP ERROR: {e}")
         traceback.print_exc()
 
+
 class QueryRequest(BaseModel):
     sql: str
     params: List[Any] = []
+
 
 @app.post("/query")
 async def run_query(req: QueryRequest):
@@ -48,6 +51,7 @@ async def run_query(req: QueryRequest):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
+
 @app.post("/execute")
 async def run_execute(req: QueryRequest):
     global con
@@ -60,6 +64,7 @@ async def run_execute(req: QueryRequest):
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)})
+
 
 if __name__ == "__main__":
     # Use the app object directly to avoid module resolution issues

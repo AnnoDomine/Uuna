@@ -4,15 +4,15 @@ from unittest.mock import MagicMock, patch
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from toolsets.tools.research.fetch_web_content import fetch_web_content, sanitize_html
 from toolsets.tools.research.search_wow_wiki import search_wow_wiki
 from toolsets.tools.research.get_wago_structure import get_wago_structure
 from core.db_client import DBClient, DBResult
 
-class TestResearchTools(unittest.TestCase):
 
+class TestResearchTools(unittest.TestCase):
     def setUp(self):
         self.mock_db_client = MagicMock(spec=DBClient)
 
@@ -23,47 +23,48 @@ class TestResearchTools(unittest.TestCase):
         self.assertIn("Title", sanitized)
         self.assertIn("Content", sanitized)
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_fetch_web_content_cached(self, mock_get):
         # Mock cache hit
         mock_result = DBResult({"results": [("Cached Content",)]})
         self.mock_db_client.execute.return_value = mock_result
-        
+
         result = fetch_web_content(self.mock_db_client, "http://test.com")
-        
+
         self.assertEqual(result, "Cached Content")
         mock_get.assert_not_called()
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_search_wow_wiki(self, mock_get):
         # Mock cache miss
         self.mock_db_client.execute.return_value = DBResult({"results": []})
-        
+
         # Mock API response
         mock_response = MagicMock()
         mock_response.json.return_value = ["query", ["Title"], ["Desc"], ["http://wiki/Title"]]
         mock_response.status_code = 200
         mock_get.return_value = mock_response
-        
+
         result = search_wow_wiki(self.mock_db_client, "test query")
-        
+
         self.assertEqual(result, ["http://wiki/Title"])
         self.assertEqual(mock_get.call_count, 1)
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_wago_structure(self, mock_get):
         # Mock cache miss
         self.mock_db_client.execute.return_value = DBResult({"results": []})
-        
+
         # Mock streaming CSV response
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.iter_lines.return_value = ["ID,Name,Type"]
         mock_get.return_value.__enter__.return_value = mock_response
-        
+
         result = get_wago_structure(self.mock_db_client, "Table", "10.0.0")
-        
+
         self.assertIn("ID,Name,Type", result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from toolsets.tools.database.update_global_knowledge import update_global_knowledge
 from core.db_client import DBClient
 
-class TestUpdateGlobalKnowledge(unittest.TestCase):
 
+class TestUpdateGlobalKnowledge(unittest.TestCase):
     def setUp(self):
         self.mock_db_client = MagicMock(spec=DBClient)
 
@@ -23,7 +23,7 @@ class TestUpdateGlobalKnowledge(unittest.TestCase):
             "target_table": "TargetTable",
             "confidence": 0.9,
             "ai_notes": "Note",
-            "build_version": "1.2.3"
+            "build_version": "1.2.3",
         }
 
         result = update_global_knowledge(self.mock_db_client, **test_data)
@@ -33,5 +33,6 @@ class TestUpdateGlobalKnowledge(unittest.TestCase):
         params_arg = self.mock_db_client.execute.call_args.args[1]
         self.assertEqual(params_arg, list(test_data.values()))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

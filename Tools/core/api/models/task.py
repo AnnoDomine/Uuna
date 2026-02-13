@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import List, Optional
 from .base import DBModel
 
+
 class Task(DBModel):
     task_id: UUID
     query: str

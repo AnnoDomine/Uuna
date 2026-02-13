@@ -5,17 +5,19 @@ import os
 from pathlib import Path
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "get_confirmed_mappings"
 
+
 def _load_query(name: str) -> str:
     """Loads a SQL query from the tool's query directory."""
-    with open(QUERY_DIR / name, 'r') as f:
+    with open(QUERY_DIR / name, "r") as f:
         return f.read().strip()
+
 
 def get_confirmed_mappings(db_client: DBClient, build_version: str) -> List[Tuple]:
     """

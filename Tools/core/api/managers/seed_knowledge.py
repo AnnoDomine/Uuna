@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.getcwd())
 
 from Tools.core.api.managers.vector_manager import VectorManager
@@ -11,15 +12,26 @@ from Tools.core.api.managers.knowledge.lore import LORE_BASICS, WOW_COSMOLOGY
 from Tools.core.api.managers.knowledge.geography import WOW_GEOGRAPHY, WOW_CITIES
 from Tools.core.api.managers.knowledge.mechanics import WOW_CLASSES_SPECS, WOW_RACES
 from Tools.core.api.managers.knowledge.history_factions import WOW_HISTORY, WOW_FACTIONS
-from Tools.core.api.managers.knowledge.technical import WOW_BRANCH_TYPES, CORPORATE_CONTEXT, DATAMINING_PRINCIPLES, DATAMINING_SOP
+from Tools.core.api.managers.knowledge.technical import (
+    WOW_BRANCH_TYPES,
+    CORPORATE_CONTEXT,
+    DATAMINING_PRINCIPLES,
+    DATAMINING_SOP,
+)
 from Tools.core.api.managers.knowledge.professions import WOW_PROFESSIONS
 from Tools.core.api.managers.knowledge.dungeons_raids import WOW_DUNGEONS_RAIDS
-from Tools.core.api.managers.knowledge.ai_system import AI_CORE_CONCEPTS, SYSTEM_ARCHITECTURE, SCORING_AND_QUALITY, MEMORY_SYSTEMS
+from Tools.core.api.managers.knowledge.ai_system import (
+    AI_CORE_CONCEPTS,
+    SYSTEM_ARCHITECTURE,
+    SCORING_AND_QUALITY,
+    MEMORY_SYSTEMS,
+)
+
 
 def seed_base_knowledge():
     logger.info("Seeding Finalized Modular Knowledge into Vector Memory...")
     vm = VectorManager(db_path="Data/knowledge/role_memory.duckdb")
-    
+
     # 1. Expansions
     for version, name in WOW_EXPANSIONS.items():
         vm.add_memory("Global", f"Expansion: {name} (Version {version})", {"type": "expansion", "version": version})
@@ -28,7 +40,9 @@ def seed_base_knowledge():
     for item in LORE_BASICS:
         vm.add_memory("Global", f"Lore: {item['entity']}. Context: {item['context']}", {"type": "lore"})
     for item in WOW_COSMOLOGY:
-        vm.add_memory("Global", f"Cosmology: {item['force']} - {item['entity']}. {item['context']}", {"type": "cosmology"})
+        vm.add_memory(
+            "Global", f"Cosmology: {item['force']} - {item['entity']}. {item['context']}", {"type": "cosmology"}
+        )
 
     # 3. Geography & Cities
     for item in WOW_GEOGRAPHY:
@@ -54,12 +68,14 @@ def seed_base_knowledge():
     for item in DATAMINING_PRINCIPLES:
         vm.add_memory("Global", f"Datamining Topic: {item['topic']}. {item['context']}", {"type": "datamining"})
     for item in DATAMINING_SOP:
-        vm.add_memory("Global", f"Datamining Step: {item['step']}. Action: {item['action']}", {"type": "datamining_sop"})
+        vm.add_memory(
+            "Global", f"Datamining Step: {item['step']}. Action: {item['action']}", {"type": "datamining_sop"}
+        )
 
     # 7. AI System Core
     for item in AI_CORE_CONCEPTS:
         vm.add_memory("Global", f"AI Concept: {item['topic']}. {item['context']}", {"type": "ai_concept"})
-    
+
     # 8. System Architecture
     for item in SYSTEM_ARCHITECTURE:
         vm.add_memory("Global", f"Architecture: {item['component']}. {item['context']}", {"type": "architecture"})
@@ -78,13 +94,20 @@ def seed_base_knowledge():
 
     # 12. Professions
     for item in WOW_PROFESSIONS:
-        vm.add_memory("Global", f"Profession: {item['name']} ({item['type']}). {item['context']}", {"type": "profession"})
+        vm.add_memory(
+            "Global", f"Profession: {item['name']} ({item['type']}). {item['context']}", {"type": "profession"}
+        )
 
     # 13. Dungeons & Raids
     for item in WOW_DUNGEONS_RAIDS:
-        vm.add_memory("Global", f"Dungeon/Raid: {item['name']} ({item['type']}). Exp: {item['expansion']}. {item['context']}", {"type": "dungeon_raid"})
+        vm.add_memory(
+            "Global",
+            f"Dungeon/Raid: {item['name']} ({item['type']}). Exp: {item['expansion']}. {item['context']}",
+            {"type": "dungeon_raid"},
+        )
 
     logger.success("All knowledge successfully seeded!")
+
 
 if __name__ == "__main__":
     seed_base_knowledge()

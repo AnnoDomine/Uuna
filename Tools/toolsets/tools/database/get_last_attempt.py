@@ -4,16 +4,18 @@ from pathlib import Path
 import os
 from typing import Optional, Tuple
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_last_attempt"
 
+
 def _load_query(name: str) -> str:
     path = QUERY_DIR / f"{name}.sql"
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         return f.read().strip()
+
 
 def get_last_attempt(db_client: DBClient, table_name: str, column_name: str) -> Optional[Tuple]:
     """

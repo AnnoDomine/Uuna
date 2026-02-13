@@ -6,17 +6,19 @@ import json
 from pathlib import Path
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 
 QUERY_DIR = Path(__file__).parent / "queries" / "extract_features"
 
+
 def _load_query(name: str) -> str:
     """Loads a SQL query from the tool's query directory."""
     path = QUERY_DIR / f"{name}.sql"
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         return f.read().strip()
+
 
 def extract_features_for_build(db_client: DBClient, build_version: str) -> dict:
     """
@@ -53,25 +55,27 @@ def extract_features_for_build(db_client: DBClient, build_version: str) -> dict:
     tables = [row[0] for row in db_client.execute(queries["get_tables"], [build_id]).fetchall()]
     total_tables = len(tables)
     total_cols = 0
-    
+
     for idx, table in enumerate(tables, 1):
         try:
             # Check if table exists in the main archive schema
             table_exists_res = db_client.execute(queries["check_table"], [table]).fetchone()
             if not table_exists_res or table_exists_res[0] == 0:
                 print(f"WARNING: Table {table} MISSING in archive. Logged for re-sync.")
-                db_client.execute(queries["log_error"], [build_id, table, "MISSING_TABLE", "Missing in archive schema."])
+                db_client.execute(
+                    queries["log_error"], [build_id, table, "MISSING_TABLE", "Missing in archive schema."]
+                )
                 continue
 
             # Get column info
             cols_info_df = db_client.execute(f'PRAGMA table_info(archive."{table}")').df()
             if cols_info_df.empty:
                 continue
-                
-            columns = [c for c in cols_info_df['name'].tolist() if c not in ('_row_hash', 'build_id')]
+
+            columns = [c for c in cols_info_df["name"].tolist() if c not in ("_row_hash", "build_id")]
             build_rows_res = db_client.execute(queries["get_row_count"], [build_id, table]).fetchone()
             build_rows = build_rows_res[0] if build_rows_res else 0
-            
+
             if idx % 50 == 0 or idx == 1:
                 print(f"INFO: Processing {idx}/{total_tables}: {table} ({build_rows} rows)")
 
@@ -80,13 +84,17 @@ def extract_features_for_build(db_client: DBClient, build_version: str) -> dict:
                 try:
                     stats_query = queries["get_stats_tpl"].format(table=table, col=col)
                     stats = db_client.execute(stats_query, [build_id, table]).fetchone()
-                    if not stats: continue
-                    
+                    if not stats:
+                        continue
+
                     samples_query = queries["get_samples_tpl"].format(table=table, col=col)
                     sample_data = db_client.execute(samples_query, [build_id, table]).fetchall()
                     samples = [row[0] for row in sample_data]
-                    
-                    db_client.execute(queries["save_feature"], [build_id, table, col, stats[0], str(stats[2]), str(stats[3]), stats[4], json.dumps(samples)])
+
+                    db_client.execute(
+                        queries["save_feature"],
+                        [build_id, table, col, stats[0], str(stats[2]), str(stats[3]), stats[4], json.dumps(samples)],
+                    )
                 except Exception:
                     # Continue to next column on inner failure
                     continue
@@ -98,12 +106,12 @@ def extract_features_for_build(db_client: DBClient, build_version: str) -> dict:
     # Mark build as indexed
     db_client.execute(queries["mark_indexed"], [build_id])
     elapsed = time.time() - start_time
-    
+
     summary = {
         "status": "success",
         "processed_columns": total_cols,
         "processed_tables": total_tables,
-        "duration_seconds": round(elapsed, 2)
+        "duration_seconds": round(elapsed, 2),
     }
     print(f"SUCCESS: Finished feature extraction for {build_version}. Processed {total_cols} columns in {elapsed:.1f}s")
     return summary

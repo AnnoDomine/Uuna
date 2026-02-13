@@ -6,16 +6,19 @@ import duckdb
 import os
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
-DB_PATH = 'Data/WoW_Master.duckdb'
+DB_PATH = "Data/WoW_Master.duckdb"
 QUERIES_PATH = "Tools/core/api/queries/tasks"
 
+
 def _load_query(name: str) -> str:
-    with open(os.path.join(QUERIES_PATH, f"{name}.sql"), 'r') as f:
+    with open(os.path.join(QUERIES_PATH, f"{name}.sql"), "r") as f:
         return f.read().strip()
+
 
 class TaskCreateRequest(BaseModel):
     objective: str
     initiator: str = "User"
+
 
 @router.post("/create")
 async def create_task(req: TaskCreateRequest):
@@ -28,6 +31,7 @@ async def create_task(req: TaskCreateRequest):
         return {"task_id": task_id, "status": "created"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/{task_id}")
 async def get_task(task_id: str):

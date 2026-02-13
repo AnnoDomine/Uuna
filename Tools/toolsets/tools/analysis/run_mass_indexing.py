@@ -5,20 +5,24 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 from .extract_features import extract_features_for_build
 
 QUERY_DIR = Path(__file__).parent / "queries" / "run_mass_indexing"
 
+
 def _load_query(name: str) -> str:
     """Loads a SQL query from the tool's query directory."""
     path = QUERY_DIR / f"{name}.sql"
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         return f.read().strip()
 
-def run_mass_indexing(db_client: DBClient, start_v: Optional[str] = None, end_v: Optional[str] = None) -> Dict[str, Any]:
+
+def run_mass_indexing(
+    db_client: DBClient, start_v: Optional[str] = None, end_v: Optional[str] = None
+) -> Dict[str, Any]:
     """
     Finds all pending builds within a range and runs the feature extraction process for each.
     """
@@ -42,11 +46,11 @@ def run_mass_indexing(db_client: DBClient, start_v: Optional[str] = None, end_v:
     # Determine range
     start_idx = all_versions.index(start_v) if start_v in all_versions else 0
     end_idx = all_versions.index(end_v) if end_v in all_versions else len(all_versions) - 1
-    
+
     to_process = [v for v in all_pending if v in all_versions[start_idx : end_idx + 1]]
     total_to_process = len(to_process)
     print(f"INFO: Found {total_to_process} builds in range to process.")
-    
+
     processed_count = 0
     failed_builds = []
 
@@ -62,12 +66,12 @@ def run_mass_indexing(db_client: DBClient, start_v: Optional[str] = None, end_v:
         except Exception as e:
             print(f"ERROR: Unhandled exception while processing {version}: {e}")
             failed_builds.append(version)
-            
+
     print("INFO: Mass indexing run finished.")
-    
+
     return {
         "status": "complete",
         "total_in_range": total_to_process,
         "processed_successfully": processed_count,
-        "failed_builds": failed_builds
+        "failed_builds": failed_builds,
     }

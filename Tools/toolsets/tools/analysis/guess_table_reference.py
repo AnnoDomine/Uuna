@@ -2,6 +2,7 @@
 import difflib
 from typing import List, Dict, Union
 
+
 def guess_table_reference(potential_name: str, all_table_names: List[str]) -> List[Dict[str, Union[str, float]]]:
     """
     Analyzes a potential reference name and suggests possible matching table names
@@ -23,7 +24,7 @@ def guess_table_reference(potential_name: str, all_table_names: List[str]) -> Li
         "Spell": "SpellName",
         "Item": "ItemSparse",
         "BroadcastText": "BroadcastText",
-        "ConversationLine": "ConversationLine"
+        "ConversationLine": "ConversationLine",
     }
 
     # 1. Direct Match (Case Insensitive)
@@ -39,7 +40,7 @@ def guess_table_reference(potential_name: str, all_table_names: List[str]) -> Li
             suggestions[target] = {"reason": "Alias Match", "confidence": 0.98}
 
     # 3. Auto-Suffixes
-    for suffix in ['V2', 'V3', 'V4', 'Sparse', 'Name']:
+    for suffix in ["V2", "V3", "V4", "Sparse", "Name"]:
         variant = potential_name + suffix
         if variant in all_table_names and variant not in suggestions:
             suggestions[variant] = {"reason": f"Suffix Match ('{suffix}')", "confidence": 0.95}
@@ -47,7 +48,7 @@ def guess_table_reference(potential_name: str, all_table_names: List[str]) -> Li
         for t in all_table_names:
             if t.lower() == variant.lower() and t not in suggestions:
                 suggestions[t] = {"reason": f"Suffix Match (case-insensitive, '{suffix}')", "confidence": 0.94}
-    
+
     # 4. Fuzzy Matching using difflib
     fuzzy_matches = difflib.get_close_matches(potential_name, all_table_names, n=15, cutoff=0.5)
     for match in fuzzy_matches:
@@ -56,7 +57,7 @@ def guess_table_reference(potential_name: str, all_table_names: List[str]) -> Li
             # A higher cutoff in get_close_matches implies higher confidence.
             ratio = difflib.SequenceMatcher(None, potential_name, match).ratio()
             suggestions[match] = {"reason": "Fuzzy Match", "confidence": round(ratio, 2)}
-            
+
     # 5. Substring matches
     for t in all_table_names:
         if p_low in t.lower() and t not in suggestions:
@@ -64,7 +65,6 @@ def guess_table_reference(potential_name: str, all_table_names: List[str]) -> Li
 
     # Format the output into a sorted list of dictionaries
     result = [{"table": table, **data} for table, data in suggestions.items()]
-    result.sort(key=lambda x: x['confidence'], reverse=True)
-    
-    return result
+    result.sort(key=lambda x: x["confidence"], reverse=True)
 
+    return result

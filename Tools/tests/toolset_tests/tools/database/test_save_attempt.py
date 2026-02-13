@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from toolsets.tools.database.save_attempt import save_attempt
 from core.db_client import DBClient
 
-class TestSaveAttempt(unittest.TestCase):
 
+class TestSaveAttempt(unittest.TestCase):
     def setUp(self):
         self.mock_db_client = MagicMock(spec=DBClient)
 
@@ -23,17 +23,18 @@ class TestSaveAttempt(unittest.TestCase):
             "column_name": "TestColumnID",
             "proposed_target": "TargetTable",
             "decision": "CONFIRM",
-            "reasoning": "High confidence match."
+            "reasoning": "High confidence match.",
         }
 
         result = save_attempt(self.mock_db_client, **test_data)
 
         self.assertEqual(result["status"], "success")
-        
+
         self.mock_db_client.execute.assert_called_once()
         call_args = self.mock_db_client.execute.call_args
         params_arg = call_args.args[1]
         self.assertEqual(params_arg, list(test_data.values()))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

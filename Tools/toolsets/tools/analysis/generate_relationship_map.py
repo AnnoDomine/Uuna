@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from core.db_client import DBClient
 from toolsets.tools.database.get_confirmed_mappings import get_confirmed_mappings
@@ -16,10 +16,12 @@ from toolsets.tools.filesystem.save_mermaid_diagram import save_mermaid_diagram
 QUERY_DIR = Path(__file__).parent / "queries" / "generate_relationship_map"
 PROMPT_DIR = Path(__file__).parent / "prompts" / "generate_relationship_map"
 
+
 def _load_file(path: Path) -> str:
     """Loads a file from a given path."""
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         return f.read().strip()
+
 
 def _get_mermaid_documentation(db_client: DBClient) -> str:
     """
@@ -29,13 +31,13 @@ def _get_mermaid_documentation(db_client: DBClient) -> str:
     try:
         sql = _load_file(QUERY_DIR / "get_mermaid_docs_cache.sql")
         # In this context, we assume a simple cache check. The original had a time-based check.
-        res = db_client.execute(sql, ["mermaid_docs", 7]) 
+        res = db_client.execute(sql, ["mermaid_docs", 7])
         if res.fetchall():
             return res.fetchone()[0]
     except Exception:
         # Fallback on any error
         pass
-        
+
     # Fallback documentation
     return "erDiagram\n    TABLE1 ||--o{ TABLE2 : relationship"
 
@@ -63,11 +65,7 @@ def generate_relationship_map(db_client: DBClient, ask_ai_func: Callable, build_
     template = _load_file(PROMPT_DIR / "visualization_build_relation_map.txt")
 
     # 3. Format the prompt for the AI
-    prompt = template.format(
-        build_version=build_version,
-        mapping_str=mapping_str,
-        mmd_docs=mmd_docs
-    )
+    prompt = template.format(build_version=build_version, mapping_str=mapping_str, mmd_docs=mmd_docs)
 
     # 4. Call the AI
     try:
@@ -80,7 +78,7 @@ def generate_relationship_map(db_client: DBClient, ask_ai_func: Callable, build_
             ai_response = ai_response_str
 
         mermaid_code = ai_response.get("mermaid")
-        
+
         if not mermaid_code:
             return "ERROR: AI failed to generate mermaid code."
 
@@ -88,11 +86,6 @@ def generate_relationship_map(db_client: DBClient, ask_ai_func: Callable, build_
         return f"ERROR: Failed to get or parse AI response: {e}"
 
     # 5. Save the result using another refactored tool
-    result_status = save_mermaid_diagram(
-        name="Build_Map",
-        content=mermaid_code,
-        build_version=build_version
-    )
-    
-    return result_status
+    result_status = save_mermaid_diagram(name="Build_Map", content=mermaid_code, build_version=build_version)
 
+    return result_status
