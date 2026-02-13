@@ -48,19 +48,13 @@ def db_service():
             cmd = [uv_path, "run", "python", "-u", script_path]
         else:
             cmd = [sys.executable, "-u", script_path]
-            
+
         print(f"Executing: {' '.join(cmd)}")
-        
+
         try:
             # We open the log file again in 'a' mode for the subprocess
             with open(log_path, "a") as sub_log:
-                proc = subprocess.Popen(
-                    cmd, 
-                    stdout=sub_log, 
-                    stderr=subprocess.STDOUT, 
-                    env=env, 
-                    start_new_session=True
-                )
+                proc = subprocess.Popen(cmd, stdout=sub_log, stderr=subprocess.STDOUT, env=env, start_new_session=True)
         except Exception as e:
             pytest.fail(f"Failed to spawn DB Service: {e}")
 
@@ -79,7 +73,7 @@ def db_service():
             except requests.exceptions.ConnectionError as e:
                 last_error = f"ConnectionError: {e}"
                 continue
-        
+
         if not ready:
             proc.terminate()
             # Read last few lines of log for context
@@ -87,12 +81,14 @@ def db_service():
             try:
                 with open(log_path, "r") as f:
                     log_context = "".join(f.readlines()[-20:])
-            except:
+            except Exception:
                 pass
-            pytest.fail(f"DB Service failed to start or initialize database within timeout.\nLast error: {last_error}\nLog context:\n{log_context}")
+            pytest.fail(
+                f"DB Service failed to start or initialize database within timeout.\nLast error: {last_error}\nLog context:\n{log_context}"
+            )
 
         yield
-        
+
         print("\nShutting down DB Service...")
         proc.terminate()
         try:
