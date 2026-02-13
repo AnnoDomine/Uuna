@@ -24,14 +24,18 @@ We provide a `.vscode/settings.json` and `.vscode/extensions.json`. When you ope
 
 ## 📏 Coding Standards
 
+### General Policies
+- **No `any` Typed Policy**: The use of `any` is strictly prohibited in TypeScript and Python. Use specific interfaces, types, or generics.
+- **Zero Warning Policy**: Code MUST NOT produce any warnings in `pytest`, `vitest`, `ruff`, or `biome`. All warnings are treated as errors.
+- **No-Force-Push Policy**: `git push --force` is strictly forbidden on shared branches.
+
 ### Python
-- All code must pass `uv run manage.py lint`.
+- All code must pass `uv run manage.py lint` and `uv run manage.py format`.
 - Use type hints wherever possible.
 - Adhere to the PEP 8 style guide (enforced by Ruff).
 
 ### Frontend (React/Ink)
-- All code must pass `pnpm biome check .` in the `tui-node` directory.
-- No `any` types allowed.
+- All code must pass `pnpm biome check .` and `pnpm tsc --noEmit` in the `tui-node` directory.
 - Follow the Atomic Design pattern as described in `AGENT.md`.
 
 ## 📝 Commit Guidelines
@@ -55,11 +59,11 @@ We follow the **Conventional Commits** specification. This means all commit mess
 
 ## 🧪 Testing
 
-Before submitting a PR, ensure that all tests pass:
+Before submitting a PR, ensure that all tests pass the 3x stability run:
 ```bash
 uv run manage.py test
 ```
-This will run the stability suite (3x Python and TUI tests).
+This runs the full suite (94+ Python tests and all TUI tests) three times to ensure no race conditions or flaky tests are introduced. CI will automatically reject PRs that fail any of these runs.
 
 ---
 *Thank you for your contribution!*
