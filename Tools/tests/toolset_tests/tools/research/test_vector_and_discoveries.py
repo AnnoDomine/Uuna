@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/research/test_vector_and_discoveries.py
-import pytest
 import responses
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.research.query_vector_memory import query_vector_memory

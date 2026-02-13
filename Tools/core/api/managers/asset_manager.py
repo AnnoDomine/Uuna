@@ -2,7 +2,6 @@ import hashlib
 import duckdb
 import os
 from loguru import logger
-import json
 from .vector_manager import VectorManager
 
 class AssetManager:

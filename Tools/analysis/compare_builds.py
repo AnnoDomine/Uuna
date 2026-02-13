@@ -1,7 +1,5 @@
 import sqlite3
 import os
-import glob
-import json
 import re
 
 def get_db_path(version):

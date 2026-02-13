@@ -1,9 +1,8 @@
 # Tools/toolsets/tools/research/search_wow_wiki.py
 import requests
-from typing import List, Optional
+from typing import List
 import sys
 import os
-from pathlib import Path
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

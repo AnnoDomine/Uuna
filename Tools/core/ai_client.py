@@ -1,9 +1,7 @@
 import requests
 import json
-import os
-import time
 from loguru import logger
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 class AIClient:
     def __init__(self, ollama_url="http://localhost:11434/api/chat", model="qwen3:8b", debug=True, threads=6):

@@ -1,9 +1,7 @@
 # Tools/toolsets/tools/research/get_wago_structure.py
 import requests
-from typing import Optional
 import sys
 import os
-from pathlib import Path
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

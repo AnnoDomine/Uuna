@@ -1,6 +1,5 @@
 import duckdb
 import requests
-import os
 import sys
 from loguru import logger
 

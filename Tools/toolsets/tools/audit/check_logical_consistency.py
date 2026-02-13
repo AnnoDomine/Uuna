@@ -1,5 +1,5 @@
 # Tools/toolsets/tools/audit/check_logical_consistency.py
-from typing import Dict, Any, List
+from typing import Dict, Any
 from pathlib import Path
 import sys
 import os

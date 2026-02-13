@@ -1,5 +1,5 @@
 # Tools/toolsets/tools/analysis/compare_builds.py
-from typing import Dict, Any, List
+from typing import Dict, Any
 import sys
 import os
 from pathlib import Path

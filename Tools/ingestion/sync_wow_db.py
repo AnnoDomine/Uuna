@@ -42,7 +42,7 @@ def sync_build(version):
         # Run master ingester with MAX_BUILDS=1 could work, but it might pick the wrong one.
         # So we just run it. It will process all pending builds including the requested one.
         logger.info("Executing Master Ingester...")
-        env = os.environ.copy()
+        os.environ.copy()
         # We could implement a specific filter in master_ingester, but for now we just run it.
         result = subprocess.run([".venv/bin/python3", "Tools/ingestion/master_ingester.py"], capture_output=True, text=True)
         

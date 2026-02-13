@@ -1,6 +1,6 @@
 # Tools/toolsets/tools/sentinel/sql_security_audit.py
 import re
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 FORBIDDEN_KEYWORDS = ["DROP", "TRUNCATE", "GRANT", "REVOKE", "ALTER", "DELETE"]
 

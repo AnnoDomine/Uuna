@@ -1,6 +1,6 @@
 # Tools/toolsets/tools/events/get_event_data.py
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 import sys
 import os

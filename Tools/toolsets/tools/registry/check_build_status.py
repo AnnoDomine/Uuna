@@ -2,7 +2,7 @@
 import sys
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

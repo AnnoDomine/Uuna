@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/system/test_get_task_context.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.system.get_task_context import get_task_context
 

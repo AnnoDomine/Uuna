@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/system/test_librarian_tools.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.system.create_research_task import create_research_task
 from Tools.toolsets.tools.system.get_verified_results import get_verified_results

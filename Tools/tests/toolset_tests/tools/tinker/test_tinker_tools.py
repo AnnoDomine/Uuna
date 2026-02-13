@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/tinker/test_tinker_tools.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.tinker.assess_complexity import assess_complexity
 from Tools.toolsets.tools.tinker.assign_potential_score import assign_potential_score

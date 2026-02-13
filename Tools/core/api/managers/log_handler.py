@@ -2,7 +2,6 @@ import sys
 import duckdb
 import os
 import json
-from datetime import datetime
 
 class SeverityLevel:
     DEBUG = "DEBUG"

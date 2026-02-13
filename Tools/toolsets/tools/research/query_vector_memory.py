@@ -1,9 +1,8 @@
 # Tools/toolsets/tools/research/query_vector_memory.py
 import requests
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import sys
 import os
-from pathlib import Path
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

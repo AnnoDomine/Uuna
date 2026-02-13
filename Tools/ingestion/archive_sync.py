@@ -1,15 +1,9 @@
 import duckdb
 import os
-import requests
-import pandas as pd
-import hashlib
-import time
 import sys
 import sqlite3
 import gzip
 import shutil
-from io import BytesIO
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from loguru import logger
 
 MASTER_DB = 'Data/WoW_Master.duckdb'

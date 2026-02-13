@@ -1,6 +1,6 @@
 # Tools/toolsets/tools/audit/evaluate_agent_output.py
 import json
-from typing import Callable, Dict, Any, List
+from typing import Callable, Dict, Any
 from pathlib import Path
 import sys
 import os

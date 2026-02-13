@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, Type, ClassVar
+from pydantic import BaseModel
+from typing import Dict, Type, ClassVar
 from datetime import datetime
 from uuid import UUID
-import json
 
 class DBModel(BaseModel):
     """Base class for all internal toolkit tables."""

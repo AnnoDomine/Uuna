@@ -2,7 +2,6 @@ import sqlite3
 import os
 import json
 import difflib
-import re
 import sys
 
 GLOBAL_MAP_PATH = 'Data/dbs/Global_Column_Map.json'

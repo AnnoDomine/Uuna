@@ -3,17 +3,15 @@ import os
 import glob
 import json
 import threading
-import time
 import asyncio
-from typing import Optional, List
-from fastapi import FastAPI, Request, Form, Response, Query
-from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
+from typing import Optional
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 from contextlib import asynccontextmanager
 
-from sync_wow_db import fetch_and_import, fetch_available_builds, get_setting
+from sync_wow_db import fetch_and_import, get_setting
 from update_build_registry import update_registry, fetch_versions
 from project_init import init_all
 

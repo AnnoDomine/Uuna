@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/events/test_get_event_data.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.events.get_event_data import get_event_data
 

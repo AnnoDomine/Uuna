@@ -1,6 +1,5 @@
 import requests
 import uuid
-import json
 from loguru import logger
 
 API_URL = "http://127.0.0.1:8001"
@@ -46,7 +45,7 @@ def run_research_test():
     
     # In a real scenario, we'd have a /events/create endpoint. 
     # For now, we'll just log it.
-    logger.info(f"Agent 'Archivist' is searching archive.Spell for 'Sylvanas' in build_id corresponding to 12.0.0")
+    logger.info("Agent 'Archivist' is searching archive.Spell for 'Sylvanas' in build_id corresponding to 12.0.0")
     
     # 4. Simulate a Discovery
     discovery = {

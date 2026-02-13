@@ -7,7 +7,6 @@ import os
 # Add Tools to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
 
-import toolsets.tools.analysis.perform_column_mapping
 pcm_module = sys.modules['toolsets.tools.analysis.perform_column_mapping']
 from toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
 from core.db_client import DBResult

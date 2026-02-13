@@ -8,7 +8,6 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
 
 # Import to ensure it's in sys.modules
-import toolsets.tools.analysis.perform_column_discovery
 pcd_module = sys.modules['toolsets.tools.analysis.perform_column_discovery']
 from toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
 from core.db_client import DBResult

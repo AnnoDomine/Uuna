@@ -1,5 +1,4 @@
 import duckdb
-import os
 
 DB_PATH = 'Data/WoW_Master.duckdb'
 

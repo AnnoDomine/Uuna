@@ -1,9 +1,8 @@
 # Tools/tests/toolsets/tools/database/test_find_value.py
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import sys
 import os
-import pandas as pd
 
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))

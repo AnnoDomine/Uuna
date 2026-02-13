@@ -3,9 +3,7 @@
 import sys
 import os
 import requests
-import json
 import time
-import threading
 from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 
@@ -71,7 +69,8 @@ def analyze_column_task(db_client: DBClient, ai_client: AIClient, col_info, buil
     log = get_safe_log(build=build_version, run_info=run_info, process="Analysis", **kwargs)
     
     # Bridge to AIClient
-    ask_ai = lambda r, p, bv, ri, pn, **kw: ask_ai_wrapper(ai_client, r, p, bv, ri, pn, **kw)
+    def ask_ai(r, p, bv, ri, pn, **kw):
+        return ask_ai_wrapper(ai_client, r, p, bv, ri, pn, **kw)
 
     # 1. Perform Column Discovery (Identifying semantics)
     try:
@@ -134,7 +133,8 @@ def process_build(db_client: DBClient, ai_client: AIClient, build_version, limit
             except Exception as e: logger.error(f"Task failed: {e}")
     
     # Generate final build map diagram
-    ask_ai_simple = lambda p: ai_client.ask("Cartographer", p)
+    def ask_ai_simple(p):
+        return ai_client.ask("Cartographer", p)
     generate_relationship_map(db_client, ask_ai_simple, build_version)
 
 

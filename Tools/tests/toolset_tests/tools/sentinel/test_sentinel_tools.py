@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/sentinel/test_sentinel_tools.py
-import pytest
 from Tools.toolsets.tools.sentinel.sanitize_data import sanitize_data
 from Tools.toolsets.tools.sentinel.sql_security_audit import sql_security_audit
 from Tools.toolsets.tools.sentinel.privacy_protection import privacy_protection

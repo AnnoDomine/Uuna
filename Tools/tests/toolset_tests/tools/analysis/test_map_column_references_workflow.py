@@ -1,14 +1,12 @@
 # Tools/tests/toolset_tests/tools/analysis/test_map_column_references_workflow.py
 import unittest
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 import sys
 import os
-import json
 
 # Add Tools to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
 
-import toolsets.tools.analysis.map_column_references_workflow
 mcrw_module = sys.modules['toolsets.tools.analysis.map_column_references_workflow']
 from toolsets.tools.analysis.map_column_references_workflow import map_column_references_workflow
 from core.db_client import DBResult

@@ -1,6 +1,6 @@
 # Tools/toolsets/tools/tinker/assess_complexity.py
 import re
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 def assess_complexity(query: str) -> Dict[str, Any]:
     """

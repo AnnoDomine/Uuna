@@ -3,7 +3,6 @@ import os
 sys.path.append(os.getcwd())
 
 from Tools.core.api.managers.vector_manager import VectorManager
-import json
 
 def audit_knowledge():
     vm = VectorManager()

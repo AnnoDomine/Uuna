@@ -2,7 +2,7 @@
 import sys
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

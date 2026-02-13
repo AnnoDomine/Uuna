@@ -1,9 +1,7 @@
 # Tools/tests/test_ai_researcher_agent.py
-import pytest
 from unittest.mock import MagicMock, patch
 import sys
 import os
-import json
 
 # Add Tools to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

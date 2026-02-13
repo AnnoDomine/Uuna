@@ -1,9 +1,7 @@
 # Tools/run_demon_hunter_research.py
 import sys
 import os
-import json
 import duckdb
-from loguru import logger
 
 # Ensure path resolution
 sys.path.append(os.getcwd())
@@ -50,7 +48,7 @@ def run_research():
     # 4. Expedition Group
     print("\n[4. EXPEDITION GROUP] Researching Lore...")
     lore = "Demon Hunters are a hero class introduced in WoW Legion (Patch 7.0.3). Their starting zone is Mardum. They use glaives and can transform into demons."
-    print(f" Lore point: introduced in Legion (7.0.3)")
+    print(" Lore point: introduced in Legion (7.0.3)")
 
     # 5. Archivist
     print("\n[5. ARCHIVIST] Researching DB Structure...")

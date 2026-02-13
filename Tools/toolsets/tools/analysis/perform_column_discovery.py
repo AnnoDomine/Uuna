@@ -1,10 +1,9 @@
 # Tools/toolsets/tools/analysis/perform_column_discovery.py
 import sys
 import os
-import time
 import re
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))

@@ -1,5 +1,4 @@
 # Tools/toolsets/tools/audit/grant_final_verdict.py
-import json
 from typing import Dict, Any, Optional
 from pathlib import Path
 import sys

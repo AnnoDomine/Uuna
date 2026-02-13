@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/audit/test_sages_tools.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.audit.check_logical_consistency import check_logical_consistency
 from Tools.toolsets.tools.audit.grant_final_verdict import grant_final_verdict

@@ -1,7 +1,7 @@
 # Tools/toolsets/tools/courier/create_task_event.py
 import uuid
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 import sys
 import os

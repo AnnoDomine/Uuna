@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/courier/test_courier_tools.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.courier.get_role_capabilities import get_role_capabilities
 from Tools.toolsets.tools.courier.create_task_event import create_task_event

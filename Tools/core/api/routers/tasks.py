@@ -1,10 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
 import uuid
 import json
-from ..models.task import Task
-from ..models.task_event import TaskEvent
 import duckdb
 import os
 

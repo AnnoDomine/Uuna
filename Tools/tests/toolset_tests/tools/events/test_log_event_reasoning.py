@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/events/test_log_event_reasoning.py
-import pytest
 from unittest.mock import MagicMock
 from Tools.toolsets.tools.events.log_event_reasoning import log_event_reasoning
 

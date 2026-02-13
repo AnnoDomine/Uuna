@@ -7,7 +7,6 @@ import os
 # Add Tools to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
 
-import toolsets.tools.analysis.run_mass_indexing
 rmi_module = sys.modules['toolsets.tools.analysis.run_mass_indexing']
 from toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
 from core.db_client import DBResult

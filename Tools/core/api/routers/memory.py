@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 from ..managers.vector_manager import VectorManager
 
 router = APIRouter(prefix="/memory", tags=["memory"])

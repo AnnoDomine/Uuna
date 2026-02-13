@@ -2,7 +2,6 @@ import os
 import time
 import sys
 import json
-import traceback
 from loguru import logger
 from Tools.core.db_client import DBClient
 

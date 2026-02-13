@@ -1,5 +1,4 @@
 # Tools/tests/toolset_tests/tools/system/test_get_my_skills.py
-import pytest
 from Tools.toolsets.tools.system.get_my_skills import get_my_skills
 
 def test_get_my_skills_success():

@@ -1,4 +1,3 @@
-import sys
 from loguru import logger
 from fastapi import FastAPI
 from .migrations.manager import MigrationManager

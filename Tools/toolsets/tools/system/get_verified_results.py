@@ -1,6 +1,5 @@
 # Tools/toolsets/tools/system/get_verified_results.py
-import json
-from typing import Dict, Any, List
+from typing import Dict, Any
 from pathlib import Path
 import sys
 import os

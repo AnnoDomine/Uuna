@@ -1,8 +1,8 @@
 import duckdb
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional, Any
+from typing import List, Any
 import uvicorn
 import traceback
 import os

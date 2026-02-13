@@ -1,13 +1,10 @@
-import duckdb
 import os
 import sys
 import requests
 import re
 import json
-import time
 import subprocess
-import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 from Tools.core.db_client import DBClient
 
@@ -147,7 +144,7 @@ def process_table_master(table, version, build_id):
             table=table, temp_table=temp_table
         )
         t_log.info("Inserting rows...")
-        sql_insert_rows = load_query("insert_unique_rows")
+        load_query("insert_unique_rows")
         t_log.info("Inserting build map...")
         sql_insert_map = load_query("insert_build_map")
 

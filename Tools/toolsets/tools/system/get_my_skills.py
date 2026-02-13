@@ -1,7 +1,6 @@
 # Tools/toolsets/tools/system/get_my_skills.py
-import os
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 SKILLS_BASE_DIR = Path("Tools/agents/skills")
 
