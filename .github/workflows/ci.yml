@@ -44,7 +44,13 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
-          cd Tools/web/tui-node
+          # Build local ink-markdown patch first
+          cd Patches/ink-addons/ink-markdown
+          npm install
+          npm run build
+          
+          # Install TUI dependencies
+          cd ../../../Tools/web/tui-node
           npm install --legacy-peer-deps
 
       - name: Start DB Service in background
