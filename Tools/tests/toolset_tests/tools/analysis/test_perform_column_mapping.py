@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, patch
 from toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
 from core.db_client import DBResult
 
-# Reference to the module for patching
-import toolsets.tools.analysis.perform_column_mapping as pcm_module
+import toolsets.tools.analysis.perform_column_mapping
+import sys
+pcm_module = sys.modules["toolsets.tools.analysis.perform_column_mapping"]
 
 
 class TestPerformColumnMapping(unittest.TestCase):

@@ -1,18 +1,12 @@
 # Tools/tests/test_ai_researcher_agent.py
 from unittest.mock import MagicMock, patch
-import sys
-import os
-
-# Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from agents.ai_researcher_agent import process_build
+from Tools.agents.ai_researcher_agent import process_build
 
 
-@patch("agents.ai_researcher_agent.extract_features_for_build")
-@patch("agents.ai_researcher_agent.perform_column_discovery")
-@patch("agents.ai_researcher_agent.perform_column_mapping")
-@patch("agents.ai_researcher_agent.generate_relationship_map")
+@patch("Tools.agents.ai_researcher_agent.extract_features_for_build")
+@patch("Tools.agents.ai_researcher_agent.perform_column_discovery")
+@patch("Tools.agents.ai_researcher_agent.perform_column_mapping")
+@patch("Tools.agents.ai_researcher_agent.generate_relationship_map")
 def test_process_build_flow(mock_gen_map, mock_mapping, mock_discovery, mock_extract):
     # Setup mocks
     mock_db_client = MagicMock()

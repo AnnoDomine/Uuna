@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, patch
 from toolsets.tools.analysis.map_column_references_workflow import map_column_references_workflow
 from core.db_client import DBResult
 
-# Reference to the module for patching
-import toolsets.tools.analysis.map_column_references_workflow as mcrw_module
+import toolsets.tools.analysis.map_column_references_workflow
+import sys
+mcrw_module = sys.modules["toolsets.tools.analysis.map_column_references_workflow"]
 
 
 class TestMapColumnReferencesWorkflow(unittest.TestCase):

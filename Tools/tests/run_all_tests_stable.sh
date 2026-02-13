@@ -27,7 +27,7 @@ do
         PYTEST_CMD=".venv/bin/pytest"
     fi
 
-    PYTEST_ARGS="Tools/tests/test_db_service.py Tools/tests/test_ai_client.py Tools/tests/test_sanitization.py"
+    PYTEST_ARGS="Tools/tests/"
     if [ "$GENERATE_REPORTS" = "true" ]; then
         PYTEST_ARGS="$PYTEST_ARGS --junitxml=$REPORTS_DIR/python-run-$i.xml"
     fi

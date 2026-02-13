@@ -61,16 +61,11 @@ jobs:
         run: |
           uv run ruff check .
 
-      - name: Install Node.js dependencies
+      - name: Lint and Type-check TUI
         run: |
-          # Build local ink-markdown patch first
-          cd Patches/ink-addons/ink-markdown
-          pnpm install
-          pnpm run build
-          
-          # Install TUI dependencies
-          cd ../../../Tools/web/tui-node
-          pnpm install --no-frozen-lockfile
+          cd Tools/web/tui-node
+          pnpm biome check .
+          pnpm tsc --noEmit
 
       - name: Run Stability Tests (3x)
         env:
