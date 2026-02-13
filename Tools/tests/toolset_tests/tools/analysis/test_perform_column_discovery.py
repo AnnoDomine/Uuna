@@ -1,16 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_perform_column_discovery.py
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-
-# Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
-
-# Import to ensure it's in sys.modules
-pcd_module = sys.modules["toolsets.tools.analysis.perform_column_discovery"]
 from toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
 from core.db_client import DBResult
+
+# Reference to the module for patching
+import toolsets.tools.analysis.perform_column_discovery as pcd_module
 
 
 class TestPerformColumnDiscovery(unittest.TestCase):

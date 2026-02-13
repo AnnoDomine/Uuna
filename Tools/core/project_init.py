@@ -102,9 +102,6 @@ def init_registry():
 
     # Simple migration: Add missing columns if they don't exist
     c.execute("PRAGMA table_info(builds)")
-    columns = [col[1] for col in cursor.fetchall()] if "cursor" in locals() else [col[1] for col in c.fetchall()]
-    # Re-fetch because I made a mistake in the line above (cursor vs c)
-    c.execute("PRAGMA table_info(builds)")
     columns = [col[1] for col in c.fetchall()]
 
     if "is_downloaded" not in columns:

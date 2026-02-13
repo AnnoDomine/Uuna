@@ -1,15 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_generate_relationship_map.py
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-
-# Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
-
-grm_module = sys.modules["toolsets.tools.analysis.generate_relationship_map"]
 from toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
 from core.db_client import DBResult
+
+# Reference to the module for patching
+import toolsets.tools.analysis.generate_relationship_map as grm_module
 
 
 class TestGenerateRelationshipMap(unittest.TestCase):

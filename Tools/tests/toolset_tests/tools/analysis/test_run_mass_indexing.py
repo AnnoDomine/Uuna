@@ -1,15 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_run_mass_indexing.py
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
-
-# Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
-
-rmi_module = sys.modules["toolsets.tools.analysis.run_mass_indexing"]
 from toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
 from core.db_client import DBResult
+
+# Reference to the module for patching
+import toolsets.tools.analysis.run_mass_indexing as rmi_module
 
 
 class TestRunMassIndexing(unittest.TestCase):

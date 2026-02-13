@@ -2,62 +2,84 @@ name: Uuna Stability CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master, dev, stage ]
+    branches: [main, master, dev, stage]
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
 
 jobs:
   stability-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: Install dependencies with uv
-      run: |
-        uv sync --frozen --all-extras
+      - name: Install dependencies with uv
+        run: |
+          uv sync --frozen --all-extras
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
 
-    - name: Lint with ruff
-      run: |
-        uv run ruff check .
+      - name: Lint with ruff
+        run: |
+          uv run ruff check .
 
-    - name: Install Node.js dependencies
-      run: |
-        cd Tools/web/tui-node
-        npm install --legacy-peer-deps
+      - name: Install Node.js dependencies
+        run: |
+          cd Tools/web/tui-node
+          npm install --legacy-peer-deps
 
-    - name: Start DB Service in background
-      run: |
-        mkdir -p Data/logs
-        PYTHONPATH=. uv run python -u Tools/core/db_service.py &
-        echo "Waiting for DB Service to start..."
-        sleep 5
+      - name: Start DB Service in background
+        run: |
+          mkdir -p Data/logs
+          PYTHONPATH=. uv run python -u Tools/core/db_service.py &
+          echo "Waiting for DB Service to start..."
+          sleep 5
 
-    - name: Run Stability Tests (3x)
-      run: |
-        chmod +x Tools/tests/run_all_tests_stable.sh
-        ./Tools/tests/run_all_tests_stable.sh
+      - name: Run Stability Tests (3x)
+        env:
+          GENERATE_REPORTS: "true"
+        run: |
+          chmod +x Tools/tests/run_all_tests_stable.sh
+          ./Tools/tests/run_all_tests_stable.sh
 
-    - name: Upload Logs on Failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-logs
-        path: |
-          Data/logs/*.log
-          Tools/web/tui-node/npm-debug.log
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            Data/test-reports/*.xml
+
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: Data/test-reports/
+
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            Data/logs/*.log
+            Tools/web/tui-node/npm-debug.log

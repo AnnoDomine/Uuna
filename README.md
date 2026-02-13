@@ -45,30 +45,35 @@ To ensure absolute integrity and prevent AI agents from "gaming the system," we 
 
 ### 1. Installation
 ```bash
-# Clone and setup environment
+# Clone the repository
 git clone https://github.com/AnnoDomine/Uuna.git
 cd Uuna
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
 
-# Start the DB Service
-bash Tools/start_db_service.sh
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Setup and sync environment
+uv sync
 ```
 
-### 2. Fetching Builds
-```bash
-# Update the registry from Wago.tools
-.venv/bin/python3 Tools/ingestion/update_build_registry.py
+### 2. Management & Development
+The project includes a `manage.py` utility to centralize common tasks:
 
-# Start the Master Ingester (Syncs DB2 to DuckDB)
-bash Tools/start_master_ingester.sh
-```
-
-### 3. Running Research
 ```bash
-# Trigger an autonomous research run
-.venv/bin/python3 Tools/agents/ai_researcher_agent.py --start 7.3.5.25600 --limit 10
+# Initialize the environment (Folders & DBs)
+uv run manage.py init
+
+# Start the Database Service (API Gateway)
+uv run manage.py serve
+
+# Run the Master Ingester (Syncs DB2 to DuckDB)
+uv run manage.py ingest --limit 50
+
+# Run all stability tests
+uv run manage.py test
+
+# Autonomous research run
+uv run python Tools/agents/ai_researcher_agent.py --start 7.3.5.25600 --limit 10
 ```
 
 ---

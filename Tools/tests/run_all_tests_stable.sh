@@ -18,6 +18,8 @@ do
     # 1. Python Tests
     echo "🐍 Running Python tests..."
     PYTEST_CMD="pytest"
+    REPORTS_DIR="$PROJECT_ROOT/Data/test-reports"
+    mkdir -p "$REPORTS_DIR"
     
     if command -v uv > /dev/null 2>&1; then
         PYTEST_CMD="uv run pytest"
@@ -25,7 +27,12 @@ do
         PYTEST_CMD=".venv/bin/pytest"
     fi
 
-    if PYTHONPATH=. $PYTEST_CMD Tools/tests/test_db_service.py Tools/tests/test_ai_client.py Tools/tests/test_sanitization.py; then
+    PYTEST_ARGS="Tools/tests/test_db_service.py Tools/tests/test_ai_client.py Tools/tests/test_sanitization.py"
+    if [ "$GENERATE_REPORTS" = "true" ]; then
+        PYTEST_ARGS="$PYTEST_ARGS --junitxml=$REPORTS_DIR/python-run-$i.xml"
+    fi
+
+    if PYTHONPATH=. $PYTEST_CMD $PYTEST_ARGS; then
         echo "✅ Python tests successful."
     else
         echo "❌ Python tests failed. Aborting."
@@ -35,7 +42,12 @@ do
     # 2. TUI Tests
     echo "⚛️ Running TUI (Ink) tests..."
     cd "$TUI_DIR"
-    if npx vitest run; then
+    VITEST_ARGS="run"
+    if [ "$GENERATE_REPORTS" = "true" ]; then
+        VITEST_ARGS="$VITEST_ARGS --reporter=junit --outputFile=$REPORTS_DIR/tui-run-$i.xml"
+    fi
+
+    if npx vitest $VITEST_ARGS; then
         echo "✅ TUI tests successful."
     else
         echo "❌ TUI tests failed. Aborting."
