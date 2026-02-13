@@ -1,25 +1,58 @@
-name: Python CI
+name: Uuna Stability CI
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, dev, stage ]
 
 jobs:
-  lint:
+  stability-tests:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python
+
+    - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
-    - name: Install dependencies
+        python-version: '3.12'
+
+    - name: Install uv
       run: |
-        python -m pip install --upgrade pip
-        pip install pandas requests ruff
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies with uv
+      run: |
+        uv sync --all-extras
+
     - name: Lint with ruff
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        ruff check .
+        uv run ruff check .
+
+    - name: Install Node.js dependencies
+      run: |
+        cd Tools/web/tui-node
+        npm install --legacy-peer-deps
+
+    - name: Start DB Service in background
+      run: |
+        mkdir -p Data/logs
+        PYTHONPATH=. uv run python Tools/core/db_service.py &
+        echo "Waiting for DB Service to start..."
+        sleep 5
+
+    - name: Run Stability Tests (3x)
+      run: |
+        chmod +x Tools/tests/run_all_tests_stable.sh
+        ./Tools/tests/run_all_tests_stable.sh
+
+    - name: Upload Logs on Failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: |
+          Data/logs/*.log
+          Tools/web/tui-node/npm-debug.log

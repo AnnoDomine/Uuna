@@ -8,7 +8,7 @@ import traceback
 import os
 
 app = FastAPI(title="WoW Datamine DB Service")
-DB_PATH = 'Data/WoW_Master.duckdb'
+DB_PATH = os.getenv("WOW_DB_PATH", 'Data/WoW_Master.duckdb')
 con = None
 
 @app.on_event("startup")

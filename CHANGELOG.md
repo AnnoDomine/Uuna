@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.12] - 2026-02-13
+### Added
+- **Python 3.12 Migration**: Upgraded the core environment to Python 3.12 for improved performance and modern feature support.
+- **uv Package Manager**: Replaced `pip` with **uv** for lightning-fast dependency management and reliable `uv.lock` builds.
+- **Standardized pyproject.toml**: Centralized all project metadata and dependencies into a modern PEP 621 compliant file.
+- **TUI E2E Testing**: Established a comprehensive Vitest-based testing suite for the React/Ink TUI with navigation simulation.
+- **Global Stability Guard**: New `run_all_tests_stable.sh` script ensuring all components pass 3 consecutive runs before deployment.
+
+### Changed
+- **CI/CD Pipeline**: Updated GitHub Actions to utilize Python 3.12 and `uv sync` for significantly faster build times.
+- **Shell Tools**: Refactored all `.sh` start scripts to prefer `uv run` for consistent environment execution.
+- **Core Mandates**: Updated `AGENT.md` to establish Python 3.12 and `uv` as the new development standards.
+
+### Removed
+- **Legacy Textual TUI**: Removed the outdated Python-based TUI to focus exclusively on the superior React (Ink) implementation.
+
 ## [0.9.11] - 2026-02-12
 ### Added
 - **Multi-Agent Skill-Sets**: Implemented atomic Markdown-based procedural knowledge for all 9 agent roles in `Tools/agents/skills/`.
