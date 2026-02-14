@@ -10,21 +10,23 @@ describe("PageSwitcher", () => {
         expect(lastFrame()).toContain("Please enter your question:");
     });
 
-    it("should switch to Settings page", () => {
+    it("should switch to Settings page", async () => {
         const { lastFrame } = render(<PageSwitcher />);
 
         useStore.getState().setCurrentPage(ENavigationItems.SETTINGS);
 
-        // We expect some settings-specific text.
-        // I'll check what's in Settings page first but usually it has "Settings" or group names.
-        expect(lastFrame()).toBeTruthy();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        expect(lastFrame()).toContain("AI & SYSTEM SETTINGS");
     });
 
-    it("should switch to Wiki page", () => {
+    it("should switch to Wiki page", async () => {
         const { lastFrame } = render(<PageSwitcher />);
 
         useStore.getState().setCurrentPage(ENavigationItems.WIKI);
 
-        expect(lastFrame()).toBeTruthy();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        expect(lastFrame()).toContain("WIKI:");
     });
 });

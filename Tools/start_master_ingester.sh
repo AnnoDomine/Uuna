@@ -15,7 +15,7 @@ sleep 1
 echo "--- Master Ingestion Batch Robust Start: $(date) (Limit: $LIMIT, Workers: $WORKERS) ---" >> "$LOG"
 
 # Wir übergeben MAX_BUILDS, MAX_WORKERS und PYTHONPATH via env im Popen call
-uv run python -c "import subprocess, os; env = os.environ.copy(); env['MAX_BUILDS'] = '$LIMIT'; env['MAX_WORKERS'] = '$WORKERS'; env['PYTHONPATH'] = os.getcwd(); subprocess.Popen(['python', '-u', '$SCRIPT'], stdout=open('$LOG', 'a'), stderr=subprocess.STDOUT, start_new_session=True, env=env)"
+$PYTHON -c "import subprocess, os; env = os.environ.copy(); env['MAX_BUILDS'] = '$LIMIT'; env['MAX_WORKERS'] = '$WORKERS'; env['PYTHONPATH'] = os.getcwd(); subprocess.Popen(['python', '-u', '$SCRIPT'], stdout=open('$LOG', 'a'), stderr=subprocess.STDOUT, start_new_session=True, env=env)"
 
 echo "Master Ingester gestartet (Limit: $LIMIT, Workers: $WORKERS)."
 echo "Log: $LOG"

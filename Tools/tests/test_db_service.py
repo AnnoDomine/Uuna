@@ -94,7 +94,7 @@ def db_service():
         proc.terminate()
         try:
             proc.wait(timeout=5)
-        except Exception:
+        except subprocess.TimeoutExpired:
             proc.kill()
 
     # Cleanup test DB

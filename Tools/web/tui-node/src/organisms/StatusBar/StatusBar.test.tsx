@@ -26,7 +26,7 @@ describe("StatusBar", () => {
         useStore.getState().setApiOnline(true);
 
         // Wait for re-render
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(lastFrame()).toContain("API Health: Online");
     });
@@ -37,7 +37,7 @@ describe("StatusBar", () => {
         useStore.getState().setAgents(5);
 
         // Wait for re-render
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(lastFrame()).toContain("Agents: 5");
     });

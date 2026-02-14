@@ -13,7 +13,7 @@ sleep 1
 
 echo "--- DB Service Robust Start: $(date) ---" >> "$LOG"
 
-uv run python -c "import subprocess, os; env = os.environ.copy(); env['PYTHONPATH'] = os.getcwd(); subprocess.Popen(['python', '-u', '$SCRIPT'], stdout=open('$LOG', 'a'), stderr=subprocess.STDOUT, start_new_session=True, env=env)"
+$PYTHON -c "import subprocess, os; env = os.environ.copy(); env['PYTHONPATH'] = os.getcwd(); subprocess.Popen(['python', '-u', '$SCRIPT'], stdout=open('$LOG', 'a'), stderr=subprocess.STDOUT, start_new_session=True, env=env)"
 
 echo "DB Service wurde im Hintergrund gestartet (start_new_session=True)."
 echo "Log: $LOG"
