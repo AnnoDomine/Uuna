@@ -11,9 +11,9 @@ from fastapi.templating import Jinja2Templates
 from sse_starlette.sse import EventSourceResponse
 from contextlib import asynccontextmanager
 
-from sync_wow_db import fetch_and_import, get_setting
-from update_build_registry import update_registry, fetch_versions
-from project_init import init_all
+from Tools.ingestion.sync_wow_db import fetch_and_import, get_setting
+from Tools.ingestion.update_build_registry import update_registry, fetch_versions
+from Tools.core.project_init import init_all
 
 
 @asynccontextmanager

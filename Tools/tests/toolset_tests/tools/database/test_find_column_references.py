@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.find_column_references import find_column_references
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.database.find_column_references import find_column_references
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestFindColumnReferences(unittest.TestCase):

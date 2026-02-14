@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.analysis.guess_table_reference import guess_table_reference
+from Tools.toolsets.tools.analysis.guess_table_reference import guess_table_reference
 
 
 class TestGuessTableReference(unittest.TestCase):

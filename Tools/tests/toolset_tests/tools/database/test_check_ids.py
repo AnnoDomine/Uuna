@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.check_ids import check_ids
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.database.check_ids import check_ids
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestCheckIds(unittest.TestCase):

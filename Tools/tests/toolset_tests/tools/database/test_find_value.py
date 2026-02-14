@@ -7,8 +7,8 @@ import os
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.find_value import find_value
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.database.find_value import find_value
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestFindValue(unittest.TestCase):

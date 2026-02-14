@@ -1,31 +1,27 @@
 # Tools/run_demon_hunter_research.py
 import sys
 import os
-import duckdb
 
 # Ensure path resolution
 sys.path.append(os.getcwd())
 
-from core.ai_client import AIClient
-from toolsets.tools.registry.check_build_status import check_build_status
-from toolsets.tools.system.create_research_task import create_research_task
-from toolsets.tools.tinker.assess_complexity import assess_complexity
-from toolsets.tools.tinker.assign_potential_score import assign_potential_score
-from toolsets.tools.courier.create_task_event import create_task_event
-from toolsets.tools.audit.evaluate_agent_output import evaluate_agent_output
+from Tools.core.ai_client import AIClient
+from Tools.core.db_client import DBClient
+from Tools.toolsets.tools.registry.check_build_status import check_build_status
+from Tools.toolsets.tools.system.create_research_task import create_research_task
+from Tools.toolsets.tools.tinker.assess_complexity import assess_complexity
+from Tools.toolsets.tools.tinker.assign_potential_score import assign_potential_score
+from Tools.toolsets.tools.courier.create_task_event import create_task_event
+from Tools.toolsets.tools.audit.evaluate_agent_output import evaluate_agent_output
 
-
-# Mock DB Client that uses a local connection for the demo
-class LocalDBClient:
-    def __init__(self, db_path):
-        self.con = duckdb.connect(db_path)
-
-    def execute(self, sql, params=None):
-        return self.con.execute(sql, params or [])
-
+def ask_ai_wrapper(ai_client: AIClient, role, prompt, build_ver, run_info, process_name, **kwargs):
+    """Wrapper to maintain compatibility with existing tool signatures."""
+    # Role header is added by AIClient.ask internally
+    return ai_client.ask(role, prompt)
 
 def run_research():
-    db = LocalDBClient("Data/WoW_Master.duckdb")
+    # Mandate: Use DBClient with Middleware
+    db = DBClient(url="http://127.0.0.1:8002")
     ai = AIClient(ollama_url="http://localhost:11434/api/chat")
 
     # Fetch localisation setting
@@ -44,37 +40,39 @@ def run_research():
 
     # 3. Tinker & Courier
     comp = assess_complexity("Demon Hunter Legion")
+    
+    # Bridge to AIClient
+    def ask_ai(r, p, bv, ri, pn, **kw):
+        return ask_ai_wrapper(ai, r, p, bv, ri, pn, **kw)
+    
     event_id = create_task_event(db, task_id, "Courier", "Expedition Group", {"query": "Lore"})["event_id"]
     assign_potential_score(db, event_id, 100)
-    print(f" [OK] Complexity Tier {comp['complexity_tier']} | Event {event_id[:8]} created.")
+    print(f" [OK] Complexity Tier {comp.get('complexity_tier')} | Event {event_id[:8]} created.")
 
     # 4. Expedition Group
     print("\n[4. EXPEDITION GROUP] Researching Lore...")
     lore = "Demon Hunters are a hero class introduced in WoW Legion (Patch 7.0.3). Their starting zone is Mardum. They use glaives and can transform into demons."
-    print(" Lore point: introduced in Legion (7.0.3)")
-
+    
     # 5. Archivist
     print("\n[5. ARCHIVIST] Researching DB Structure...")
     db_tables = ["ChrClasses", "SkillLine"]
-    print(f" DB References: {db_tables}")
-
+    
     # 6. Observer
     print("\n[6. OBSERVER] Evaluating Quality...")
-    obs = evaluate_agent_output(db, ai.ask, task_id, event_id, {"lore": lore}, 0.95)
+    obs = evaluate_agent_output(db, ask_ai, task_id, event_id, {"lore": lore}, 0.95)
     print(f" Score: {obs.get('cpp_percent')}% | Honesty: {obs.get('honesty_rating')}")
 
     # 7. Librarian Synthesis
     print("\n[7. LIBRARIAN] Creating response for user...")
-    # Using the new template logic
+    role_header = "ROLE: You are the Librarian. Synthesize knowledge for the user."
     prompt = f"Lore: {lore}. DB Tables: {db_tables}. Construct a response in {loc}."
-    final = ai.ask("The Librarian", f"JSON Format {{'response_local': '...'}}: {prompt}")
+    final = ai.ask(role_header, f"JSON Format {{'response_local': '...'}}: {prompt}")
 
     print("\n" + "=" * 60)
     print(f"FINAL ANSWER (Grand Library - {loc}):")
     print("-" * 60)
     print(final.get("response_local", "Error generating response."))
     print("=" * 60 + "\n")
-
 
 if __name__ == "__main__":
     run_research()

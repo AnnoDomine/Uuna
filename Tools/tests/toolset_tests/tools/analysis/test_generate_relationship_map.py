@@ -1,11 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_generate_relationship_map.py
 import unittest
 from unittest.mock import MagicMock, patch
-from toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
-from core.db_client import DBResult
+from Tools.toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
+from Tools.core.db_client import DBResult
 
 import sys
-grm_module = sys.modules["toolsets.tools.analysis.generate_relationship_map"]
+grm_module = sys.modules["Tools.toolsets.tools.analysis.generate_relationship_map"]
 
 
 class TestGenerateRelationshipMap(unittest.TestCase):

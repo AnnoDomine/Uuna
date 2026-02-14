@@ -7,7 +7,7 @@ from pathlib import Path
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
+from Tools.core.db_client import DBClient
 
 # Define the path to the queries for this tool and related generic ones
 QUERY_DIR_COMPARE = Path(__file__).parent / "queries" / "compare_builds"

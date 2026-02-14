@@ -6,7 +6,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.filesystem.save_mermaid_diagram import save_mermaid_diagram
+from Tools.toolsets.tools.filesystem.save_mermaid_diagram import save_mermaid_diagram
 
 
 class TestSaveMermaidDiagram(unittest.TestCase):

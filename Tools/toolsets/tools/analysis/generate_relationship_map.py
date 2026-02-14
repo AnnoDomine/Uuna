@@ -8,9 +8,9 @@ from pathlib import Path
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
-from toolsets.tools.database.get_confirmed_mappings import get_confirmed_mappings
-from toolsets.tools.filesystem.save_mermaid_diagram import save_mermaid_diagram
+from Tools.core.db_client import DBClient
+from Tools.toolsets.tools.database.get_confirmed_mappings import get_confirmed_mappings
+from Tools.toolsets.tools.filesystem.save_mermaid_diagram import save_mermaid_diagram
 
 # Define paths to query/prompt directories
 QUERY_DIR = Path(__file__).parent / "queries" / "generate_relationship_map"

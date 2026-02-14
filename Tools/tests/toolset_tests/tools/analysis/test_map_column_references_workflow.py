@@ -1,11 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_map_column_references_workflow.py
 import unittest
 from unittest.mock import MagicMock, patch
-from toolsets.tools.analysis.map_column_references_workflow import map_column_references_workflow
-from core.db_client import DBResult
+from Tools.toolsets.tools.analysis.map_column_references_workflow import map_column_references_workflow
+from Tools.core.db_client import DBResult
 
 import sys
-mcrw_module = sys.modules["toolsets.tools.analysis.map_column_references_workflow"]
+mcrw_module = sys.modules["Tools.toolsets.tools.analysis.map_column_references_workflow"]
 
 
 class TestMapColumnReferencesWorkflow(unittest.TestCase):

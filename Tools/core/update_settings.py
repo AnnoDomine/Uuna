@@ -3,7 +3,7 @@ import os
 
 # Ensure path resolution for core modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from core.db_client import DBClient
+from Tools.core.db_client import DBClient
 
 DB_SERVICE_URL = "http://127.0.0.1:8002"
 

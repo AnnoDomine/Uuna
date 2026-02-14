@@ -5,7 +5,7 @@ import os
 # Add Tools to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from toolsets.tools.research.fetch_web_content import sanitize_html
+from Tools.toolsets.tools.research.fetch_web_content import sanitize_html
 
 
 class TestSanitization(unittest.TestCase):

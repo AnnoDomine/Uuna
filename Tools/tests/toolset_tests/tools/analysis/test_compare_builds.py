@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.analysis.compare_builds import compare_builds
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.analysis.compare_builds import compare_builds
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestCompareBuilds(unittest.TestCase):

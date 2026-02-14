@@ -1,11 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_run_mass_indexing.py
 import unittest
 from unittest.mock import MagicMock, patch
-from toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
-from core.db_client import DBResult
+from Tools.toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
+from Tools.core.db_client import DBResult
 
 import sys
-rmi_module = sys.modules["toolsets.tools.analysis.run_mass_indexing"]
+rmi_module = sys.modules["Tools.toolsets.tools.analysis.run_mass_indexing"]
 
 
 class TestRunMassIndexing(unittest.TestCase):

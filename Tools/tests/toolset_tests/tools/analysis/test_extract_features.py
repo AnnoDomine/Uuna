@@ -7,8 +7,8 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.analysis.extract_features import extract_features_for_build
-from core.db_client import DBResult
+from Tools.toolsets.tools.analysis.extract_features import extract_features_for_build
+from Tools.core.db_client import DBResult
 
 
 class TestExtractFeatures(unittest.TestCase):

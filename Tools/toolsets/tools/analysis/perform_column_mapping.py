@@ -7,10 +7,10 @@ from typing import Dict, List, Any, Callable
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
-from toolsets.tools.database.check_ids import check_ids
-from toolsets.tools.database.save_attempt import save_attempt
-from toolsets.tools.database.update_global_knowledge import update_global_knowledge
+from Tools.core.db_client import DBClient
+from Tools.toolsets.tools.database.check_ids import check_ids
+from Tools.toolsets.tools.database.save_attempt import save_attempt
+from Tools.toolsets.tools.database.update_global_knowledge import update_global_knowledge
 
 QUERY_DIR = Path(__file__).parent / "queries" / "perform_column_mapping"
 PROMPT_DIR = Path(__file__).parent / "prompts" / "perform_column_mapping"

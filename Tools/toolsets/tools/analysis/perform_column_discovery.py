@@ -8,12 +8,12 @@ from typing import Dict, List, Any, Callable
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
-from toolsets.tools.database.save_discovery import save_discovery
-from toolsets.tools.database.get_last_attempt import get_last_attempt
-from toolsets.tools.research.get_wago_structure import get_wago_structure
-from toolsets.tools.research.search_wow_wiki import search_wow_wiki
-from toolsets.tools.research.fetch_web_content import fetch_web_content
+from Tools.core.db_client import DBClient
+from Tools.toolsets.tools.database.save_discovery import save_discovery
+from Tools.toolsets.tools.database.get_last_attempt import get_last_attempt
+from Tools.toolsets.tools.research.get_wago_structure import get_wago_structure
+from Tools.toolsets.tools.research.search_wow_wiki import search_wow_wiki
+from Tools.toolsets.tools.research.fetch_web_content import fetch_web_content
 
 QUERY_DIR = Path(__file__).parent / "queries" / "perform_column_discovery"
 PROMPT_DIR = Path(__file__).parent / "prompts" / "perform_column_discovery"

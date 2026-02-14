@@ -1,5 +1,7 @@
 # AGENT.md - WoW Datamine Toolkit Context
 
+Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+
 This document serves as the technical context for AI agents and developers. The project is a universal toolkit for World of Warcraft datamining, utilizing a multi-agent orchestration system.
 
 ## Communication & Naming
@@ -46,7 +48,7 @@ This document serves as the technical context for AI agents and developers. The 
 8.  **Safe Updates**: Avoid `write_file` for updating existing documentation or large files. Use the `replace` tool for surgical edits to preserve historical data.
 9.  **CLI-First**: All core functions must be primarily operable via the terminal.
 10. **Unified Log Schema**: Format: `[{run_info} - {timestamp} - {level} - {process} - {build}]: {message}`.
-11. **Strict Quality Policies**: 
+11. **Strict Quality Policies**:
     - **No `any` Typed Policy**: The use of `any` is strictly prohibited in TypeScript and Python (use `object`, `unknown` or specific generics instead).
     - **Zero Warning Policy**: Code MUST NOT produce any warnings in `pytest`, `vitest`, `ruff`, or `biome`. All warnings are treated as errors.
     - **No-Force-Push Policy**: `git push --force` or `git push --force-with-lease` are strictly forbidden on shared branches (`main`, `master`, `dev`, `stage`). Rebase and merge conflicts MUST be resolved locally.

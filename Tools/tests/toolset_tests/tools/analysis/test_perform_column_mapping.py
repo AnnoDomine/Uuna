@@ -1,11 +1,11 @@
 # Tools/tests/toolset_tests/tools/analysis/test_perform_column_mapping.py
 import unittest
 from unittest.mock import MagicMock, patch
-from toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
-from core.db_client import DBResult
+from Tools.toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
+from Tools.core.db_client import DBResult
 
 import sys
-pcm_module = sys.modules["toolsets.tools.analysis.perform_column_mapping"]
+pcm_module = sys.modules["Tools.toolsets.tools.analysis.perform_column_mapping"]
 
 
 class TestPerformColumnMapping(unittest.TestCase):

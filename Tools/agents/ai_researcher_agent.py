@@ -11,12 +11,12 @@ from loguru import logger
 sys.path.append(os.getcwd())
 
 # Project modules
-from core.db_client import DBClient
-from core.ai_client import AIClient
-from toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
-from toolsets.tools.analysis.extract_features import extract_features_for_build
-from toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
-from toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
+from Tools.core.db_client import DBClient
+from Tools.core.ai_client import AIClient
+from Tools.toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
+from Tools.toolsets.tools.analysis.extract_features import extract_features_for_build
+from Tools.toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
+from Tools.toolsets.tools.analysis.perform_column_mapping import perform_column_mapping
 
 # Constants
 DB_SERVICE_URL = "http://127.0.0.1:8002"

@@ -7,7 +7,7 @@ from pathlib import Path
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
+from Tools.core.db_client import DBClient
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "find_value"

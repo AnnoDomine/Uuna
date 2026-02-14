@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.get_last_attempt import get_last_attempt
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.database.get_last_attempt import get_last_attempt
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestGetLastAttempt(unittest.TestCase):

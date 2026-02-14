@@ -8,7 +8,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from core.db_client import DBClient
+from Tools.core.db_client import DBClient
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_event_data"
 

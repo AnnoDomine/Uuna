@@ -57,6 +57,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install TUI dependencies
+        run: |
+          cd Tools/web/tui-node
+          pnpm install --frozen-lockfile
+
       - name: Lint with ruff
         run: |
           uv run ruff check .

@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.update_global_knowledge import update_global_knowledge
-from core.db_client import DBClient
+from Tools.toolsets.tools.database.update_global_knowledge import update_global_knowledge
+from Tools.core.db_client import DBClient
 
 
 class TestUpdateGlobalKnowledge(unittest.TestCase):

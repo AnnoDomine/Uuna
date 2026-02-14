@@ -6,10 +6,10 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.research.fetch_web_content import fetch_web_content, sanitize_html
-from toolsets.tools.research.search_wow_wiki import search_wow_wiki
-from toolsets.tools.research.get_wago_structure import get_wago_structure
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.research.fetch_web_content import fetch_web_content, sanitize_html
+from Tools.toolsets.tools.research.search_wow_wiki import search_wow_wiki
+from Tools.toolsets.tools.research.get_wago_structure import get_wago_structure
+from Tools.core.db_client import DBClient, DBResult
 
 
 class TestResearchTools(unittest.TestCase):

@@ -6,8 +6,8 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.save_discovery import save_discovery
-from core.db_client import DBClient
+from Tools.toolsets.tools.database.save_discovery import save_discovery
+from Tools.core.db_client import DBClient
 
 
 class TestSaveDiscovery(unittest.TestCase):
