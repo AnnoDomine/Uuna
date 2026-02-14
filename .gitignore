@@ -25,21 +25,24 @@ Desktop.ini
 *.old
 *.lua.bak
 
-# Environment AI related
-ADDITIONAL_CONTEXT.md
-AGENT.md
-HISTORY.md
-*.jpg
-.venv
-Data
-.gemini
-addons
+# Node
+node_modules
+
+
 
 # From dev defined (To AI: Do not remove)
 #########################################
 ########## FROM DEV START ###############
 #########################################
 
+# Environment AI related
+ADDITIONAL_CONTEXT.md
+HISTORY.md
+*.jpg
+.venv
+Data
+.gemini
+addons
 AGENT.md
 .agents
 
