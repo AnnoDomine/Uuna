@@ -1,5 +1,21 @@
 # Projekt History - WoW Datamine Toolkit
 
+## [0.9.13] - 2026-02-14 - "The Inspector & Global Connectivity"
+
+### Added
+- **Interactive Task Inspector**: Implementierung einer 3-Spalten-Ansicht zur Überwachung von Forschungsaufträgen. Nutzer können nun Tasks selektieren, deren Event-Kette einsehen und detaillierte Ergebnisse inkl. Scoring in Echtzeit verfolgen.
+- **Zentralisierte DB-Architektur**: Einführung der `shared_db_instance.py`. Alle Tools greifen nun auf ein globales Datenbank-Objekt zu, was die Codebase entschlackt und technische Parameter aus den KI-Prompts entfernt.
+- **Atomic UI Refactoring**: Vollständige Modularisierung der Task-Seite in `TaskList`, `EventList` und `TaskDetails` Organismen gemäß dem Atomic Design Standard.
+- **Threadpool Integration**: Umstellung des AI-Routers auf asynchrone Threadpool-Ausführung, um die Reaktionsfähigkeit der TUI (Health Checks) während komplexer KI-Anfragen sicherzustellen.
+
+### Changed
+- **Parser-Ready Tools**: Überarbeitung von über 40 Tool-Funktionen. Alle Docstrings folgen nun einem strikten Schema, das eine automatisierte Extraktion von Parametern und Beschreibungen für die KI ermöglicht.
+- **Unified Focus Management**: Integration des `useScopedInput` Hooks in die Startseite (`Home.tsx`) zur Vermeidung von Steuerungskonflikten.
+
+### Fixed
+- **Frontend-Backend Sync**: Korrektur von 404-Fehlern und Verbindungsabbrüchen durch Port-Harmonisierung und verbessertes Exception-Handling.
+- **DuckDB Concurrency**: Behebung von Datei-Sperren durch konsequente Nutzung der Middleware-API.
+
 ## [0.9.11] - 2026-02-12 - "The Relay-Race & Blind Wisdom"
 
 ### Added

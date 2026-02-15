@@ -41,8 +41,12 @@ This document serves as the technical context for AI agents and developers. The 
 1.  **No Redundancy**: Consistently avoid redundant code through modularization.
 2.  **Outsourcing**: Prompts and SQL queries are strictly outsourced to dedicated files and folders within the tool directories (e.g., `Tools/toolsets/tools/.../queries/`).
 3.  **Secure API Protocol**: Agents NEVER execute raw SQL directly. They interact with the library via a restricted Middleware API (`db_service.py`) using dedicated `DBClient` and `AIClient`.
-4.  **Test-Driven**: No class, method, or function is considered integrated without a passing test. A pre-filled test database is created if necessary.
-5.  **Full Code Delivery**: Always deliver the **complete code** for requests or changes, never fragments or partial edits.
+4.  **Shared DB Instance**: Tools MUST NOT accept `db_client` as a parameter. Instead, they MUST import and use the global `db` instance from `Tools.core.shared_db_instance.py` to ensure consistent connectivity and cleaner orchestration prompts.
+5.  **Docstring Standard (Parser-Ready)**: All tool functions MUST follow the standardized docstring format for automated KI-parsing:
+    - Line 1: Concise summary.
+    - Args section: Parameters listed as `- name: description`.
+6.  **Test-Driven**: No class, method, or function is considered integrated without a passing test. A pre-filled test database is created if necessary.
+7.  **Full Code Delivery**: Always deliver the **complete code** for requests or changes, never fragments or partial edits.
 6.  **Documentation First**: Everything is documented cleanly in English. The Wiki (`docs/wiki/`) is the primary "User Manual" and must be kept up-to-date.
 7.  **Gamification**: Documentation utilizes RPG-style imagery (in `docs/wiki/images/`) to reflect the project's WoW theme.
 8.  **Safe Updates**: Avoid `write_file` for updating existing documentation or large files. Use the `replace` tool for surgical edits to preserve historical data.

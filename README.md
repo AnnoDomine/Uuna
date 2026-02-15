@@ -38,6 +38,8 @@ To ensure absolute integrity and prevent AI agents from "gaming the system," we 
 *   **role_memory.duckdb**: Dedicated long-term memory utilizing **DuckDB VSS** (Vector Similarity Search) for semantic pattern recognition.
 *   **AI Engine**: Local LLM orchestration via **Ollama** (Optimized for Qwen 3 8B).
 *   **API Gateway**: All database operations are proxied through a FastAPI middleware (`db_service.py`) to prevent concurrency locks.
+*   **Shared DB Pattern**: High-level tools utilize a centralized `db` instance (`shared_db_instance.py`) to streamline orchestration and prompt clarity.
+*   **Task Inspector**: Real-time TUI monitoring of the multi-agent relay race, providing granular visibility into events, agent reasoning, and scoring.
 
 ---
 

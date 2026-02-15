@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.13] - 2026-02-14
+### Added
+- **Task Inspector Page**: New 3-column interactive monitoring interface in the TUI for real-time tracking of research tasks, events, and scoring.
+- **Atomic Design Refactor**: Complete modularization of the Tasks page into `TaskList`, `EventList`, and `TaskDetails` organisms.
+- **Global DB Instance**: Introduced `shared_db_instance.py` providing a centralized `db` object, eliminating the need to pass `db_client` through every tool signature.
+- **Scoped Input Integration**: Replaced legacy focus handling in `Home.tsx` with `useScopedInput` for consistent navigation across all pages.
+- **Enhanced Task Metadata**: New API endpoints for retrieving granular event data and task-specific scoring logs.
+
+### Changed
+- **Tool Standardisation**: Refactored all 40+ system, research, and analysis tools to support automated docstring parsing for the new KI-orchestration flow.
+- **Non-Blocking AI Chat**: Integrated `run_in_threadpool` in the AI router to keep the TUI health-check responsive during long-running LLM operations.
+- **Test Suite Modernization**: Updated the entire test suite (68+ tests) to support global DB mocking and the new tool signatures.
+
+### Fixed
+- **API Health False-Offlines**: Resolved UI lock-ups by offloading blocking synchronous AI calls to background threads.
+- **DuckDB Catalog Errors**: Fixed table name resolution in the build registry queries.
+
 ## [0.9.12] - 2026-02-13
 ### Added
 - **Python 3.12 Migration**: Upgraded the core environment to Python 3.12 for improved performance and modern feature support.
