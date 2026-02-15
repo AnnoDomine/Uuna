@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "save_discovery"
 
@@ -16,16 +16,21 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def save_discovery(
-    db_client: DBClient, build_id: int, table_name: str, column_name: str, discovery: str, confidence: float
-):
+def save_discovery(build_id: int, table_name: str, column_name: str, discovery: str, confidence: float):
     """
-    Saves a new discovery about a column to the research database.
+    Saves a new discovery about a column.
+
+    Args:
+    - build_id: The internal ID of the build.
+    - table_name: The name of the table.
+    - column_name: The name of the column.
+    - discovery: The textual description of the discovery.
+    - confidence: Confidence score (0.0 to 1.0).
     """
     try:
         sql = _load_query("save_discovery")
         params = [build_id, table_name, column_name, discovery, confidence]
-        db_client.execute(sql, params)
+        db.execute(sql, params)
         print(f"INFO: Discovery saved for {table_name}.{column_name}")
         return {"status": "success"}
     except Exception as e:

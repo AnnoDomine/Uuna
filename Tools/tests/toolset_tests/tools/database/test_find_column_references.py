@@ -1,18 +1,22 @@
 # Tools/tests/toolsets/tools/database/test_find_column_references.py
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import patch
 import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from Tools.toolsets.tools.database.find_column_references import find_column_references
-from Tools.core.db_client import DBClient, DBResult
+from Tools.core.db_client import DBResult
 
 
 class TestFindColumnReferences(unittest.TestCase):
     def setUp(self):
-        self.mock_db_client = MagicMock(spec=DBClient)
+        self.db_patcher = patch("Tools.toolsets.tools.database.find_column_references.db")
+        self.mock_db = self.db_patcher.start()
+
+    def tearDown(self):
+        self.db_patcher.stop()
 
     def test_finds_column_and_sorts_correctly(self):
         # --- Mock Data ---
@@ -51,11 +55,11 @@ class TestFindColumnReferences(unittest.TestCase):
             # Fallback for any other query
             return DBResult({"results": []})
 
-        self.mock_db_client.execute.side_effect = mock_execute_side_effect
+        self.mock_db.execute.side_effect = mock_execute_side_effect
 
         # --- Test Execution ---
         # Search for 'spellID' (should match 'spellID' and 'SpellID' case-insensitively)
-        result = find_column_references(self.mock_db_client, "spellID")
+        result = find_column_references("spellID")
 
         # --- Assertions ---
         self.assertEqual(len(result), 2)
@@ -70,6 +74,10 @@ class TestFindColumnReferences(unittest.TestCase):
         result_keys = list(result.keys())
         self.assertEqual(result_keys[0], "spell_effects")
         self.assertEqual(result_keys[1], "mount_data")
+
+
+if __name__ == "__main__":
+    unittest.main()
 
 
 if __name__ == "__main__":

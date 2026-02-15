@@ -6,8 +6,10 @@ from typing import Dict, Any
 
 def sanitize_data(raw_content: str) -> Dict[str, Any]:
     """
-    Strictly sanitizes raw content by removing HTML tags, scripts,
-    styles, and common web noise (boilerplate).
+    Sanitizes raw content by removing HTML tags and noise.
+
+    Args:
+    - raw_content: The raw string content (e.g. HTML) to sanitize.
     """
     if not raw_content:
         return {"sanitized_content": "", "removed_elements_count": 0, "purity_score": 1.0}

@@ -20,7 +20,11 @@ def _load_query(name: str) -> str:
 def assign_potential_score(db_client: DBClient, event_id: str, potential: int) -> Dict[str, Any]:
     """
     Sets the Max_Potential score for a specific task event.
-    This defines the performance ceiling for the agent assigned to this event.
+
+    Args:
+    - db_client: The database client instance.
+    - event_id: The UUID of the event.
+    - potential: The maximum potential points for this event.
     """
     try:
         sql = _load_query("update_potential")

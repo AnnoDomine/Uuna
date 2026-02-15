@@ -5,6 +5,7 @@ from Tools.toolsets.tools.analysis.perform_column_discovery import perform_colum
 from Tools.core.db_client import DBResult
 
 import sys
+
 pcd_module = sys.modules["Tools.toolsets.tools.analysis.perform_column_discovery"]
 
 
@@ -16,14 +17,13 @@ class TestPerformColumnDiscovery(unittest.TestCase):
             patch.object(pcd_module, "get_wago_structure") as mock_wago,
             patch.object(pcd_module, "search_wow_wiki") as mock_wiki,
             patch.object(pcd_module, "fetch_web_content") as mock_fetch,
-            patch("core.db_client.DBClient") as MockDBClient,
+            patch("Tools.toolsets.tools.analysis.perform_column_discovery.db") as mock_db,
         ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
-            mock_db_client.execute.return_value = MagicMock(spec=DBResult)
+            mock_db.execute.return_value = MagicMock(spec=DBResult)
 
             # Sequence for: get_column_samples, get_legacy_discoveries, get_global_knowledge
-            mock_db_client.execute.return_value.fetchall.side_effect = [
+            mock_db.execute.return_value.fetchall.side_effect = [
                 [(10,), (20,)],  # samples
                 [("Prev Discovery",)],  # legacy
                 [],  # existing knowledge
@@ -40,7 +40,7 @@ class TestPerformColumnDiscovery(unittest.TestCase):
             # --- Test Execution ---
             # col_info: f_id, table, col, d_type, v_min, v_max
             col_info = [1, "Table", "Column", "INT", 0, 100]
-            result = perform_column_discovery(mock_db_client, mock_ai_func, col_info, 123, "10.0.0")
+            result = perform_column_discovery(mock_ai_func, col_info, 123, "10.0.0")
 
             # --- Assertions ---
             assert result["discovery"] == "Test Result"

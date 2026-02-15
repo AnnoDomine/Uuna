@@ -1,0 +1,24 @@
+[
+    {
+        "type": "INFO",
+        "message": "Backend health check result: true",
+        "timestamp": 1771108854882,
+        "actor": "system",
+        "id": "a0a5aa7d-8691-4f8d-8363-ac212c397e1f"
+    },
+    {
+        "type": "TRACE",
+        "message": "Backend is healthy",
+        "process": "BackendService",
+        "timestamp": 1771108859809,
+        "actor": "system",
+        "id": "1a0cc044-4a30-4a7e-af6a-3c10e444ad9c"
+    },
+    {
+        "type": "INFO",
+        "message": "Backend health check result: true",
+        "timestamp": 1771108859851,
+        "actor": "system",
+        "id": "7f3c307f-a797-4310-8534-67eeebb81b62"
+    }
+]

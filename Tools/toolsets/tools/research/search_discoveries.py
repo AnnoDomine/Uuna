@@ -7,7 +7,7 @@ from typing import List, Dict, Any
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "search_discoveries"
 
@@ -17,16 +17,19 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def search_discoveries(db_client: DBClient, term: str, limit: int = 10) -> List[Dict[str, Any]]:
+def search_discoveries(term: str, limit: int = 10) -> List[Dict[str, Any]]:
     """
     Searches through confirmed discoveries in the research schema.
-    Use this to find previously analyzed table/column purposes.
+
+    Args:
+    - term: The search term (searches in table name, column name, and discovery text).
+    - limit: Maximum number of results to return.
     """
     try:
         sql = _load_query("search")
         # ILIKE with wildcards
         pattern = f"%{term}%"
-        res = db_client.execute(sql, [pattern, pattern, limit]).fetchall()
+        res = db.execute(sql, [pattern, pattern, limit]).fetchall()
 
         results = []
         for row in res:

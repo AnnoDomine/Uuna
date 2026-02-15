@@ -64,6 +64,7 @@ const useScrollArea = (id: string, areal?: EFocusAreal) => {
     return {
         scrollRef,
         scrollOffset,
+        setScrollOffset,
         scrollToItem,
         isFocused,
     };

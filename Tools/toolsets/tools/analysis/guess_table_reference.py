@@ -5,16 +5,11 @@ from typing import List, Dict, Union
 
 def guess_table_reference(potential_name: str, all_table_names: List[str]) -> List[Dict[str, Union[str, float]]]:
     """
-    Analyzes a potential reference name and suggests possible matching table names
-    based on a series of heuristics. This is a pure function with no side effects.
+    Suggests matching table names based on a potential reference name.
 
     Args:
-        potential_name: The base name to find a match for (e.g., 'Spell').
-        all_table_names: A list of all table names to search within.
-
-    Returns:
-        A list of suggestion dictionaries, sorted by confidence.
-        e.g., [{'table': 'SpellName', 'reason': 'Alias Match', 'confidence': 0.95}]
+    - potential_name: The base name to find a match for (e.g. 'Spell').
+    - all_table_names: A list of all table names to search within.
     """
     suggestions = {}
 

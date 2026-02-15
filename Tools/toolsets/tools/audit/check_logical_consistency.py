@@ -1,13 +1,13 @@
 # Tools/toolsets/tools/audit/check_logical_consistency.py
-from typing import Dict, Any
-from pathlib import Path
-import sys
 import os
+import sys
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "check_logical_consistency"
 
@@ -17,13 +17,18 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def check_logical_consistency(db_client: DBClient, table: str, column: str, proposed_target: str) -> Dict[str, Any]:
+def check_logical_consistency(table: str, column: str, proposed_target: str) -> Dict[str, Any]:
     """
-    Checks if a proposed mapping contradicts existing established knowledge in the research database.
+    Checks if a mapping contradicts existing knowledge.
+
+    Args:
+    - table: The source table.
+    - column: The source column.
+    - proposed_target: The proposed target table.
     """
     try:
         sql = _load_query("get_conflicts")
-        res = db_client.execute(sql, [column, table]).fetchall()
+        res = db.execute(sql, [column, table]).fetchall()
 
         if not res:
             return {"status": "consistent", "message": "No existing knowledge found for this column/table combination."}

@@ -12,7 +12,7 @@ TEST_DB_PATH = "Data/WoW_Test.duckdb"
 
 @pytest.fixture(scope="module", autouse=True)
 def db_service():
-    # Force kill any existing service instance. 
+    # Force kill any existing service instance.
     # We use a very specific pattern to avoid killing the test process itself!
     try:
         subprocess.run(["pkill", "-f", "Tools/core/db_service.py"], capture_output=True)

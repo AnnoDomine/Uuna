@@ -8,6 +8,8 @@ from .tools.events.log_event_reasoning import log_event_reasoning
 from .tools.events.get_event_data import get_event_data
 from .tools.research.query_vector_memory import query_vector_memory
 from .tools.research.search_discoveries import search_discoveries
+from .tools.system.create_research_task import create_research_task
+from .tools.courier.create_task_event import create_task_event
 
 # Global tools are available to ALL agents.
 GLOBAL_TOOLS = [
@@ -19,4 +21,6 @@ GLOBAL_TOOLS = [
     get_event_data,
     query_vector_memory,
     search_discoveries,
+    create_research_task,
+    create_task_event,
 ]

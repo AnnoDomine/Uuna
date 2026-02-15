@@ -1,6 +1,6 @@
 # Tools/tests/toolsets/tools/database/test_find_value.py
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import patch
 import sys
 import os
 
@@ -8,13 +8,17 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
 from Tools.toolsets.tools.database.find_value import find_value
-from Tools.core.db_client import DBClient, DBResult
+from Tools.core.db_client import DBResult
 
 
 class TestFindValue(unittest.TestCase):
     def setUp(self):
         """Set up a mock DBClient before each test."""
-        self.mock_db_client = MagicMock(spec=DBClient)
+        self.db_patcher = patch("Tools.toolsets.tools.database.find_value.db")
+        self.mock_db = self.db_patcher.start()
+
+    def tearDown(self):
+        self.db_patcher.stop()
 
     def test_finds_value_in_one_table(self):
         """
@@ -74,11 +78,11 @@ class TestFindValue(unittest.TestCase):
                 return mock_count_spell_names
             return DBResult({"results": [], "columns": []})
 
-        self.mock_db_client.execute.side_effect = mock_execute_side_effect
+        self.mock_db.execute.side_effect = mock_execute_side_effect
 
         # --- Test Execution ---
         search_term = "Frostbolt"
-        result = find_value(self.mock_db_client, search_term)
+        result = find_value(search_term)
 
         # --- Assertions ---
         self.assertIn("item_effects", result)
@@ -116,14 +120,18 @@ class TestFindValue(unittest.TestCase):
                 return mock_count_result
             return DBResult({"results": [], "columns": []})
 
-        self.mock_db_client.execute.side_effect = mock_execute_side_effect
+        self.mock_db.execute.side_effect = mock_execute_side_effect
 
         # --- Test Execution ---
-        result = find_value(self.mock_db_client, "TestValue", build_version="10.2.5.52762")
+        result = find_value("TestValue", build_version="10.2.5.52762")
 
         # --- Assertions ---
         self.assertIn("item_effects", result)
         self.assertEqual(result["item_effects"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
 
 
 if __name__ == "__main__":

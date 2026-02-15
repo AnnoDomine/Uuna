@@ -7,7 +7,7 @@ from typing import Dict, List, Any, Callable
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 from Tools.toolsets.tools.database.check_ids import check_ids
 from Tools.toolsets.tools.database.save_attempt import save_attempt
 from Tools.toolsets.tools.database.update_global_knowledge import update_global_knowledge
@@ -48,7 +48,6 @@ def _clean_target(name: str, all_tables: List[str] = None) -> str:
 
 
 def perform_column_mapping(
-    db_client: DBClient,
     ask_ai_func: Callable,
     discovery_result: Dict[str, Any],
     col_info: List[Any],
@@ -56,13 +55,19 @@ def perform_column_mapping(
     **kwargs,
 ) -> Dict[str, Any]:
     """
-    Workflow to map a column to a target table using the Archivist and Sages.
+    Maps a column to a target table using the Archivist and Sages.
+
+    Args:
+    - ask_ai_func: Function to call the AI for discovery.
+    - discovery_result: The result from perform_column_discovery.
+    - col_info: List containing column metadata [f_id, table, col, d_type, min, max].
+    - build_version: The version string of the build.
     """
     f_id, table, col, d_type, v_min, v_max = col_info
     ai_full_response = discovery_result.get("ai_full_response", {})
 
     # 1. Check if we should map
-    preds_res = db_client.execute(_load_query("get_statistical_predictions"), [f_id])
+    preds_res = db.execute(_load_query("get_statistical_predictions"), [f_id])
     preds = preds_res.fetchall()
 
     ai_type = str(ai_full_response.get("type", "")).lower()
@@ -77,7 +82,7 @@ def perform_column_mapping(
         return {"status": "skipped", "reason": "Not a candidate for mapping"}
 
     # 2. Archivist: Propose Mapping
-    all_tables_res = db_client.execute(_load_query("get_available_tables"))
+    all_tables_res = db.execute(_load_query("get_available_tables"))
     all_tables = [r[0] for r in all_tables_res.fetchall()]
 
     # Use context from discovery result
@@ -104,7 +109,7 @@ def perform_column_mapping(
         return {"status": "skipped", "reason": "No target proposed by Archivist"}
 
     # 3. ID Check: Empirical Proof
-    match_count = check_ids(db_client, target, samples)
+    match_count = check_ids(target, samples)
     proof = f"ID Check: {match_count} of {len(samples)} samples found in target '{target}'."
 
     # 4. Sages: Verify
@@ -116,12 +121,11 @@ def perform_column_mapping(
     reasoning = crit.get("reasoning", "No reason provided")
 
     # 5. Save results
-    save_attempt(db_client, build_version, table, col, target, decision.upper(), f"{proof} | {reasoning}")
+    save_attempt(build_version, table, col, target, decision.upper(), f"{proof} | {reasoning}")
 
     mapping_confirmed = False
     if decision in ("confirm", "yes", "true"):
         update_global_knowledge(
-            db_client,
             col,
             table,
             target,

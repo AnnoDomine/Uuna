@@ -5,7 +5,7 @@ import { type EFocusAreal, useFocusStore } from "../store/useFocusStore.js";
 import { ELogTypes } from "../types/global.enums.js";
 import quitApplication from "../utils/helpers/quitApplication.js";
 
-type InputCallback = (input: string, key: Key) => void;
+export type InputCallback = (input: string, key: Key) => void;
 
 interface UseScopedInputOptions {
     id: string;

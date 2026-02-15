@@ -5,6 +5,7 @@ from Tools.toolsets.tools.analysis.generate_relationship_map import generate_rel
 from Tools.core.db_client import DBResult
 
 import sys
+
 grm_module = sys.modules["Tools.toolsets.tools.analysis.generate_relationship_map"]
 
 
@@ -13,12 +14,11 @@ class TestGenerateRelationshipMap(unittest.TestCase):
         with (
             patch.object(grm_module, "get_confirmed_mappings") as mock_get_mappings,
             patch.object(grm_module, "save_mermaid_diagram") as mock_save_diagram,
-            patch("core.db_client.DBClient") as MockDBClient,
+            patch("Tools.toolsets.tools.analysis.generate_relationship_map.db") as mock_db,
         ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
             # Simulate cache miss for mermaid docs
-            mock_db_client.execute.return_value = DBResult({"results": []})
+            mock_db.execute.return_value = DBResult({"results": []})
 
             # 2. Mock the AI function
             mock_ai_response = {"mermaid": "erDiagram\nFAKE_DATA", "description": "A fake diagram"}
@@ -35,11 +35,11 @@ class TestGenerateRelationshipMap(unittest.TestCase):
             build_version = "11.0.0"
 
             # --- Test Execution ---
-            result = generate_relationship_map(mock_db_client, mock_ask_ai_func, build_version)
+            result = generate_relationship_map(mock_ask_ai_func, build_version)
 
             # --- Assertions ---
             # Assert that the dependent tools were called correctly
-            mock_get_mappings.assert_called_once_with(mock_db_client, build_version)
+            mock_get_mappings.assert_called_once_with(build_version)
             mock_ask_ai_func.assert_called_once()
 
             # Assert that the save function was called with the mermaid code from the AI
@@ -52,10 +52,9 @@ class TestGenerateRelationshipMap(unittest.TestCase):
 
     def test_no_mappings_found(self):
         with patch.object(grm_module, "get_confirmed_mappings", return_value=[]):
-            mock_db_client = MagicMock()
             mock_ask_ai_func = MagicMock()
 
-            result = generate_relationship_map(mock_db_client, mock_ask_ai_func, "11.0.0")
+            result = generate_relationship_map(mock_ask_ai_func, "11.0.0")
 
             # Assert no AI call or save was attempted
             mock_ask_ai_func.assert_not_called()

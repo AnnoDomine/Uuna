@@ -7,7 +7,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_verified_results"
 
@@ -17,14 +17,16 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def get_verified_results(db_client: DBClient, task_id: str) -> Dict[str, Any]:
+def get_verified_results(task_id: str) -> Dict[str, Any]:
     """
     Collects all finalized and approved findings for a specific task.
-    This data is used by the Librarian to construct the final answer for the user.
+
+    Args:
+    - task_id: The UUID of the task to retrieve.
     """
     try:
         sql = _load_query("get_results")
-        res = db_client.execute(sql, [task_id]).fetchall()
+        res = db.execute(sql, [task_id]).fetchall()
 
         findings = []
         for row in res:

@@ -5,6 +5,7 @@ from Tools.toolsets.tools.analysis.perform_column_mapping import perform_column_
 from Tools.core.db_client import DBResult
 
 import sys
+
 pcm_module = sys.modules["Tools.toolsets.tools.analysis.perform_column_mapping"]
 
 
@@ -14,14 +15,13 @@ class TestPerformColumnMapping(unittest.TestCase):
             patch.object(pcm_module, "check_ids") as mock_check_ids,
             patch.object(pcm_module, "save_attempt") as mock_save_attempt,
             patch.object(pcm_module, "update_global_knowledge") as mock_update,
-            patch("core.db_client.DBClient") as MockDBClient,
+            patch("Tools.toolsets.tools.analysis.perform_column_mapping.db") as mock_db,
         ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
-            mock_db_client.execute.return_value = MagicMock(spec=DBResult)
+            mock_db.execute.return_value = MagicMock(spec=DBResult)
 
             # Responses for get_statistical_predictions and get_available_tables
-            mock_db_client.execute.return_value.fetchall.side_effect = [
+            mock_db.execute.return_value.fetchall.side_effect = [
                 [("Prediction",)],  # preds
                 [("TargetTable",), ("OtherTable",)],  # all_tables
             ]
@@ -41,7 +41,6 @@ class TestPerformColumnMapping(unittest.TestCase):
             discovery_res = {"ai_full_response": {"type": "structure"}}
             col_info = [1, "Table", "Column", "INT", 0, 100]
             result = perform_column_mapping(
-                mock_db_client,
                 mock_ai_func,
                 discovery_res,
                 col_info,
@@ -63,16 +62,15 @@ class TestPerformColumnMapping(unittest.TestCase):
             mock_update.assert_called_once()
 
     def test_skips_non_mapping_candidate(self):
-        with patch("core.db_client.DBClient") as MockDBClient:
-            mock_db_client = MockDBClient.return_value
-            mock_db_client.execute.return_value = MagicMock(spec=DBResult)
-            mock_db_client.execute.return_value.fetchall.return_value = []  # no predictions
+        with patch("Tools.toolsets.tools.analysis.perform_column_mapping.db") as mock_db:
+            mock_db.execute.return_value = MagicMock(spec=DBResult)
+            mock_db.execute.return_value.fetchall.return_value = []  # no predictions
 
             discovery_res = {"ai_full_response": {"type": "value"}}  # Not a structure
             col_info = [1, "Table", "msec_column", "INT", 0, 100]
 
             mock_ai_func = MagicMock()
-            result = perform_column_mapping(mock_db_client, mock_ai_func, discovery_res, col_info, "10.0.0")
+            result = perform_column_mapping(mock_ai_func, discovery_res, col_info, "10.0.0")
 
             assert result["status"] == "skipped"
             mock_ai_func.assert_not_called()

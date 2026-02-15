@@ -7,7 +7,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "update_task_status"
 
@@ -17,14 +17,18 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def update_task_status(db_client: DBClient, task_id: str, status: str, location: str) -> Dict[str, Any]:
+def update_task_status(task_id: str, status: str, location: str) -> Dict[str, Any]:
     """
-    Updates the global state and current location of a research task.
-    Valid statuses: spawned, active, stalled, rejected, finalized.
+    Updates the state and location of a research task.
+
+    Args:
+    - task_id: The UUID of the task.
+    - status: The new status (e.g. 'active', 'finalized').
+    - location: The role name where the task is currently located.
     """
     try:
         sql = _load_query("update_status")
-        db_client.execute(sql, [status, location, task_id])
+        db.execute(sql, [status, location, task_id])
 
         return {"status": "success", "task_id": task_id, "new_status": status, "current_location": location}
     except Exception as e:

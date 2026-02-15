@@ -7,7 +7,7 @@ import sys
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_task_context"
 
@@ -17,14 +17,16 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def get_task_context(db_client: DBClient, task_id: str) -> Dict[str, Any]:
+def get_task_context(task_id: str) -> Dict[str, Any]:
     """
-    Retrieves the full history and original intent of a research task.
-    Helps agents understand what has already been discovered and by whom.
+    Retrieves the full history and intent of a research task.
+
+    Args:
+    - task_id: The UUID of the task to retrieve.
     """
     try:
         sql = _load_query("get_history")
-        res = db_client.execute(sql, [task_id]).fetchall()
+        res = db.execute(sql, [task_id]).fetchall()
 
         if not res:
             return {"error": f"Task ID {task_id} not found."}

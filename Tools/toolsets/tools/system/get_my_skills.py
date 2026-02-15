@@ -1,14 +1,16 @@
 # Tools/toolsets/tools/system/get_my_skills.py
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 SKILLS_BASE_DIR = Path("Tools/agents/skills")
 
 
 def get_my_skills(role: str) -> Dict[str, Any]:
     """
-    Retrieves the skill-set and procedural instructions for the calling agent role.
-    An agent should use this to ensure it stays within its defined capabilities.
+    Retrieves the skill-set and instructions for the calling agent.
+
+    Args:
+    - role: The role name of the agent (e.g. 'Librarian').
     """
     role_dir = SKILLS_BASE_DIR / role.lower().replace(" ", "_")
     skills_file = role_dir / "SKILLS.md"

@@ -1,13 +1,14 @@
-from loguru import logger
 from fastapi import FastAPI
-from .migrations.manager import MigrationManager
+from loguru import logger
+
 from .managers.log_handler import DatabaseLogHandler
-from .models.task import Task
-from .models.task_event import TaskEvent
+from .migrations.manager import MigrationManager
+from .models.build import Build
 from .models.event_log import EventLog
 from .models.score_board import ScoreBoard
-from .models.build import Build
-from .routers import memory, tasks, scoreboard, logs, settings
+from .models.task import Task
+from .models.task_event import TaskEvent
+from .routers import ai, builds, logs, memory, scoreboard, settings, tasks
 
 app = FastAPI(title="Grand Library API")
 DB_PATH = "Data/WoW_Master.duckdb"
@@ -22,6 +23,8 @@ app.include_router(tasks.router)
 app.include_router(scoreboard.router)
 app.include_router(logs.router)
 app.include_router(settings.router)
+app.include_router(ai.router)
+app.include_router(builds.router)
 
 
 @app.on_event("startup")

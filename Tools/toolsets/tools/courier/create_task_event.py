@@ -9,7 +9,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "create_task_event"
 
@@ -19,13 +19,15 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def create_task_event(
-    db_client: DBClient, task_id: str, initiator: str, target: str, input_data: Dict[str, Any]
-) -> Dict[str, Any]:
+def create_task_event(task_id: str, initiator: str, target: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Creates a new event in the task chain. This is how the Courier hands off
-    work to a specialist agent.
-    The Max_Potential score is NOT part of this tool to maintain role isolation.
+    Creates a new event in the task chain.
+
+    Args:
+    - task_id: The ID of the task this event belongs to.
+    - initiator: The role name of the agent creating the event.
+    - target: The role name of the agent who should receive the event.
+    - input_data: Dictionary containing the data for the target agent.
     """
     try:
         event_id = str(uuid.uuid4())
@@ -33,7 +35,7 @@ def create_task_event(
         # because the Courier doesn't (and shouldn't) know it.
         sql = "INSERT INTO research.task_events (event_id, task_id, initiator_role, target_role, input_data, agent_confidence) VALUES (?, ?, ?, ?, ?, ?)"
 
-        db_client.execute(
+        db.execute(
             sql,
             [
                 event_id,

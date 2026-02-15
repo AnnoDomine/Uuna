@@ -1,7 +1,10 @@
-import requests
 import json
+from typing import Any, Dict
+
+import requests
 from loguru import logger
-from typing import Dict, Any
+
+from Tools.agents.get_agent_skill_set import Agents, get_skill_set
 
 
 class AIClient:
@@ -10,6 +13,25 @@ class AIClient:
         self.model = model
         self.debug = debug
         self.threads = threads
+
+    def make_request(self, payload, role: Agents, temperature: float = 0.1):
+        payload["model"] = self.model
+        payload["options"] = {"num_thread": self.threads, "temperature": temperature}
+        try:
+            r = requests.post(self.ollama_url, json=payload, timeout=600)
+            r.raise_for_status()
+            res = r.json()
+            content = res["message"]["content"]
+
+            if self.debug:
+                logger.debug(f"RAW RESPONSE:\n{content}\n{'=' * 80}")
+
+            parsed = json.loads(content)
+            return self.robust_json_decode(parsed)
+
+        except Exception as e:
+            logger.error(f"AI Call failed for role '{role}': {e}")
+            return {}
 
     def robust_json_decode(self, data):
         """Extracts JSON from common wrapper formats."""
@@ -24,34 +46,22 @@ class AIClient:
                 return data[wrapper]
         return data
 
-    def ask(self, role: str, prompt: str, temperature: float = 0.1) -> Dict[str, Any]:
+    def ask_direct(self, payload: dict, temperature: float = 0.1) -> Dict[str, Any]:
+        return self.make_request(payload, temperature)
+
+    def ask(self, role: Agents, prompt: str, temperature: float = 0.1) -> Dict[str, Any]:
         """Bridge to the local LLM via Ollama."""
         if self.debug:
             logger.debug(f"\n{'=' * 80}\n[DEBUG] ROLE: {role}\nPROMPT:\n{prompt}\n{'-' * 80}")
 
         payload = {
-            "model": self.model,
             "messages": [
                 {"role": "system", "content": f"You are {role}. Return ONLY raw JSON."},
+                {"role": "system", "content": f"SKILLS:\n{get_skill_set(role)}"},
                 {"role": "user", "content": prompt},
             ],
             "stream": False,
             "format": "json",
-            "options": {"num_thread": self.threads, "temperature": temperature},
         }
 
-        try:
-            r = requests.post(self.ollama_url, json=payload, timeout=120)
-            r.raise_for_status()
-            res = r.json()
-            content = res["message"]["content"]
-
-            if self.debug:
-                logger.debug(f"RAW RESPONSE:\n{content}\n{'=' * 80}")
-
-            parsed = json.loads(content)
-            return self.robust_json_decode(parsed)
-
-        except Exception as e:
-            logger.error(f"AI Call failed for role '{role}': {e}")
-            return {}
+        return self.make_request(payload, temperature)

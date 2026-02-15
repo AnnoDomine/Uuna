@@ -12,8 +12,10 @@ SENSITIVE_PATTERNS = {
 
 def privacy_protection(data: str) -> Dict[str, Any]:
     """
-    Scans data for potential PII or secrets and masks them to protect
-    the system and user privacy.
+    Scans data for potential PII or secrets and masks them.
+
+    Args:
+    - data: The input string to scan for sensitive information.
     """
     if not data:
         return {"protected_data": "", "leaks_detected": 0}

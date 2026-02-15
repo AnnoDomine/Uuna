@@ -1,14 +1,16 @@
 # Tools/toolsets/tools/events/get_event_data.py
 import json
-from typing import Dict, Any
-from pathlib import Path
-import sys
 import os
+import sys
+from pathlib import Path
+from typing import Tuple
+
+from Tools.core.shared_db_instance import db
 
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from typing import TypedDict
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_event_data"
 
@@ -18,14 +20,30 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def get_event_data(db_client: DBClient, event_id: str) -> Dict[str, Any]:
+class EventReturn(TypedDict):
+    event_id: int
+    task_id: int
+    initialiator: str
+    target: str
+    input_data: str
+    confidence: float
+    max_potential: str
+
+
+class EventError(TypedDict):
+    error: str
+
+
+def get_event_data(event_id: str) -> Tuple[EventReturn, EventError]:
     """
     Retrieves the payload and metadata of a specific task event.
-    Agents use this to read their assigned work when they receive an event_id.
+
+    Args:
+    - event_id: The UUID of the event to retrieve.
     """
     try:
         sql = _load_query("get_event")
-        res = db_client.execute(sql, [event_id]).fetchone()
+        res = db.execute(sql, [event_id]).fetchone()
 
         if not res:
             return {"error": f"Event ID {event_id} not found."}

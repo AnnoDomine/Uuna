@@ -6,7 +6,9 @@ from typing import Dict, Any
 def assess_complexity(query: str) -> Dict[str, Any]:
     """
     Analyzes a research query to determine its complexity tier.
-    Basis for setting the Max_Potential score.
+
+    Args:
+    - query: The research query string.
     """
     if not query:
         return {"tier": 1, "factors": ["Empty query"]}

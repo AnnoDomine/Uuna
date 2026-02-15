@@ -95,6 +95,14 @@ def _resolve_table_name_headless(
 def map_column_references_workflow(
     db_client: DBClient, build_version: str, auto_import_previous: bool = True
 ) -> Dict[str, Any]:
+    """
+    Workflow to automatically map column references for a build.
+
+    Args:
+    - db_client: The database client instance.
+    - build_version: The version string of the build.
+    - auto_import_previous: Whether to import mappings from the previous build.
+    """
     print(f"=== REFERENCE MAPPING WORKFLOW - {build_version} ===")
 
     # --- Setup and Data Loading ---

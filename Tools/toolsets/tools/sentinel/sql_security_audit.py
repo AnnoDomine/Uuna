@@ -7,8 +7,10 @@ FORBIDDEN_KEYWORDS = ["DROP", "TRUNCATE", "GRANT", "REVOKE", "ALTER", "DELETE"]
 
 def sql_security_audit(sql_query: str) -> Dict[str, Any]:
     """
-    Scans a SQL query for forbidden keywords and potential injection patterns.
-    Ensures that only read-safe or allowed internal operations are performed.
+    Scans a SQL query for forbidden keywords and patterns.
+
+    Args:
+    - sql_query: The raw SQL query string to audit.
     """
     if not sql_query:
         return {"audit_passed": False, "forbidden_detected": ["Empty query"], "threat_level": "Low"}

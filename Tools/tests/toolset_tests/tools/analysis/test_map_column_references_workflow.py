@@ -5,6 +5,7 @@ from Tools.toolsets.tools.analysis.map_column_references_workflow import map_col
 from Tools.core.db_client import DBResult
 
 import sys
+
 mcrw_module = sys.modules["Tools.toolsets.tools.analysis.map_column_references_workflow"]
 
 

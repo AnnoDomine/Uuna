@@ -8,7 +8,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "evaluate_agent_output"
 PROMPT_DIR = Path(__file__).parent / "prompts" / "evaluate_agent_output"
@@ -28,7 +28,6 @@ def _load_prompt(name: str) -> str:
 
 
 def evaluate_agent_output(
-    db_client: DBClient,
     ask_ai_func: Callable,
     task_id: str,
     event_id: str,
@@ -37,13 +36,18 @@ def evaluate_agent_output(
 ) -> Dict[str, Any]:
     """
     Evaluates an agent's output using the Observer's strict logic.
-    Retrieves the Max_Potential points blindly from the database.
-    Only returns percentage values to protect the system's scoring integrity.
+
+    Args:
+    - ask_ai_func: Function to call the AI for evaluation.
+    - task_id: The UUID of the task.
+    - event_id: The UUID of the event.
+    - agent_output: The actual output produced by the agent.
+    - reported_confidence: The confidence reported by the agent.
     """
     try:
         # 1. Fetch Max Potential blindly from DB
         sql_pot = _load_query("get_potential")
-        res_pot = db_client.execute(sql_pot, [event_id]).fetchone()
+        res_pot = db.execute(sql_pot, [event_id]).fetchone()
 
         # Default to 100 if for some reason not set, but log warning
         max_potential_points = res_pot[0] if res_pot and res_pot[0] > 0 else 100

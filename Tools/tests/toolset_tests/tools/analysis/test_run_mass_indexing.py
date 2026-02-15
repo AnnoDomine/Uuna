@@ -5,6 +5,7 @@ from Tools.toolsets.tools.analysis.run_mass_indexing import run_mass_indexing
 from Tools.core.db_client import DBResult
 
 import sys
+
 rmi_module = sys.modules["Tools.toolsets.tools.analysis.run_mass_indexing"]
 
 
@@ -12,11 +13,9 @@ class TestRunMassIndexing(unittest.TestCase):
     def test_indexing_flow(self):
         with (
             patch.object(rmi_module, "extract_features_for_build") as mock_extract_features,
-            patch("core.db_client.DBClient") as MockDBClient,
+            patch("Tools.toolsets.tools.analysis.run_mass_indexing.db") as mock_db,
         ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
-
             all_versions = [("1.0",), ("1.1",), ("1.2",), ("1.3",)]
             pending_builds = [("1.1",), ("1.3",)]
 
@@ -31,14 +30,14 @@ class TestRunMassIndexing(unittest.TestCase):
                     mock_result.fetchall.return_value = []
                 return mock_result
 
-            mock_db_client.execute.side_effect = execute_side_effect
+            mock_db.execute.side_effect = execute_side_effect
 
             # Mock the tool we are calling
             mock_extract_features.return_value = {"status": "success"}
 
             # --- Test Execution ---
             # No range, should process all pending
-            result = run_mass_indexing(mock_db_client)
+            result = run_mass_indexing()
 
             # --- Assertions ---
             assert result["processed_successfully"] == 2
@@ -46,16 +45,15 @@ class TestRunMassIndexing(unittest.TestCase):
 
             # Check that extract_features was called for the correct builds
             assert mock_extract_features.call_count == 2
-            mock_extract_features.assert_any_call(mock_db_client, "1.1")
-            mock_extract_features.assert_any_call(mock_db_client, "1.3")
+            mock_extract_features.assert_any_call("1.1")
+            mock_extract_features.assert_any_call("1.3")
 
     def test_indexing_with_range(self):
         with (
             patch.object(rmi_module, "extract_features_for_build") as mock_extract_features,
-            patch("core.db_client.DBClient") as MockDBClient,
+            patch("Tools.toolsets.tools.analysis.run_mass_indexing.db") as mock_db,
         ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
             all_versions = [("1.0",), ("1.1",), ("1.2",), ("1.3",)]
             pending_builds = [("1.1",), ("1.3",)]
 
@@ -70,19 +68,19 @@ class TestRunMassIndexing(unittest.TestCase):
                     mock_result.fetchall.return_value = []
                 return mock_result
 
-            mock_db_client.execute.side_effect = execute_side_effect
+            mock_db.execute.side_effect = execute_side_effect
 
             mock_extract_features.return_value = {"status": "success"}
 
             # --- Test Execution ---
             # Range includes 1.1 but excludes 1.3
-            result = run_mass_indexing(mock_db_client, start_v="1.0", end_v="1.2")
+            result = run_mass_indexing(start_v="1.0", end_v="1.2")
 
             # --- Assertions ---
             assert result["processed_successfully"] == 1
             # Check that extract_features was called only for build 1.1
             assert mock_extract_features.call_count == 1
-            mock_extract_features.assert_called_once_with(mock_db_client, "1.1")
+            mock_extract_features.assert_called_once_with("1.1")
 
 
 if __name__ == "__main__":

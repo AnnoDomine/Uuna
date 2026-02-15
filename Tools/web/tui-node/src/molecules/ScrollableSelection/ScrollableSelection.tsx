@@ -25,7 +25,10 @@ type Options = Partial<{
 // biome-ignore lint/suspicious/noExplicitAny: Allow everything
 type DefaultMeta = any;
 
-type Item<IM extends DefaultMeta = DefaultMeta> = Record<"label" | "value" | "id", string> & {
+export type Item<IM extends DefaultMeta = DefaultMeta> = Record<
+    "label" | "value" | "id",
+    string
+> & {
     meta: IM;
 };
 
@@ -36,6 +39,7 @@ type Parsers<IM extends DefaultMeta = DefaultMeta> = Partial<{
     parseUnselectedSuffix: (suffix: string) => string;
     parseSlectedItem: (item: Item<IM>) => Item<IM>;
     parseUnselectedItem: (item: Item<IM>) => Item<IM>;
+    overrideTextColor: (idx: number, fallback: string, item: Item<IM>) => string;
 }>;
 
 type Props<IM extends DefaultMeta = DefaultMeta> = {
@@ -145,6 +149,18 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
         [parseItem, parsePrefixSuffix, constants],
     );
 
+    const getTextColor = useCallback(
+        (index: number, item: Item<IM>) => {
+            const color =
+                index === selectedIndex
+                    ? constants.selected_item_color
+                    : constants.unselected_item_color;
+            if (parsers.overrideTextColor) return parsers.overrideTextColor(index, color, item);
+            return color;
+        },
+        [constants.selected_item_color, constants.unselected_item_color, parsers, selectedIndex],
+    );
+
     return (
         <Box
             flexGrow={1}
@@ -164,13 +180,7 @@ const ScrollableSelection = <IM extends DefaultMeta = DefaultMeta>({
                 <ScrollList ref={listRef} selectedIndex={selectedIndex}>
                     {items.map((item, index) => (
                         <Box key={item.id} width={usedOptions.width}>
-                            <Text
-                                color={
-                                    index === selectedIndex
-                                        ? constants.selected_item_color
-                                        : constants.unselected_item_color
-                                }
-                            >
+                            <Text color={getTextColor(index, item)}>
                                 {index === selectedIndex
                                     ? getItemValue(item, true)
                                     : getItemValue(item)}

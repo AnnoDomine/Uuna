@@ -8,7 +8,7 @@ from typing import Dict, List, Any, Callable
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 from Tools.toolsets.tools.database.save_discovery import save_discovery
 from Tools.toolsets.tools.database.get_last_attempt import get_last_attempt
 from Tools.toolsets.tools.research.get_wago_structure import get_wago_structure
@@ -40,7 +40,6 @@ def _sanitize_identifier(name: str) -> str:
 
 
 def perform_column_discovery(
-    db_client: DBClient,
     ask_ai_func: Callable,
     col_info: List[Any],
     build_id: int,
@@ -49,7 +48,14 @@ def perform_column_discovery(
     **kwargs,
 ) -> Dict[str, Any]:
     """
-    Full workflow to discover the purpose and semantics of a database column.
+    Discovers the purpose and semantics of a database column.
+
+    Args:
+    - ask_ai_func: Function to call the AI for discovery.
+    - col_info: List containing column metadata [f_id, table, col, d_type, min, max].
+    - build_id: The internal ID of the build.
+    - build_version: The version string of the build.
+    - version_context: Textual context about version differences.
     """
     f_id, table, col, d_type, v_min, v_max = col_info
 
@@ -58,22 +64,22 @@ def perform_column_discovery(
     safe_col = _sanitize_identifier(col)
 
     sample_sql = _load_query("get_column_samples").format(col=safe_col, table=safe_table)
-    samples = [r[0] for r in db_client.execute(sample_sql, [build_id, table]).fetchall()]
+    samples = [r[0] for r in db.execute(sample_sql, [build_id, table]).fetchall()]
 
-    prev_discoveries = db_client.execute(_load_query("get_legacy_discoveries"), [table, col, build_id]).fetchall()
-    existing = db_client.execute(_load_query("get_global_knowledge"), [col, table]).fetchall()
-    last_attempt = get_last_attempt(db_client, table, col)
+    prev_discoveries = db.execute(_load_query("get_legacy_discoveries"), [table, col, build_id]).fetchall()
+    existing = db.execute(_load_query("get_global_knowledge"), [col, table]).fetchall()
+    last_attempt = get_last_attempt(table, col)
 
     # 2. Online Research (conditional)
     online_info = ""
     is_first_time = not last_attempt
     if is_first_time or (last_attempt and last_attempt[1] == "VETO"):
         try:
-            wago_headers = get_wago_structure(db_client, table, build_version)
+            wago_headers = get_wago_structure(table, build_version)
             online_info += f"\n### WAGO.TOOLS STRUCTURE:\n{wago_headers}\n"
-            wiki_links = search_wow_wiki(db_client, f"WoW DB2 {table} {col}")
+            wiki_links = search_wow_wiki(f"WoW DB2 {table} {col}")
             if wiki_links:
-                content = fetch_web_content(db_client, wiki_links[0])
+                content = fetch_web_content(wiki_links[0])
                 online_info += f"\n### ONLINE RESEARCH (WoW Wiki):\nURL: {wiki_links[0]}\nCONTENT: {content[:500]}...\n"
         except Exception:
             pass
@@ -118,7 +124,7 @@ def perform_column_discovery(
     discovery_text = ai_result.get("discovery") or "Analysis pending"
     confidence = ai_result.get("confidence", 0.5)
 
-    save_discovery(db_client, build_id, table, col, discovery_text, confidence)
+    save_discovery(build_id, table, col, discovery_text, confidence)
 
     return {
         "table": table,

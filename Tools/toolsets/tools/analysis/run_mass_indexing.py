@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 from .extract_features import extract_features_for_build
 
 QUERY_DIR = Path(__file__).parent / "queries" / "run_mass_indexing"
@@ -20,11 +20,13 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def run_mass_indexing(
-    db_client: DBClient, start_v: Optional[str] = None, end_v: Optional[str] = None
-) -> Dict[str, Any]:
+def run_mass_indexing(start_v: Optional[str] = None, end_v: Optional[str] = None) -> Dict[str, Any]:
     """
-    Finds all pending builds within a range and runs the feature extraction process for each.
+    Runs feature extraction for all pending builds in a range.
+
+    Args:
+    - start_v: Optional start version string.
+    - end_v: Optional end version string.
     """
     print("INFO: Starting Mass Indexing run.")
 
@@ -33,14 +35,14 @@ def run_mass_indexing(
     sql_get_all_versions = _load_query("get_all_versions")
 
     # Get data from DB
-    all_pending_res = db_client.execute(sql_get_pending).fetchall()
+    all_pending_res = db.execute(sql_get_pending).fetchall()
     all_pending = [r[0] for r in all_pending_res]
 
     if not all_pending:
         print("INFO: No pending builds found.")
         return {"status": "complete", "processed_builds": 0}
 
-    all_versions_res = db_client.execute(sql_get_all_versions).fetchall()
+    all_versions_res = db.execute(sql_get_all_versions).fetchall()
     all_versions = [r[0] for r in all_versions_res]
 
     # Determine range
@@ -58,7 +60,7 @@ def run_mass_indexing(
         print(f"--- Processing {idx}/{total_to_process}: {version} ---")
         try:
             # --- REPLACED SUBPROCESS WITH DIRECT TOOL CALL ---
-            result = extract_features_for_build(db_client, version)
+            result = extract_features_for_build(version)
             if result.get("status") == "success":
                 processed_count += 1
             else:

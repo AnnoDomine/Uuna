@@ -13,13 +13,10 @@ from Tools.core.db_client import DBResult
 
 class TestExtractFeatures(unittest.TestCase):
     # This is a complex test, so we patch the db_client at the class level
-    @patch("core.db_client.DBClient")
-    def test_full_extraction_flow(self, MockDBClient):
+    @patch("Tools.toolsets.tools.analysis.extract_features.db")
+    def test_full_extraction_flow(self, mock_db):
         # --- Mock Setup ---
-        # 1. Instantiate the mock client from the patched class
-        mock_db_client = MockDBClient.return_value
-
-        # 2. Define the sequence of return values for execute()
+        # 1. Define the sequence of return values for execute()
         mock_build_id = (123,)
         mock_tables = [("table_one",), ("table_two",)]
         mock_table_exists = (1,)
@@ -31,8 +28,8 @@ class TestExtractFeatures(unittest.TestCase):
         mock_df = pd.DataFrame({"name": ["col_a", "col_b"]})
 
         # Configure the side effects for execute and df
-        mock_db_client.execute.return_value = MagicMock(spec=DBResult)
-        mock_db_client.execute.return_value.fetchone.side_effect = [
+        mock_db.execute.return_value = MagicMock(spec=DBResult)
+        mock_db.execute.return_value.fetchone.side_effect = [
             mock_build_id,
             mock_table_exists,  # for table_one
             mock_row_count,  # for table_one
@@ -44,18 +41,18 @@ class TestExtractFeatures(unittest.TestCase):
             mock_stats,  # for table_two.col_b
             None,  # for mark_indexed
         ]
-        mock_db_client.execute.return_value.fetchall.side_effect = [
+        mock_db.execute.return_value.fetchall.side_effect = [
             mock_tables,
             mock_samples,  # for table_one.col_a
             mock_samples,  # for table_one.col_b
             mock_samples,  # for table_two.col_a
             mock_samples,  # for table_two.col_b
         ]
-        mock_db_client.execute.return_value.df.return_value = mock_df
+        mock_db.execute.return_value.df.return_value = mock_df
 
         # --- Test Execution ---
         build_version = "12.0.0"
-        result = extract_features_for_build(mock_db_client, build_version)
+        result = extract_features_for_build(build_version)
 
         # --- Assertions ---
         # 1. Check the summary
@@ -68,7 +65,7 @@ class TestExtractFeatures(unittest.TestCase):
         save_feature_call_count = 0
         mark_indexed_call_count = 0
 
-        for call in mock_db_client.execute.call_args_list:
+        for call in mock_db.execute.call_args_list:
             sql = call.args[0]
             if "INSERT INTO research.features" in sql:
                 save_feature_call_count += 1

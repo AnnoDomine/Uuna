@@ -1,7 +1,7 @@
 import { Box, type BoxProps } from "ink";
 import { ControlledScrollView } from "ink-scroll-view";
 import type { FC, PropsWithChildren } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import type { EFocusAreal } from "../../store/useFocusStore.js";
 import useScrollArea from "./scroll_area.hooks.js";
 
@@ -23,6 +23,7 @@ interface ScrollAreaProps {
     id: string;
     hideBoarder?: boolean;
     areal?: EFocusAreal;
+    autoScrollToBottom?: boolean;
 }
 
 const ScrollArea: FC<PropsWithChildren<ScrollAreaProps>> = ({
@@ -30,8 +31,22 @@ const ScrollArea: FC<PropsWithChildren<ScrollAreaProps>> = ({
     id,
     hideBoarder = false,
     areal,
+    autoScrollToBottom = false,
 }) => {
-    const { scrollRef, scrollOffset, scrollToItem, isFocused } = useScrollArea(id, areal);
+    const { scrollRef, scrollOffset, setScrollOffset, scrollToItem, isFocused } = useScrollArea(
+        id,
+        areal,
+    );
+
+    useEffect(() => {
+        if (autoScrollToBottom && scrollRef.current) {
+            const max = scrollRef.current.getBottomOffset();
+            // Scroll to max if valid
+            if (max > 0) {
+                setScrollOffset(max);
+            }
+        }
+    }, [autoScrollToBottom, scrollRef, setScrollOffset]);
 
     const defaultBoxProps = {
         flexGrow: 1,

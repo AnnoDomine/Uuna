@@ -6,7 +6,7 @@ from typing import Optional
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "update_global_knowledge"
 
@@ -18,7 +18,6 @@ def _load_query(name: str) -> str:
 
 
 def update_global_knowledge(
-    db_client: DBClient,
     column_pattern: str,
     source_table: str,
     target_table: str,
@@ -27,12 +26,20 @@ def update_global_knowledge(
     ai_notes: Optional[str] = None,
 ):
     """
-    Upserts a piece of global knowledge about a column-to-table relationship.
+    Upserts knowledge about a column-to-table relationship.
+
+    Args:
+    - column_pattern: The name or pattern of the column (e.g. 'CreatureID').
+    - source_table: The table where the column was found.
+    - target_table: The table the column relates to.
+    - confidence: Confidence score (0.0 to 1.0).
+    - build_version: WoW version this knowledge was derived from.
+    - ai_notes: Optional notes from the AI about the discovery.
     """
     try:
         sql = _load_query("upsert_global_knowledge")
         params = [column_pattern, source_table, target_table, confidence, ai_notes, build_version]
-        db_client.execute(sql, params)
+        db.execute(sql, params)
         print(f"INFO: Global knowledge updated for {column_pattern} ({source_table} -> {target_table})")
         return {"status": "success"}
     except Exception as e:

@@ -9,7 +9,7 @@ import os
 # Ensure path resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "create_research_task"
 
@@ -19,16 +19,19 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def create_research_task(db_client: DBClient, query: str, assigned_builds: List[str]) -> Dict[str, Any]:
+def create_research_task(query: str, assigned_builds: List[str]) -> Dict[str, Any]:
     """
     Initiates a new research mission in the system.
-    This triggers the multi-agent orchestration via the Courier.
+
+    Args:
+    - query: The research query or objective.
+    - assigned_builds: List of WoW build versions to research.
     """
     try:
         task_id = str(uuid.uuid4())
         sql = _load_query("insert_task")
 
-        db_client.execute(sql, [task_id, query, json.dumps(assigned_builds)])
+        db.execute(sql, [task_id, query, json.dumps(assigned_builds)])
 
         return {
             "status": "success",

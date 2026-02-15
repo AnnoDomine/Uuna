@@ -7,7 +7,7 @@ from pathlib import Path
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "find_value"
@@ -19,24 +19,20 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def find_value(db_client: DBClient, search_term: str, build_version: Optional[str] = None) -> Dict[str, int]:
+def find_value(search_term: str, build_version: Optional[str] = None) -> Dict[str, int]:
     """
-    Searches for a given value across all tables in the 'archive' schema by loading external SQL files.
+    Searches for a given value across all archive tables.
 
     Args:
-        db_client: An instance of DBClient to interact with the database service.
-        search_term: The value to search for.
-        build_version: Optional specific build version to filter the search.
-
-    Returns:
-        A dictionary mapping table names to the count of matches found.
+    - search_term: The value to search for (exact match).
+    - build_version: Optional build version to filter by.
     """
     found_in = {}
     build_id = None
 
     if build_version:
         sql = _load_query("get_build_id_by_version.sql")
-        res = db_client.execute(sql, [build_version])
+        res = db.execute(sql, [build_version])
         build_id_row = res.fetchone()
         if not build_id_row:
             raise ValueError(f"Build version '{build_version}' not found in registry.")
@@ -44,7 +40,7 @@ def find_value(db_client: DBClient, search_term: str, build_version: Optional[st
 
     # 1. Get all tables in the 'archive' schema
     tables_sql = _load_query("get_archive_tables.sql")
-    tables_res = db_client.execute(tables_sql)
+    tables_res = db.execute(tables_sql)
     tables = [row[0] for row in tables_res.fetchall()]
 
     # Load templates once
@@ -56,7 +52,7 @@ def find_value(db_client: DBClient, search_term: str, build_version: Optional[st
         try:
             # 2. Get columns for the current table
             describe_sql = describe_template.format(table_name=table)
-            cols_res = db_client.execute(describe_sql)
+            cols_res = db.execute(describe_sql)
             columns = [row[0] for row in cols_res.fetchall()]
 
             # We search for exact match as string or number
@@ -75,7 +71,7 @@ def find_value(db_client: DBClient, search_term: str, build_version: Optional[st
                 query = count_template.format(table_name=table, where_clause=where_clause)
 
             # 3. Execute the count query
-            count_res = db_client.execute(query, params)
+            count_res = db.execute(query, params)
             count = count_res.fetchone()[0]
 
             if count > 0:

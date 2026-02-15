@@ -1,6 +1,6 @@
 # Tools/tests/toolset_tests/tools/research/test_vector_and_discoveries.py
 import responses
-from unittest.mock import MagicMock
+from unittest.mock import patch
 from Tools.toolsets.tools.research.query_vector_memory import query_vector_memory
 from Tools.toolsets.tools.research.search_discoveries import search_discoveries
 
@@ -18,11 +18,11 @@ def test_query_vector_memory_success():
 
 
 def test_search_discoveries_success():
-    mock_db = MagicMock()
-    mock_db.execute.return_value.fetchall.return_value = [("TableX", "ColY", "Found a secret", 0.99)]
+    with patch("Tools.toolsets.tools.research.search_discoveries.db") as mock_db:
+        mock_db.execute.return_value.fetchall.return_value = [("TableX", "ColY", "Found a secret", 0.99)]
 
-    result = search_discoveries(mock_db, "secret")
+        result = search_discoveries("secret")
 
-    assert len(result) == 1
-    assert result[0]["table"] == "TableX"
-    assert result[0]["discovery"] == "Found a secret"
+        assert len(result) == 1
+        assert result[0]["table"] == "TableX"
+        assert result[0]["discovery"] == "Found a secret"

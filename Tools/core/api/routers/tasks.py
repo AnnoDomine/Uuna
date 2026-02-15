@@ -41,3 +41,58 @@ async def get_task(task_id: str):
         if not res:
             raise HTTPException(status_code=404, detail="Task not found")
         return {"task": res}
+
+
+@router.get("/list/all")
+async def list_tasks():
+    try:
+        sql = _load_query("list_tasks")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql)
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"tasks": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/{task_id}/events")
+async def get_task_events(task_id: str):
+    try:
+        sql = _load_query("get_task_events")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql, [task_id])
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"events": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/{task_id}/scores")
+async def get_task_scores(task_id: str):
+    try:
+        sql = _load_query("get_task_scores")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql, [task_id])
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"scores": result}
+    except Exception:
+        # Fallback empty list if table doesn't exist or other error
+        return {"scores": []}

@@ -1,5 +1,5 @@
 # Tools/toolsets/tools/database/check_ids.py
-from typing import List
+from typing import List, Any
 import sys
 import os
 import re
@@ -8,7 +8,7 @@ from pathlib import Path
 # Ensure the parent directory is in the Python path for module resolution
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "check_ids"
 
@@ -26,10 +26,13 @@ def _sanitize_identifier(name: str) -> str:
     return str(name)
 
 
-def check_ids(db_client: DBClient, table_name: str, id_list: List[any]) -> int:
+def check_ids(table_name: str, id_list: List[Any]) -> int:
     """
-    Checks how many of the provided IDs exist in the target table's ID column.
-    This function is safe against SQL injection and will raise a ValueError on invalid table names.
+    Checks how many of the provided IDs exist in a table.
+
+    Args:
+    - table_name: The name of the table to check (e.g. 'Creature').
+    - id_list: List of numeric IDs to look for.
     """
     # 1. Input validation that should raise errors
     safe_table = _sanitize_identifier(table_name)
@@ -52,7 +55,7 @@ def check_ids(db_client: DBClient, table_name: str, id_list: List[any]) -> int:
         placeholders = ", ".join(["?"] * len(clean_ids))
         query = sql_template.format(table=safe_table, placeholders=placeholders)
 
-        res = db_client.execute(query, clean_ids)
+        res = db.execute(query, clean_ids)
         fetch_result = res.fetchone()
         return fetch_result[0] if fetch_result else 0
 
