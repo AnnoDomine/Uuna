@@ -1,24 +1,13 @@
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
-import { type FC, useMemo } from "react";
+import type { FC } from "react";
 import ScrollableSelection from "../../../molecules/ScrollableSelection/ScrollableSelection.js";
 import { EFocusAreal } from "../../../store/useFocusStore.js";
-import useTaskInspectorStore, { type EventItem } from "../../../store/useTaskInspectorStore.js";
+import { useEventList } from "./EventList.hooks.js";
 
 const EventList: FC = () => {
-    const { events, selectedTaskId, selectedEventId, selectEvent, isLoadingEvents } =
-        useTaskInspectorStore();
-
-    const eventItems = useMemo(
-        () =>
-            events.map((e: EventItem) => ({
-                label: `${e.role}: ${e.event}`,
-                value: e.event_id,
-                id: e.event_id,
-                meta: e,
-            })),
-        [events],
-    );
+    const { eventItems, selectedTaskId, selectedEventId, selectEvent, isLoadingEvents } =
+        useEventList();
 
     if (!selectedTaskId) {
         return null;

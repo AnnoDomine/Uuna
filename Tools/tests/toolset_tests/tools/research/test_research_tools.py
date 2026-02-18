@@ -33,7 +33,7 @@ class TestResearchTools(unittest.TestCase):
         mock_get.assert_not_called()
 
     @patch("requests.get")
-    @patch("Tools.toolsets.tools.research.search_wow_wiki.db")
+    @patch("Tools.toolsets.tools.research.fetch_web_content.db")
     def test_search_wow_wiki(self, mock_db, mock_get):
         # Mock cache miss
         mock_db.execute.return_value = DBResult({"results": []})
@@ -50,7 +50,7 @@ class TestResearchTools(unittest.TestCase):
         self.assertEqual(mock_get.call_count, 1)
 
     @patch("requests.get")
-    @patch("Tools.toolsets.tools.research.get_wago_structure.db")
+    @patch("Tools.toolsets.tools.research.fetch_web_content.db")
     def test_get_wago_structure(self, mock_db, mock_get):
         # Mock cache miss
         mock_db.execute.return_value = DBResult({"results": []})
