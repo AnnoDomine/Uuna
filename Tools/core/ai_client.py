@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import requests
 from loguru import logger
