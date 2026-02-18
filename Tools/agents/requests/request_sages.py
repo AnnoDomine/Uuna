@@ -27,7 +27,7 @@ def request_sages(task_id):
             raise Exception(task.get("error", f"No error spezified while getting task id: {task_id}"))
 
         history = task.get("history", [])
-        if len(history) > 80:
+        if len(history) > 50:
             request_courier_from_sages(
                 task_id, approval=Approval.APPROVED, context="Aborded task due the amount of research events."
             )
@@ -45,7 +45,7 @@ def request_sages(task_id):
             ]
         }
 
-        response = {"approval": "string", "context": "string"}
+        response = {"approval": Approval, "context": "string"}
 
         approval_response = request_with_schema(response, payload, Agents.SAGES)
         if "error" in approval_response:

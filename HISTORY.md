@@ -1,24 +1,41 @@
 # Projekt History - WoW Datamine Toolkit
 
+## [0.9.14] - 2026-02-18 - "Automated Setup & Hardware Synergy"
+
+### Added
+- **One-Click Setup (`init.sh`)**: Ein neues interaktives Bash-Skript, das die gesamte Entwicklungsumgebung (uv, Node.js, pnpm, Ollama, Modelle) prüft, installiert und konfiguriert.
+- **Hardware-Analyzer & Auto-Config**: Einführung des `optimize`-Befehls in `manage.py`. Das System analysiert nun CPU, RAM und GPU (NVIDIA, AMD, Apple Silicon) und schlägt optimale Einstellungen vor.
+- **Drei Beschleunigungs-Modi**: Explizite Unterstützung für `CPU`, `GPU` und `Hybrid` (Both) Modi zur optimalen Nutzung der Systemressourcen.
+- **Umfassende TUI-Testsuite**: Implementierung von Unit-Tests für alle Organismen, Moleküle und Hooks der TUI unter Nutzung von Vitest und `ink-testing-library`.
+
+### Changed
+- **Atomic Design Finalisierung**: Abschluss des Refactorings der TUI. Sämtliche Business-Logik wurde aus den Komponenten in Hooks ausgelagert, um 100%ige Testbarkeit zu gewährleisten.
+- **Dynamischer AI-Client**: Der `AIClient` lädt nun seine Konfiguration dynamisch aus der DuckDB (`registry.settings`) und nutzt ein Caching-System zur Performance-Optimierung.
+- **Dokumentations-Upgrade**: Aktualisierung der `Requirements.md` und `CONTRIBUTING.md` mit Fokus auf das Modell-Setup (Qwen 3 8B) und Hardware-Voraussetzungen.
+
 ## [0.9.13] - 2026-02-14 - "The Inspector & Global Connectivity"
 
 ### Added
+
 - **Interactive Task Inspector**: Implementierung einer 3-Spalten-Ansicht zur Überwachung von Forschungsaufträgen. Nutzer können nun Tasks selektieren, deren Event-Kette einsehen und detaillierte Ergebnisse inkl. Scoring in Echtzeit verfolgen.
 - **Zentralisierte DB-Architektur**: Einführung der `shared_db_instance.py`. Alle Tools greifen nun auf ein globales Datenbank-Objekt zu, was die Codebase entschlackt und technische Parameter aus den KI-Prompts entfernt.
 - **Atomic UI Refactoring**: Vollständige Modularisierung der Task-Seite in `TaskList`, `EventList` und `TaskDetails` Organismen gemäß dem Atomic Design Standard.
 - **Threadpool Integration**: Umstellung des AI-Routers auf asynchrone Threadpool-Ausführung, um die Reaktionsfähigkeit der TUI (Health Checks) während komplexer KI-Anfragen sicherzustellen.
 
 ### Changed
+
 - **Parser-Ready Tools**: Überarbeitung von über 40 Tool-Funktionen. Alle Docstrings folgen nun einem strikten Schema, das eine automatisierte Extraktion von Parametern und Beschreibungen für die KI ermöglicht.
 - **Unified Focus Management**: Integration des `useScopedInput` Hooks in die Startseite (`Home.tsx`) zur Vermeidung von Steuerungskonflikten.
 
 ### Fixed
+
 - **Frontend-Backend Sync**: Korrektur von 404-Fehlern und Verbindungsabbrüchen durch Port-Harmonisierung und verbessertes Exception-Handling.
 - **DuckDB Concurrency**: Behebung von Datei-Sperren durch konsequente Nutzung der Middleware-API.
 
 ## [0.9.11] - 2026-02-12 - "The Relay-Race & Blind Wisdom"
 
 ### Added
+
 - **Atomisierte Skill-Sets**: Einführung einer Markdown-basierten "Ausbildung" für alle 9 Agenten. Jeder Agent weiß nun durch `get_my_skills` exakt, welche prozeduralen Schritte für seine Aufgaben notwendig sind.
 - **Event-Relais-Logik**: Das System wurde von flüchtigen Funktionsaufrufen auf eine lückenlose Kette von Event-IDs ("Fackellauf") umgestellt. Dies garantiert eine 100%ige Auditierbarkeit jeder Entscheidung.
 - **Vektor-Gedächtnis (RAG)**: Integration von DuckDB VSS als Langzeitgedächtnis. Agenten können nun semantisch nach Mustern in früheren Forschungsaufträgen suchen.
@@ -26,16 +43,19 @@
 - **Blind Scoring**: Vollständige Isolation der Bewertungsebene. Agents und der Courier haben keinen Zugriff auf absolute Punktzahlen (Max Potential), was Manipulationen des Systems verhindert.
 
 ### Changed
+
 - **Rollen-Konsolidierung**: Überführung des "Data Engineer" in den Archivist und des "Senior Critic" in die Sages für ein schlankeres 9-Agenten-Modell.
 - **Chirurgisches Prompting**: Umstellung aller KI-Anweisungen auf lokale Tool-Prompts mit Verweisen auf die neuen Skill-Files.
 
 ### Fixed
+
 - **Wiki-Scraping**: Behebung von 403-Fehlern beim Zugriff auf Warcraft Wiki durch Referer-Header-Injection.
 - **Integrität**: Beseitigung von Redundanzen in der Tool-Hierarchie (Global vs. Agent-spezifisch).
 
 ## [0.9.10] - 2026-02-11 - "The API Gateway & Parallel Ingestion"
 
 ### Added
+
 - **API-First Architektur**: Einführung des `db_service.py` als zentrales FastAPI-Gateway. Alle Schreib- und Lesezugriffe auf den DuckDB-Master erfolgen nun über eine entkoppelte Schnittstelle.
 - **Zentraler DB-Client**: Implementierung der `DBClient`-Klasse in `Tools/core/db_client.py`. Dies ermöglicht allen Python-Tools einen einheitlichen, Thread-sicheren Zugriff ohne direkte Datei-Sperren.
 - **Multi-Worker Ingestion**: Der `master_ingester.py` unterstützt nun parallele Tabellen-Downloads und -Imports mittels `ThreadPoolExecutor`.
@@ -44,39 +64,45 @@
 - **Hintergrund-Resilienz**: Upgrade der Start-Skripte auf eine Python-basierte Prozess-Abkopplung (`start_new_session=True`), die Terminal-unabhängig stabil läuft.
 
 ### Changed
+
 - **Entkoppelung**: Umstellung von `feature_extractor.py` und `master_ingester.py` auf API-Zugriff via `DBClient`.
 - **Modul-Auflösung**: Optimierung des `PYTHONPATH` Handlings, um das `Tools`-Paket systemweit verfügbar zu machen.
 
 ### Fixed
+
 - **Schema Evolution Race Conditions**: Case-insensitive Spalten-Prüfung verhindert Abstürze bei unterschiedlicher Groß-/Kleinschreibung in neuen Builds.
 - **API Debugging**: Integration von Traceback-Printing im `/execute` Endpoint zur schnellen Fehleranalyse im `api.log`.
 
 ## [0.9.9] - 2026-02-08 - "The Responsive Layout & Semantic Memory"
 
 ### Added
+
 - **Dynamic Full-Screen TUI**: Einführung des `useTerminalDimensions` Hooks. Das Interface skaliert nun verzögerungsfrei bei jeder Größenänderung des Terminalfensters.
 - **Enterprise Layout-Stabilität**: Umstellung auf eine "Fixed-Fluid" Architektur. Jedes UI-Element hat nun strikt definierte Maße (statisch oder prozentual), was Layout-Sprünge und Verschiebungen eliminiert.
-- **Vector Memory Explorer**: 
+- **Vector Memory Explorer**:
   - Funktionale semantische Suche im Agenten-Gedächtnis.
   - Zwei-Spalten-Layout mit Echtzeit-Filterung nach Rollen (Librarian, Archivist, etc.).
   - Anzeige der Match-Qualität (Similarity Score) und Metadaten-Herkunft.
 - **Scoring Board Optimierung**: Redesign der Übersicht in ein Side-by-Side Modell (Agent-Stats vs. Scoring-History) für bessere Lesbarkeit auf breiten Terminals.
-- **Interaktives Wiki & Help**: 
+- **Interaktives Wiki & Help**:
   - **Wiki**: Markdown-Inhalte sind nun fokussierbar und scrollbar.
   - **Help**: Neue statische Seite für CLI-Interaktionshilfe mit Keybinding-Tabelle.
 - **Python-Backend Synchronisierung**: Anpassung des `VectorManager` an das Frontend (id, role, score Felder) für nahtlose Datenflüsse.
 
 ### Changed
+
 - **Struktur**: Trennung der "Help"-Logik von der "Wiki"-Dokumentation.
 - **Komponenten**: `ScrollableSelection` und `ScrollArea` wurden für maximale Flexibilität innerhalb von Container-Layouts optimiert.
 
 ### Fixed
+
 - **Scroll-In-View**: Fokussierte Listenelemente werden nun zuverlässig in den sichtbaren Bereich geschoben.
 - **Typ-Sicherheit**: Finale Beseitigung aller `@ts-ignore` Altlasten durch korrekte API-Interface-Definitionen.
 
 ## [0.9.8] - 2026-02-08 - "The React TUI & Enterprise Standards"
 
 ### Added
+
 - **Node.js/Ink Migration**: Radikaler Technologiewechsel des User-Interfaces von Python Textual zu **React (Ink)**. Dies ermöglicht echtes Flexbox-Layout und eine stabilere Render-Engine (Yoga).
 - **Enterprise-Standard Architektur**: Einführung eines strikten Frontend-Patterns:
   - **Atomic Design**: Hierarchische Trennung in Atoms, Molecules, Organisms und Pages.
@@ -93,17 +119,20 @@
 - **Biome Integration**: Einführung von **Biome** als ultraschneller Ersatz für ESLint und Prettier (Format & Lint on Save).
 
 ### Changed
+
 - **Navigation Flow**: Umstellung auf ein zustandsgesteuertes Switch-Pattern für blitzschnelle Seitenwechsel.
 - **StatusBar Revamp**: Umbau zu einem dynamischen, daten-getriebenen Organismus mit Echtzeit-Indikatoren.
 - **Settings & Tasks Integration**: Überführung der zentralen Mining-Funktionen in die neue React-Architektur.
 
 ### Fixed
+
 - **Terminal Rendering Bugs**: Behebung von Layout-Verschiebungen und korrupten Zeichen-Zellen durch Wechsel auf React-Komponenten.
 - **MaxListeners Warnings**: Optimierung des Keyboard-Listener-Managements zur Vermeidung von Memory Leaks.
 
 ## [0.9.5] - 2026-02-01 - "The Library Orchestration & Scoring Logic"
 
 ### Added
+
 - **Library Multi-Agent Architecture**: Einführung eines spezialisierten Orchestrierungssystems mit klar definierten Rollen:
   - **Librarian**: Zentrales Nutzer-Interface und Wissens-Synthese.
   - **Courier**: Herzstück der Orchestrierung, managt Task-Routing und Queue-Priorisierung.
@@ -126,12 +155,14 @@
 - **AI PATCH System**: Etablierung eines Best-Practice-Katalogs in `AGENT.md` zur Vermeidung technischer Fallstricke (Process Management, SQL Injection, JSON Parsing).
 
 ### Changed
+
 - **Tools Reorganization**: Vollständige Modularisierung des `Tools/` Verzeichnisses in `core`, `ingestion`, `analysis`, `agents`, `web` und `tests`.
 - **Log-Standardisierung**: Einführung eines einheitlichen, hoch-informativen Log-Schemas für alle Systemkomponenten.
 - **SQL Outsourcing**: Konsequente Trennung von Logik und Daten durch Externalisierung aller SQL-Abfragen in das `queries/` Verzeichnis.
 - **Storage Optimization**: Auslagerung von Legacy-Backups (SQLite) auf externen Cold Storage; Optimierung der lokalen SSD für den DuckDB-Master.
 
 ### Fixed
+
 - **Stability Break-through**: Behebung von "Missing Table" Warnungen durch direkten CSV-Stream-Import von Wago.tools.
 - **Background Process Resilienz**: Lösung von Terminal-Session-Abbrüchen durch entkoppelte Python-Sessions (`start_new_session=True`).
 - **DuckDB Constraint Fix**: Korrektur der Auto-Increment-Syntax für Sequenzen und Primärschlüssel.
@@ -139,7 +170,9 @@
 ---
 
 ## [0.9.0] - 2026-02-01 - "The Master Archive & DuckDB Integration"
+
 ### Added
+
 - **DuckDB Master Integration**: Umstellung des zentralen Speichers auf **DuckDB** (`WoW_Master.duckdb`) zur Handhabung hunderter Millionen von Datensätzen bei minimalem Speicherbedarf.
 - **Unified Middleware (`db_service.py`)**: Implementierung eines asynchronen FastAPI-Dienstes zur Orchestrierung des Master-DB-Zugriffs für alle KI-Agenten und Tools.
 - **Mass-Migration & Archiving**: Neues hocheffizientes Tool `migrate_to_master.py` mit:
@@ -150,18 +183,22 @@
 - **Persistent Knowledge Migration**: Erfolgreiche Überführung von Legacy-Wissen (Mappings, Entdeckungen) in das neue Master-Schema.
 
 ### Changed
+
 - **Performance-Boost**: Reduzierung der Mapping-Validierungszeiten durch DuckDB-Indizierung und asynchrones ID-Checking.
 - `ai_researcher_agent.py`: Agent nutzt nun die Middleware-API statt direkter SQLite-Verbindungen für verbesserte Resilienz.
 - **Logging-Standardisierung**: Alle Logs werden nun zentral in `Data/logs/` strukturiert erfasst.
 
 ### Fixed
+
 - Behebung von DuckDB-Startup-Problemen durch Korrektur falscher PRAGMA-Kommandos und Umstellung auf Thread-sichere Connections.
 - Stabilisierung paralleler Schreibzugriffe durch Entfernung blockierender globaler Locks zugunsten nativer DuckDB-Concurrency.
 
 ---
 
 ## [0.8.0] - 2026-01-31 - "The AI Brain Update"
+
 ### Added
+
 - **Local LLM Orchestration**: Nahtlose Integration von **Ollama** zur Ausführung lokaler Modelle (**Qwen 3 8B**).
 - **Research Knowledge DB**: Implementierung einer zentralen SQLite-Wissensdatenbank zur build-übergreifenden Speicherung von KI-Erkenntnissen.
 - **Archivist Agent**: Entwicklung eines autonomen Forschungs-Agenten mit einem zweistufigen Prozess:
@@ -174,18 +211,22 @@
 - **Discovery Logging**: Neue Tabelle `ai_discoveries` für inhaltliche Funde, die über das technische Mapping hinausgehen.
 
 ### Changed
+
 - `feature_extractor.py`: Umstellung von massivem JSON-Output auf effiziente SQLite-Speicherung in der Research-DB.
 - `README.md` & `AGENT.md`: Umfassende Aktualisierung mit Fokus auf KI-gestütztes Research und CLI-First Workflow.
 - Erhöhung der Stabilität durch robustes JSON-Decoding und automatische Begriffsreinigung (`clean_confidence`).
 
 ### Fixed
+
 - Behebung von Timeouts bei großen Abfrage-Batches durch optimiertes Thread-Management.
 - Korrektur von Abstürzen bei inkonsistenten KI-Antwortformaten via `robust_json_decode`.
 
 ---
 
 ## [0.6.0] - 2026-01-25 - "The GUI Era"
+
 ### Added
+
 - **FastAPI + HTMX GUI**: Vollständig neue Web-Oberfläche mit Explorer, Sync-Management und Build-Vergleich.
 - **Real-time Logging**: SSE (Server-Sent Events) Integration für Live-Sync-Logs im Browser.
 - **Theme Support**: Implementierung von Light/Dark Mode via Bootstrap 5.3 (persistant gespeichert).
@@ -194,18 +235,22 @@
 - **Concurrent Safety**: Globaler Sync-Lock zur Vermeidung paralleler Datenbank-Operationen in der GUI.
 
 ### Changed
+
 - Migration von Flask zu FastAPI für verbesserte asynchrone Performance.
 - `db_gui.py` nutzt nun HTMX Partials zur Reduzierung des Netzwerk-Traffics.
 - Refactoring der Build-Registrierung zur Speicherung von Download-Status und Sync-Zeitstempeln.
 
 ### Fixed
+
 - UI-Nesting-Fehler beim Navigieren durch die GUI behoben.
 - Korrektur der Datenbank-Schemata bei Alt-Installationen via automatischer Migration.
 
 ---
 
 ## [0.5.0] - 2026-01-25 - "The Performance & Intelligence Update"
+
 ### Added
+
 - **Build Registry**: Zentrale `Build_Registry.db` speichert nun alle verfügbaren WoW-Builds von Wago.tools via API.
 - **Settings System**: `Settings.db` zur Konfiguration globaler Tool-Parameter (z.B. `workers`).
 - **Parallel Sync**: `sync_wow_db.py` unterstützt jetzt Multi-Threading (ThreadPoolExecutor) für massiv beschleunigte Downloads und Imports.
@@ -216,32 +261,39 @@
 - **Auto-Automation**: Neue Settings für vollautomatisches globales Mapping und Auto-Skip.
 
 ### Changed
+
 - `sync_wow_db.py`: Robusteres CSV-Parsing mit automatischer Trennzeichen-Erkennung (Komma vs. Semicolon).
 - `compare_builds.py`: Integration der Build-Registry und Support für On-the-fly Downloads fehlender Vergleichs-Builds.
 - `map_references.py`: Code-Cleanup und Entfernung von Redundanzen.
 
 ### Fixed
+
 - Behebung von Header-Korruption ("ID;Name") durch verbesserte Delimiter-Logik.
 - Korrektur von Fehl-Mappings bei inkonsistenten Spaltennamen über verschiedene WoW-Versionen hinweg.
 
 ---
 
 ## [0.4.0] - 2026-01-25 - Referenz-Mapping & Interaktivität
+
 ### Added
+
 - `Tools/map_references.py`: Komplett überarbeitet für interaktives Mapping.
 - Build-spezifische Benutzer-Mappings (`_user_map.json`) zur Vermeidung von Fehlzuordnungen zwischen WoW-Versionen.
 - Fuzzy-Matching und Substring-Suche für Tabellenvorschläge ohne künstliches Limit.
 - Erkennung und Warnung bei korrupten Spaltennamen (Semikolon-Importfehler).
 
 ### Changed
+
 - `AGENT.md`: Dokumentation der neuen Tool-Suite und des Referenz-Workflows.
 - `Tools/map_references.py`: `resolve_table_name` verbessert (Alias-Support für QuestV2, SpellName, etc.).
 
 ### Fixed
+
 - Problem mit unübersichtlichen Referenz-Abfragen bei fehlerhaftem DB-Import behoben.
 - Trennung von globalen und build-spezifischen Mapping-Entscheidungen.
 
 ## [Frühere Sitzungen]
+
 - Initialisierung der Tool-Suite (`sync_wow_db.py`, `find_val.py`).
 - Aufbau der SQLite-Datenbankstruktur für WoW 12.0 Retail.
 - Implementierung des Flask-basierten DB-Explorers (`db_gui.py`).

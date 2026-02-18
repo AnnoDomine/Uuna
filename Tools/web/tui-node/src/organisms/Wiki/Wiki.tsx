@@ -1,13 +1,13 @@
 import { Box, Text } from "ink";
 import Markdown from "ink-markdown";
 import type { FC } from "react";
-import { useWiki } from "../../contexts/WikiContext.js";
 import ScrollableSelection from "../../molecules/ScrollableSelection/ScrollableSelection.js";
 import { EFocusAreal } from "../../store/useFocusStore.js";
 import ScrollArea from "../ScrollArea/ScrollArea.js";
+import { useWikiLogic } from "./wiki.hooks.js";
 
 const Wiki: FC = () => {
-    const { error, currentPage, currentLink, fetchWikiPage, linkMapping, loading } = useWiki();
+    const { error, currentPage, currentLink, fetchWikiPage, linkMapping, loading } = useWikiLogic();
 
     if (loading) {
         return (

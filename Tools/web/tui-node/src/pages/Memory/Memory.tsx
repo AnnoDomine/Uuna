@@ -1,7 +1,6 @@
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import type { FC } from "react";
-import { useScopedInput } from "../../hooks/useScopedInput.js";
 import ScrollableSelection from "../../molecules/ScrollableSelection/ScrollableSelection.js";
 import ScrollArea from "../../organisms/ScrollArea/ScrollArea.js";
 import { EFocusAreal } from "../../store/useFocusStore.js";
@@ -9,19 +8,7 @@ import { MEMORY_ROLES } from "./memory.constants.js";
 import useMemory from "./memory.hooks.js";
 
 const Memory: FC = () => {
-    const { query, setQuery, role, setRole, results, isLoading, handleSearch } = useMemory();
-
-    // Search Input Scope
-    const { isFocused: isSearchFocused } = useScopedInput({
-        id: "memory-search-input",
-        areal: EFocusAreal.CONTENT,
-        autoFocus: true,
-        keyMap: (_input, key) => {
-            if (key.return) {
-                handleSearch();
-            }
-        },
-    });
+    const { query, setQuery, role, setRole, results, isLoading, isSearchFocused } = useMemory();
 
     return (
         <Box

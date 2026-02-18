@@ -4,21 +4,8 @@ import Table from "../../atoms/Table/Table.js";
 import useScoring from "./scoring.hooks.js";
 
 const Scoring: FC = () => {
-    const { agentStats, rawScores, isLoading, error } = useScoring();
-
-    const agentTableData = agentStats.map((s) => ({
-        Agent: s.agent,
-        Tasks: s.taskCount,
-        "Avg %": `${s.averageScore}%`,
-        Total: s.totalScore,
-    }));
-
-    const historyTableData = rawScores.map((s) => ({
-        ID: s.score_id,
-        Task: s.task_id.slice(0, 8),
-        Score: `${s.final_percent}%`,
-        Date: new Date(s.created_at).toLocaleDateString(),
-    }));
+    const { agentStats, rawScores, isLoading, error, agentTableData, historyTableData } =
+        useScoring();
 
     return (
         <Box flexDirection="column" flexGrow={1} height="100%" width="100%">

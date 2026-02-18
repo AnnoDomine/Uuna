@@ -9,6 +9,10 @@ Data/dbs/*.db
 Data/logs/*.log
 Data/DB2_CSV/
 Data/DB2/
+Tools/**/*.log
+Tools/**/*.json
+Tools/web/src/store/*.json
+!Tools/web/**/*.json
 
 # Windows / OS
 Thumbs.db
@@ -45,6 +49,9 @@ Data
 addons
 AGENT.md
 .agents
+.ruff_cache
+.pytest_cache
+!docs/wiki/data
 
 #########################################
 ######### FROM DEV END ##################

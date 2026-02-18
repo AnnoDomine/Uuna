@@ -69,5 +69,23 @@ def format():
     subprocess.run(["uv", "run", "ruff", "format", "."])
 
 
+@cli.command()
+@click.option("-y", "--yes", is_flag=True, help="Automatically apply settings without confirmation.")
+@click.option("-n", "--dry-run", is_flag=True, help="Calculate settings but do not apply them.")
+def optimize(yes, dry_run):
+    """Analyze hardware and auto-configure AI settings."""
+    click.echo("🚀 Running Hardware Optimization...")
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd()
+    
+    cmd = ["uv", "run", "python", "Tools/core/hardware_analyzer.py"]
+    if yes:
+        cmd.append("-y")
+    if dry_run:
+        cmd.append("-n")
+        
+    subprocess.run(cmd, check=True, env=env)
+
+
 if __name__ == "__main__":
     cli()

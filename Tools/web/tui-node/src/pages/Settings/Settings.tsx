@@ -1,41 +1,22 @@
 import { Box, Text } from "ink";
 import type { FC } from "react";
 import Button from "../../atoms/Button/Button.js";
-import useBackend from "../../hooks/useBackend.js";
-import { useScopedInput } from "../../hooks/useScopedInput.js";
 import SettingsListItem from "../../molecules/SettingsListItem/SettingsListItem.js";
 import ScrollArea from "../../organisms/ScrollArea/ScrollArea.js";
-import { EFocusAreal } from "../../store/useFocusStore.js";
-import { useStore } from "../../store/useStore.js";
 import useSettings from "./settings.hooks.js";
 
 const Settings: FC = () => {
-    const { settings, isLoading, error, handleUpdateSetting, fetchSettings } = useSettings();
-
-    const { restartBackend } = useBackend();
-    const { isRestarting } = useStore();
-
-    // RESTART BACKEND: Scoped Focus + Return logic
-    const { isFocused: isRestartFocused } = useScopedInput({
-        id: "btn-restart-backend",
-        areal: EFocusAreal.CONTENT,
-        keyMap: (_input, key) => {
-            if (key.return) {
-                restartBackend();
-            }
-        },
-    });
-
-    // RELOAD: Scoped Focus + Return logic
-    const { isFocused: isReloadFocused } = useScopedInput({
-        id: "btn-reload-settings",
-        areal: EFocusAreal.CONTENT,
-        keyMap: (_input, key) => {
-            if (key.return) {
-                fetchSettings();
-            }
-        },
-    });
+    const {
+        settings,
+        isLoading,
+        error,
+        handleUpdateSetting,
+        fetchSettings,
+        isRestarting,
+        restartBackend,
+        isRestartFocused,
+        isReloadFocused,
+    } = useSettings();
 
     return (
         <Box flexDirection="column" flexGrow={1} padding={1}>

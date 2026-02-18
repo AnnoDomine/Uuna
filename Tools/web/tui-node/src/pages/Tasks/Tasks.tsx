@@ -1,18 +1,12 @@
 import { Box, Text } from "ink";
-import { type FC, useEffect } from "react";
+import type { FC } from "react";
 import EventList from "../../organisms/TaskInspector/EventList/EventList.js";
 import TaskDetails from "../../organisms/TaskInspector/TaskDetails/TaskDetails.js";
 import TaskList from "../../organisms/TaskInspector/TaskList/TaskList.js";
-import useTaskInspectorStore from "../../store/useTaskInspectorStore.js";
+import { useTasksPage } from "./tasks.hooks.js";
 
 const Tasks: FC = () => {
-    const { fetchTasks, error } = useTaskInspectorStore();
-
-    useEffect(() => {
-        fetchTasks();
-        const interval = setInterval(fetchTasks, 5000);
-        return () => clearInterval(interval);
-    }, [fetchTasks]);
+    const { error } = useTasksPage();
 
     if (error) {
         return (

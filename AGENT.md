@@ -23,6 +23,7 @@ This document serves as the technical context for AI agents and developers. The 
 - **Addon Code**: The `addons/` directory is strictly **off-limits** for AI agents. Changes are only allowed upon explicit instruction.
 - **Master Archive**: Local build-specific SQLite files are legacy. All data resides in the `archive` schema within `Data/WoW_Master.duckdb`.
 - **Data Access**: Full access to DuckDB (schemas: `archive`, `registry`, `research`) and JSON maps in `Data/`.
+- **AI Optimization**: Hardware-specific settings (`num_thread`, `num_ctx`, `num_gpu`) are stored in `registry.settings` and managed via `manage.py optimize`. The `AIClient` uses a TTL-based cache (5m) for these settings.
 
 ## Project Structure (Modular)
 
@@ -38,21 +39,21 @@ This document serves as the technical context for AI agents and developers. The 
 
 ## Development Conventions & Guidelines
 
-1.  **No Redundancy**: Consistently avoid redundant code through modularization.
-2.  **Outsourcing**: Prompts and SQL queries are strictly outsourced to dedicated files and folders within the tool directories (e.g., `Tools/toolsets/tools/.../queries/`).
-3.  **Secure API Protocol**: Agents NEVER execute raw SQL directly. They interact with the library via a restricted Middleware API (`db_service.py`) using dedicated `DBClient` and `AIClient`.
-4.  **Shared DB Instance**: Tools MUST NOT accept `db_client` as a parameter. Instead, they MUST import and use the global `db` instance from `Tools.core.shared_db_instance.py` to ensure consistent connectivity and cleaner orchestration prompts.
-5.  **Docstring Standard (Parser-Ready)**: All tool functions MUST follow the standardized docstring format for automated KI-parsing:
-    - Line 1: Concise summary.
-    - Args section: Parameters listed as `- name: description`.
-6.  **Test-Driven**: No class, method, or function is considered integrated without a passing test. A pre-filled test database is created if necessary.
-7.  **Full Code Delivery**: Always deliver the **complete code** for requests or changes, never fragments or partial edits.
-6.  **Documentation First**: Everything is documented cleanly in English. The Wiki (`docs/wiki/`) is the primary "User Manual" and must be kept up-to-date.
-7.  **Gamification**: Documentation utilizes RPG-style imagery (in `docs/wiki/images/`) to reflect the project's WoW theme.
-8.  **Safe Updates**: Avoid `write_file` for updating existing documentation or large files. Use the `replace` tool for surgical edits to preserve historical data.
-9.  **CLI-First**: All core functions must be primarily operable via the terminal.
-10. **Unified Log Schema**: Format: `[{run_info} - {timestamp} - {level} - {process} - {build}]: {message}`.
-11. **Strict Quality Policies**:
+1. **No Redundancy**: Consistently avoid redundant code through modularization.
+2. **Outsourcing**: Prompts and SQL queries are strictly outsourced to dedicated files and folders within the tool directories (e.g., `Tools/toolsets/tools/.../queries/`).
+3. **Secure API Protocol**: Agents NEVER execute raw SQL directly. They interact with the library via a restricted Middleware API (`db_service.py`) using dedicated `DBClient` and `AIClient`.
+4. **Shared DB Instance**: Tools MUST NOT accept `db_client` as a parameter. Instead, they MUST import and use the global `db` instance from `Tools.core.shared_db_instance.py` to ensure consistent connectivity and cleaner orchestration prompts.
+5. **Docstring Standard (Parser-Ready)**: All tool functions MUST follow the standardized docstring format for automated KI-parsing:
+   - Line 1: Concise summary.
+   - Args section: Parameters listed as `- name: description`.
+6. **Test-Driven**: No class, method, or function is considered integrated without a passing test. A pre-filled test database is created if necessary.
+7. **Full Code Delivery**: Always deliver the **complete code** for requests or changes, never fragments or partial edits.
+8. **Documentation First**: Everything is documented cleanly in English. The Wiki (`docs/wiki/`) is the primary "User Manual" and must be kept up-to-date.
+9. **Gamification**: Documentation utilizes RPG-style imagery (in `docs/wiki/images/`) to reflect the project's WoW theme.
+10. **Safe Updates**: Avoid `write_file` for updating existing documentation or large files. Use the `replace` tool for surgical edits to preserve historical data.
+11. **CLI-First**: All core functions must be primarily operable via the terminal.
+12. **Unified Log Schema**: Format: `[{run_info} - {timestamp} - {level} - {process} - {build}]: {message}`.
+13. **Strict Quality Policies**:
     - **No `any` Typed Policy**: The use of `any` is strictly prohibited in TypeScript and Python (use `object`, `unknown` or specific generics instead).
     - **Zero Warning Policy**: Code MUST NOT produce any warnings in `pytest`, `vitest`, `ruff`, or `biome`. All warnings are treated as errors.
     - **No-Force-Push Policy**: `git push --force` or `git push --force-with-lease` are strictly forbidden on shared branches (`main`, `master`, `dev`, `stage`). Rebase and merge conflicts MUST be resolved locally.

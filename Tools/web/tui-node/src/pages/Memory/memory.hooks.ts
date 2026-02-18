@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { useImmer } from "use-immer";
+import { useScopedInput } from "../../hooks/useScopedInput.js";
 import useDebugStore from "../../store/useDebugStore.js";
+import { EFocusAreal } from "../../store/useFocusStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import MemoryService from "../../utils/services/memory.service.js";
 import type { IMemoryResult } from "./memory.types.js";
@@ -48,6 +50,18 @@ const useMemory = () => {
         }
     }, [query, role, updateResults, addLog]);
 
+    // Search Input Scope
+    const { isFocused: isSearchFocused } = useScopedInput({
+        id: "memory-search-input",
+        areal: EFocusAreal.CONTENT,
+        autoFocus: true,
+        keyMap: (_input, key) => {
+            if (key.return) {
+                handleSearch();
+            }
+        },
+    });
+
     return {
         query,
         setQuery,
@@ -56,6 +70,7 @@ const useMemory = () => {
         results,
         isLoading,
         handleSearch,
+        isSearchFocused,
     };
 };
 

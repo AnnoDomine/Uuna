@@ -35,5 +35,6 @@
 	// General
 	"files.insertFinalNewline": true,
 	"files.trimTrailingWhitespace": true,
-	"editor.rulers": [120]
+	"editor.rulers": [120],
+	"biome.configurationPath": "Tools/web/tui-node/biome.json"
 }

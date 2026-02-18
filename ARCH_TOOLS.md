@@ -8,7 +8,9 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 ## Verzeichnis-Struktur
 
 ### 📂 Tools/core/
-*Zentrale Infrastruktur und Basis-Dienste.*
+
+_Zentrale Infrastruktur und Basis-Dienste._
+
 - `db_service.py` - FastAPI Middleware für Master-DB Zugriff.
 - `project_init.py` - Initialisierung der Ordnerstrukturen.
 - `master_db_init.py` - Setup des DuckDB Master Schemas.
@@ -16,7 +18,9 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 - `update_settings.py` - Verwaltung der `Settings.db`.
 
 ### 📂 Tools/ingestion/
-*Datenbeschaffung und Konvertierung.*
+
+_Datenbeschaffung und Konvertierung._
+
 - `sync_wow_db.py` - Multi-threaded Sync von Wago.tools.
 - `update_build_registry.py` - Abgleich der verfügbaren WoW-Builds.
 - `db2_to_sqlite.py` - Konvertierung von DB2 zu SQLite (Legacy).
@@ -24,12 +28,16 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 - `archive_sync.py` - Synchronisation mit externen Archiven.
 
 ### 📂 Tools/migration/
-*Datenkonsolidierung und Langzeitarchivierung.*
+
+_Datenkonsolidierung und Langzeitarchivierung._
+
 - `migrate_to_master.py` - Überführung von SQLite-Builds in den DuckDB-Master.
 - (Zukünftig: `archive_cleanup.py` - Management gezippter Alt-Bestände.)
 
 ### 📂 Tools/agents/
-*KI-Agenten und Forschungs-Logik.*
+
+_KI-Agenten und Forschungs-Logik._
+
 - `ai_researcher_agent.py` - Autonomer Archivist für Discovery & Mapping.
 - `ai_control.py` - CLI zur Steuerung der KI-Parameter.
 - `ai_trainer_dryrun.py` - Simulation von KI-Läufen zu Trainingszwecken.
@@ -37,7 +45,9 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 - 📂 `prompts/` - System-Prompts für die verschiedenen KI-Rollen.
 
 ### 📂 Tools/analysis/
-*Analyse, Mapping und Visualisierung.*
+
+_Analyse, Mapping und Visualisierung._
+
 - `feature_extractor.py` - Extraktion statistischer Merkmale aus Tabellen.
 - `map_references.py` - Interaktives Mapping von Fremdschlüsseln.
 - `cartographer.py` - Generierung von Mermaid ER-Diagrammen.
@@ -47,13 +57,17 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 - 📂 `queries/` - SQL-Templates für komplexe Abfragen.
 
 ### 📂 Tools/web/
-*Benutzeroberfläche und Präsentation.*
+
+_Benutzeroberfläche und Präsentation._
+
 - `db_gui.py` - Hauptanwendung der FastAPI Web-UI.
 - 📂 `static/` - CSS, JS und Bilder für die GUI.
 - 📂 `templates/` - Jinja2 HTML-Templates.
 
 ### 📂 Tools/tests/
-*Qualitätssicherung und Sicherheit.*
+
+_Qualitätssicherung und Sicherheit._
+
 - `run_qa_test.sh` - Automatisierter Uuna-Rule QA-Lauf.
 - `basic_test.py` - Schnelle Funktionsprüfung.
 - `test_db_service.py` - Integrationstest für die Middleware.
@@ -63,6 +77,7 @@ Dieses Dokument beschreibt die geplante Ziel-Struktur des `Tools/` Verzeichnisse
 ---
 
 ## Implementierungs-Hinweise
+
 1. **Pfad-Anpassungen**: Bei der Verschiebung müssen alle internen Imports auf absolute Pfade (z.B. `from Tools.core.db_service import ...`) umgestellt werden.
 2. **Abhängigkeiten**: Skripte in `analysis/` oder `agents/` sollten primär über den `db_service` kommunizieren, anstatt direkt auf Dateien zuzugreifen.
 3. **Ausführung**: Python-Skripte sollten weiterhin über die Root-Venv gestartet werden: `.venv/bin/python3 Tools/subdir/script.py`.

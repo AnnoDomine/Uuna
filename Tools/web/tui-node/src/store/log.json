@@ -1,130 +1,49 @@
 [
     {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396183133,
+        "message": "[]",
+        "process": "useSelectBuild-parsedBuilds",
+        "type": "INFO",
+        "timestamp": 1771421592333,
         "actor": "system",
-        "id": "efae38e0-6c89-4f13-9dd8-a0a77ecbb9a9"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396183133,
-        "actor": "system",
-        "id": "b521a449-aece-4b86-b863-85ddad6fb246"
+        "id": "5dca7749-e8d7-4b5f-b234-8f2f9cf57c42"
     },
     {
         "message": "[]",
         "process": "useSelectBuild-parsedBuilds",
         "type": "INFO",
-        "timestamp": 1771396182800,
+        "timestamp": 1771421593449,
         "actor": "system",
-        "id": "9c51946a-3f80-4f18-963e-563f2aada3da"
+        "id": "7a03e805-cde1-42ad-a4b3-9dd93a89b1d1"
     },
     {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
+        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
+        "type": "ERROR",
+        "process": "fetchBuilds-error",
+        "timestamp": 1771421593464,
+        "actor": "system",
+        "id": "e08cf7d6-aec5-4979-a398-9d7e0a3b8f8b"
+    },
+    {
+        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
+        "type": "ERROR",
+        "process": "fetchBuilds-error",
+        "timestamp": 1771421593465,
+        "actor": "system",
+        "id": "241cf9c2-ea2e-4179-9146-394d8c9e9316"
+    },
+    {
+        "type": "TRACE",
+        "message": "Backend is healthy",
+        "process": "BackendService",
+        "timestamp": 1771421593466,
+        "actor": "system",
+        "id": "816ba7f7-5005-4956-b821-5640c8f559c6"
+    },
+    {
         "type": "INFO",
-        "timestamp": 1771396183791,
+        "message": "Backend health check result: true",
+        "timestamp": 1771421593467,
         "actor": "system",
-        "id": "4712f838-ee7a-426e-badf-f81aae473b3f"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396183795,
-        "actor": "system",
-        "id": "b9798e4b-97c7-44a4-8685-1de14c460b49"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396183796,
-        "actor": "system",
-        "id": "63c3da46-9cfc-4ab8-874b-cf8becb72b2a"
-    },
-    {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
-        "type": "INFO",
-        "timestamp": 1771396234362,
-        "actor": "system",
-        "id": "51961780-ad43-4ec6-94d1-0f5169fca60b"
-    },
-    {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
-        "type": "INFO",
-        "timestamp": 1771396235079,
-        "actor": "system",
-        "id": "0387b393-2208-4d41-8cb8-a72bf77cff6f"
-    },
-    {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
-        "type": "INFO",
-        "timestamp": 1771396235081,
-        "actor": "system",
-        "id": "d625959c-5c5b-441e-817e-b10b47bef48e"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396235082,
-        "actor": "system",
-        "id": "b42e8f34-7e72-476e-b173-1bcf3a7b4b50"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396235082,
-        "actor": "system",
-        "id": "469ff367-ce80-44bd-997f-9552762d8357"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396235083,
-        "actor": "system",
-        "id": "c3d3fd06-3ab8-48ec-9803-930b183814c9"
-    },
-    {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
-        "type": "INFO",
-        "timestamp": 1771396234347,
-        "actor": "system",
-        "id": "d13f4b7e-41b6-4c54-8549-1bbdaed0d3fc"
-    },
-    {
-        "message": "[]",
-        "process": "useSelectBuild-parsedBuilds",
-        "type": "INFO",
-        "timestamp": 1771396235361,
-        "actor": "system",
-        "id": "ba5962e2-df81-4f84-8e76-3242b4bdb669"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396235362,
-        "actor": "system",
-        "id": "4cdf9021-8ce3-49ee-bd2b-cbcc5f6ad07e"
-    },
-    {
-        "message": "{\"message\":\"Request failed with status code 400\",\"name\":\"AxiosError\",\"stack\":\"AxiosError: Request failed with status code 400\\n    at settle (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/settle.js:19:12)\\n    at IncomingMessage.handleStreamEnd (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/adapters/http.js:798:11)\\n    at IncomingMessage.emit (node:events:520:35)\\n    at endReadableNT (node:internal/streams/readable:1701:12)\\n    at processTicksAndRejections (node:internal/process/task_queues:89:21)\\n    at Axios.request (file:///home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/node_modules/.pnpm/axios@1.13.5/node_modules/axios/lib/core/Axios.js:46:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at fetchBuilds (/home/hackmnin/private/UunaWantSomething/Tools/web/tui-node/src/store/useBuildsStore.ts:33:25)\",\"config\":{\"transitional\":{\"silentJSONParsing\":true,\"forcedJSONParsing\":true,\"clarifyTimeoutError\":false,\"legacyInterceptorReqResOrdering\":true},\"adapter\":[\"xhr\",\"http\",\"fetch\"],\"transformRequest\":[null],\"transformResponse\":[null],\"timeout\":0,\"xsrfCookieName\":\"XSRF-TOKEN\",\"xsrfHeaderName\":\"X-XSRF-TOKEN\",\"maxContentLength\":-1,\"maxBodyLength\":-1,\"env\":{},\"headers\":{\"Accept\":\"application/json, text/plain, */*\",\"User-Agent\":\"axios/1.13.5\",\"Accept-Encoding\":\"gzip, compress, deflate, br\"},\"method\":\"get\",\"url\":\"http://127.0.0.1:8001/builds/list/all\",\"allowAbsoluteUrls\":true},\"code\":\"ERR_BAD_REQUEST\",\"status\":400}",
-        "type": "ERROR",
-        "process": "fetchBuilds-error",
-        "timestamp": 1771396235363,
-        "actor": "system",
-        "id": "f44bc37d-2950-47a3-aa21-7af9d2be7c91"
+        "id": "0c5041ee-31a3-4ff1-aaa2-ec5f84361c98"
     }
 ]

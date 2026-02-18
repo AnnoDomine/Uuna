@@ -1,14 +1,11 @@
 import { Box, Text } from "ink";
 import type { FC } from "react";
 import { EFocusAreal } from "../../../store/useFocusStore.js";
-import useTaskInspectorStore from "../../../store/useTaskInspectorStore.js";
 import ScrollArea from "../../ScrollArea/ScrollArea.js";
+import { useTaskDetails } from "./TaskDetails.hooks.js";
 
 const TaskDetails: FC = () => {
-    const { tasks, events, scores, selectedTaskId, selectedEventId } = useTaskInspectorStore();
-
-    const selectedTask = tasks.find((t) => t.task_id === selectedTaskId);
-    const selectedEvent = events.find((e) => e.event_id === selectedEventId);
+    const { selectedTask, selectedEvent, scores, selectedTaskId } = useTaskDetails();
 
     if (!selectedTaskId) {
         return null;

@@ -1,23 +1,12 @@
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
-import { type FC, useMemo } from "react";
+import type { FC } from "react";
 import ScrollableSelection from "../../../molecules/ScrollableSelection/ScrollableSelection.js";
 import { EFocusAreal } from "../../../store/useFocusStore.js";
-import useTaskInspectorStore, { type TaskItem } from "../../../store/useTaskInspectorStore.js";
+import { useTaskList } from "./TaskList.hooks.js";
 
 const TaskList: FC = () => {
-    const { tasks, selectedTaskId, selectTask, isLoadingTasks } = useTaskInspectorStore();
-
-    const taskItems = useMemo(
-        () =>
-            tasks.map((t: TaskItem) => ({
-                label: `[${t.status}] ${t.title.slice(0, 20)}...`,
-                value: t.task_id,
-                id: t.task_id,
-                meta: t,
-            })),
-        [tasks],
-    );
+    const { taskItems, selectedTaskId, selectTask, isLoadingTasks } = useTaskList();
 
     return (
         <Box

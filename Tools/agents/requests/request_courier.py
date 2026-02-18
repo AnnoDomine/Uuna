@@ -1,7 +1,7 @@
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_archivist import request_archivist
 from Tools.agents.requests.request_librarian import send_librarian_response
-from Tools.agents.requests.request_sages import request_sages
+from Tools.agents.requests.request_sages import Approval, request_sages
 from Tools.agents.requests.utils.get_valid_return_json import request_with_schema
 from Tools.toolsets import global_tool_set
 
@@ -19,7 +19,7 @@ def request_courier_from_sages(task_id, approval: str, context: str):
     - If approved, send the task id to the tinker to start scoring
     - If revoked, create a new event and restart the research queue
     """
-    if approval == "APPROVED":
+    if approval == Approval.APPROVED:
         # Scoring flow
         pass
     else:  # create event with the current output

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useImmer } from "use-immer";
 import useDebugStore from "../../store/useDebugStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
@@ -69,12 +69,36 @@ const useScoring = () => {
         return () => clearInterval(interval);
     }, [fetchBoard]);
 
+    const agentTableData = useMemo(
+        () =>
+            agentStats.map((s) => ({
+                Agent: s.agent,
+                Tasks: s.taskCount,
+                "Avg %": `${s.averageScore}%`,
+                Total: s.totalScore,
+            })),
+        [agentStats],
+    );
+
+    const historyTableData = useMemo(
+        () =>
+            rawScores.map((s) => ({
+                ID: s.score_id,
+                Task: s.task_id.slice(0, 8),
+                Score: `${s.final_percent}%`,
+                Date: new Date(s.created_at).toLocaleDateString(),
+            })),
+        [rawScores],
+    );
+
     return {
         rawScores,
         agentStats,
         isLoading,
         error,
         refresh: fetchBoard,
+        agentTableData,
+        historyTableData,
     };
 };
 
