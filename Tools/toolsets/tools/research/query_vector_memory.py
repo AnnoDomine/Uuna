@@ -1,11 +1,7 @@
 # Tools/toolsets/tools/research/query_vector_memory.py
-import requests
-from typing import List, Dict, Any
-import sys
-import os
+from typing import Any, Dict, List
 
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+import requests
 
 ORCHESTRA_API_URL = "http://127.0.0.1:8001"
 

@@ -1,12 +1,6 @@
-# Tools/toolsets/tools/audit/evaluate_agent_output.py
 import json
-from typing import Callable, Dict, Any
 from pathlib import Path
-import sys
-import os
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Callable, Dict
 
 from Tools.core.shared_db_instance import db
 
@@ -15,11 +9,13 @@ PROMPT_DIR = Path(__file__).parent / "prompts" / "evaluate_agent_output"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
 
 def _load_prompt(name: str) -> str:
+    """Loads a prompt template from the tool's local prompt directory."""
     path = PROMPT_DIR / f"{name}.txt"
     if path.exists():
         with open(path, "r") as f:

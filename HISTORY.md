@@ -1,5 +1,22 @@
 # Projekt History - WoW Datamine Toolkit
 
+## [0.9.15] - 2026-02-19 - "Clean Architecture & Industrial Testing"
+
+### Added
+- **Expedition Group Toolset**: Vollständige Implementierung des Toolsets für Online-Lore-Research (Wiki, Wago, Web-Content) mit automatischer Caching-Logik.
+- **Observer Toolset Upgrade**: Integration von Konsistenzprüfungs-Tools (`check_logical_consistency`) und finalen Verdict-Mechanismen für den Observer.
+- **Umfassende Backend-Testsuite**: Implementierung und Stabilisierung von 68 Unit-Tests für alle Agenten-Tools unter Nutzung von `pytest` und `unittest.mock`.
+- **Atomic Task Validation**: Jedes Tool wurde gegen die im `AGENT.md` definierten KI-Parsing-Standards validiert und angepasst.
+
+### Changed
+- **Parser-Ready Docstrings**: Vollständiges Refactoring aller Tool-Docstrings auf das standardisierte "Short summary + Args list" Format zur fehlerfreien KI-Orchestrierung.
+- **Shared DB Architecture**: Umstellung komplexer Analyse-Workflows (Reference Mapping, Build Comparison) auf das globale `db` Instanz-Pattern zur Reduzierung der Prompt-Komplexität.
+- **Bereinigung der Codebase**: Entfernung aller redundanten `sys.path` Hacks und Modul-Auflösungs-Workarounds zugunsten einer sauberen `PYTHONPATH` Steuerung via `manage.py`.
+
+### Fixed
+- **Stabile Mocks**: Behebung von Race Conditions und fehlerhaften SQL-Erkennungen in den Test-Mocks für `compare_builds` und `map_column_references_workflow`.
+- **Import-Integrität**: Korrektur fehlender Abhängigkeiten in den Analyse-Tools (z.B. `save_discovery` in `perform_column_discovery`).
+
 ## [0.9.14] - 2026-02-18 - "Automated Setup & Hardware Synergy"
 
 ### Added

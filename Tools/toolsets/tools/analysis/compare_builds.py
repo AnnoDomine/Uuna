@@ -1,13 +1,8 @@
 # Tools/toolsets/tools/analysis/compare_builds.py
-from typing import Dict, Any
-import sys
-import os
 from pathlib import Path
+from typing import Any, Dict
 
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
-
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 # Define the path to the queries for this tool and related generic ones
 QUERY_DIR_COMPARE = Path(__file__).parent / "queries" / "compare_builds"
@@ -20,10 +15,9 @@ def _load_query(name: str, specific_dir: Path) -> str:
         return f.read().strip()
 
 
-def _get_schema_for_build(db_client: DBClient, build_version: str) -> Dict[str, Dict[str, Any]]:
+def _get_schema_for_build(build_version: str) -> Dict[str, Dict[str, Any]]:
     """
-    Retrieves the full schema for a given build version, including table names,
-    columns, and row counts.
+    Retrieves the full schema for a given build version.
     """
     schema = {}
 
@@ -34,26 +28,26 @@ def _get_schema_for_build(db_client: DBClient, build_version: str) -> Dict[str, 
     get_count_template = _load_query("get_table_count_for_build.sql", QUERY_DIR_COMPARE)
 
     # --- Execute logic ---
-    res = db_client.execute(get_build_id_sql, [build_version])
+    res = db.execute(get_build_id_sql, [build_version])
     build_id_row = res.fetchone()
     if not build_id_row:
         raise ValueError(f"Build version '{build_version}' not found in registry.")
     build_id = build_id_row[0]
 
-    tables_res = db_client.execute(get_tables_sql)
+    tables_res = db.execute(get_tables_sql)
     tables = [row[0] for row in tables_res.fetchall()]
 
     for table in tables:
         try:
             describe_sql = describe_table_template.format(table_name=table)
-            cols_res = db_client.execute(describe_sql)
+            cols_res = db.execute(describe_sql)
             columns = [row[0] for row in cols_res.fetchall()]
 
             if "build_id" not in [c.lower() for c in columns]:
                 continue
 
             count_sql = get_count_template.format(table_name=table)
-            count_res = db_client.execute(count_sql, [build_id])
+            count_res = db.execute(count_sql, [build_id])
             count = count_res.fetchone()[0]
 
             if count > 0:
@@ -65,12 +59,16 @@ def _get_schema_for_build(db_client: DBClient, build_version: str) -> Dict[str, 
     return schema
 
 
-def compare_builds(db_client: DBClient, build_version_A: str, build_version_B: str) -> Dict[str, Any]:
+def compare_builds(build_version_A: str, build_version_B: str) -> Dict[str, Any]:
     """
     Compares the schemas of two build versions and returns a diff.
+
+    Args:
+    - build_version_A: The first build version string.
+    - build_version_B: The second build version string.
     """
-    schema_A = _get_schema_for_build(db_client, build_version_A)
-    schema_B = _get_schema_for_build(db_client, build_version_B)
+    schema_A = _get_schema_for_build(build_version_A)
+    schema_B = _get_schema_for_build(build_version_B)
 
     diff = {"added_tables": [], "removed_tables": [], "modified_tables": {}}
 

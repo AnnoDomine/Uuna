@@ -1,10 +1,6 @@
 # Tools/toolsets/tools/database/get_last_attempt.py
-import sys
 from pathlib import Path
-import os
 from typing import Optional, Tuple
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 

@@ -1,11 +1,6 @@
 # Tools/toolsets/tools/database/find_value.py
-from typing import Optional, Dict
-import sys
-import os
 from pathlib import Path
-
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Dict, Optional
 
 from Tools.core.shared_db_instance import db
 

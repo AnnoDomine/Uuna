@@ -1,13 +1,9 @@
 # Tools/toolsets/tools/research/fetch_web_content.py
+from pathlib import Path
+from typing import Optional
+
 import requests
 from bs4 import BeautifulSoup
-from typing import Optional
-import sys
-import os
-from pathlib import Path
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -57,6 +53,10 @@ def sanitize_html(html_content: str) -> str:
 def fetch_web_content(url: str, use_cache: bool = True) -> str:
     """
     Fetches, sanitizes, and optionally caches web content from a given URL.
+
+    Args:
+    - url: The target URL to fetch.
+    - use_cache: Whether to use the local cache (defaults to True).
     """
     if use_cache:
         cached = _check_cache(url)

@@ -1,40 +1,19 @@
-# Tools/toolsets/tools/events/get_event_data.py
 import json
-import os
-import sys
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Union
 
 from Tools.core.shared_db_instance import db
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
-
-from typing import TypedDict
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_event_data"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
 
-class EventReturn(TypedDict):
-    event_id: int
-    task_id: int
-    initialiator: str
-    target: str
-    input_data: str
-    confidence: float
-    max_potential: str
-
-
-class EventError(TypedDict):
-    error: str
-
-
-def get_event_data(event_id: str) -> Tuple[EventReturn, EventError]:
+def get_event_data(event_id: str) -> Dict[str, Union[str, float, dict]]:
     """
     Retrieves the payload and metadata of a specific task event.
 

@@ -1,9 +1,5 @@
 # Tools/toolsets/tools/database/save_attempt.py
-import sys
 from pathlib import Path
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -23,7 +19,7 @@ def save_attempt(
     proposed_target: str,
     decision: str,
     reasoning: str,
-):
+) -> dict:
     """
     Saves the result of an AI mapping attempt.
 

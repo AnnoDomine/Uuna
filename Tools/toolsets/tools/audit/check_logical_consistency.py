@@ -1,11 +1,6 @@
 # Tools/toolsets/tools/audit/check_logical_consistency.py
-import os
-import sys
 from pathlib import Path
 from typing import Any, Dict
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -13,6 +8,7 @@ QUERY_DIR = Path(__file__).parent / "queries" / "check_logical_consistency"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 

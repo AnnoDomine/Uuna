@@ -1,12 +1,5 @@
-# Tools/toolsets/tools/events/log_event_reasoning.py
-import os
 from pathlib import Path
-from typing import Dict, Any
-import sys
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
-
+from typing import Any, Dict
 
 from Tools.core.shared_db_instance import db
 
@@ -14,6 +7,7 @@ QUERY_DIR = Path(__file__).parent / "queries" / "log_event_reasoning"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 

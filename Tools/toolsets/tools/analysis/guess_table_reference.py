@@ -1,6 +1,6 @@
 # Tools/toolsets/tools/analysis/guess_table_reference.py
 import difflib
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 
 def guess_table_reference(potential_name: str, all_table_names: List[str]) -> List[Dict[str, Union[str, float]]]:

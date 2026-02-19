@@ -1,12 +1,7 @@
 # Tools/toolsets/tools/analysis/extract_features.py
-import sys
-import os
-import time
 import json
+import time
 from pathlib import Path
-
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -25,7 +20,7 @@ def extract_features_for_build(build_version: str) -> dict:
     Extracts column features (stats, samples) from a build.
 
     Args:
-    - build_version: The version string of the build.
+    - build_version: The version string of the build (e.g. '10.0.0.12345').
     """
     start_time = time.time()
     print(f"INFO: Feature extraction started for build: {build_version}")

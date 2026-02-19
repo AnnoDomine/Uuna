@@ -1,11 +1,6 @@
 # Tools/toolsets/tools/analysis/perform_column_mapping.py
-import sys
-import os
 from pathlib import Path
-from typing import Dict, List, Any, Callable
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Callable, Dict, List
 
 from Tools.core.shared_db_instance import db
 from Tools.toolsets.tools.database.check_ids import check_ids
@@ -17,6 +12,7 @@ PROMPT_DIR = Path(__file__).parent / "prompts" / "perform_column_mapping"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
@@ -31,6 +27,7 @@ def _load_prompt(name: str) -> str:
 
 
 def _clean_target(name: str, all_tables: List[str] = None) -> str:
+    """Clean the AI-proposed target table name."""
     if not isinstance(name, str):
         return "NONE"
     target = name.split()[-1].replace("'", "").replace('"', "").strip()
@@ -58,7 +55,7 @@ def perform_column_mapping(
     Maps a column to a target table using the Archivist and Sages.
 
     Args:
-    - ask_ai_func: Function to call the AI for discovery.
+    - ask_ai_func: Function to call the AI for mapping.
     - discovery_result: The result from perform_column_discovery.
     - col_info: List containing column metadata [f_id, table, col, d_type, min, max].
     - build_version: The version string of the build.

@@ -1,13 +1,7 @@
-# Tools/toolsets/tools/courier/create_task_event.py
-import uuid
 import json
-from typing import Dict, Any
+import uuid
 from pathlib import Path
-import sys
-import os
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Dict
 
 from Tools.core.shared_db_instance import db
 
@@ -15,6 +9,7 @@ QUERY_DIR = Path(__file__).parent / "queries" / "create_task_event"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 

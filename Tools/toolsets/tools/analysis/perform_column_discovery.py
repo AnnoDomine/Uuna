@@ -1,25 +1,21 @@
 # Tools/toolsets/tools/analysis/perform_column_discovery.py
-import sys
-import os
 import re
 from pathlib import Path
-from typing import Dict, List, Any, Callable
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Callable, Dict, List
 
 from Tools.core.shared_db_instance import db
-from Tools.toolsets.tools.database.save_discovery import save_discovery
 from Tools.toolsets.tools.database.get_last_attempt import get_last_attempt
+from Tools.toolsets.tools.database.save_discovery import save_discovery
+from Tools.toolsets.tools.research.fetch_web_content import fetch_web_content
 from Tools.toolsets.tools.research.get_wago_structure import get_wago_structure
 from Tools.toolsets.tools.research.search_wow_wiki import search_wow_wiki
-from Tools.toolsets.tools.research.fetch_web_content import fetch_web_content
 
 QUERY_DIR = Path(__file__).parent / "queries" / "perform_column_discovery"
 PROMPT_DIR = Path(__file__).parent / "prompts" / "perform_column_discovery"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
@@ -34,6 +30,7 @@ def _load_prompt(name: str) -> str:
 
 
 def _sanitize_identifier(name: str) -> str:
+    """Ensures table/column names only contain alphanumeric characters and underscores."""
     if not re.match(r"^[a-zA-Z0-9_.]+$", str(name)):
         raise ValueError(f"Invalid identifier: {name}")
     return str(name)

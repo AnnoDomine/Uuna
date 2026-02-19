@@ -1,10 +1,5 @@
 # Tools/toolsets/tools/research/get_wago_structure.py
 import requests
-import sys
-import os
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from .fetch_web_content import _check_cache, _save_cache
 
@@ -16,6 +11,11 @@ USER_AGENT = (
 def get_wago_structure(table_name: str, build_version: str, use_cache: bool = True) -> str:
     """
     Fetches the DB2 structure (headers) from wago.tools for a given table and build.
+
+    Args:
+    - table_name: The name of the DB2 table.
+    - build_version: The WoW build version (e.g. '10.0.0.12345').
+    - use_cache: Whether to use the local cache (defaults to True).
     """
     csv_url = f"https://wago.tools/db2/{table_name}/csv?build={build_version}"
 

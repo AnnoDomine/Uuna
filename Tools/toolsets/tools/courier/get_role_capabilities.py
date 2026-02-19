@@ -1,14 +1,13 @@
 # Tools/toolsets/tools/courier/get_role_capabilities.py
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 SKILLS_BASE_DIR = Path("Tools/agents/skills")
 
 
 def get_role_capabilities() -> Dict[str, Any]:
     """
-    Exclusively for the Courier. Returns an overview of all specialists and their
-    atomic task skills to assist in routing decisions.
+    Returns an overview of all specialists and their atomic task skills.
     """
     capabilities = {}
 

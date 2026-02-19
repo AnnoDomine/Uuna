@@ -1,11 +1,6 @@
 # Tools/toolsets/tools/research/search_discoveries.py
-import sys
-import os
 from pathlib import Path
-from typing import List, Dict, Any
-
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Dict, List
 
 from Tools.core.shared_db_instance import db
 

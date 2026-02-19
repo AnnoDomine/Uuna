@@ -1,10 +1,6 @@
 # Tools/toolsets/tools/database/update_global_knowledge.py
-import sys
 from pathlib import Path
-import os
 from typing import Optional
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -24,7 +20,7 @@ def update_global_knowledge(
     confidence: float,
     build_version: str,
     ai_notes: Optional[str] = None,
-):
+) -> dict:
     """
     Upserts knowledge about a column-to-table relationship.
 

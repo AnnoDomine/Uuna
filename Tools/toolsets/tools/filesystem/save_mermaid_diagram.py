@@ -1,4 +1,3 @@
-# Tools/toolsets/tools/filesystem/save_mermaid_diagram.py
 import os
 from typing import Optional
 
@@ -8,12 +7,9 @@ def save_mermaid_diagram(name: str, content: str, build_version: Optional[str] =
     Saves a mermaid diagram string to a file in Data/maps/.
 
     Args:
-        name: The base name for the diagram file.
-        content: The string content of the Mermaid diagram.
-        build_version: Optional build version to append to the filename.
-
-    Returns:
-        A string indicating success or failure with the file path.
+    - name: The base name for the diagram file.
+    - content: The string content of the Mermaid diagram.
+    - build_version: Optional build version to append to the filename.
     """
     try:
         maps_dir = "Data/maps"

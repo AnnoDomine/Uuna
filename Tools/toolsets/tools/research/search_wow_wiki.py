@@ -1,11 +1,7 @@
 # Tools/toolsets/tools/research/search_wow_wiki.py
-import requests
 from typing import List
-import sys
-import os
 
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+import requests
 
 from .fetch_web_content import _check_cache, _save_cache
 
@@ -18,6 +14,10 @@ USER_AGENT = (
 def search_wow_wiki(query: str, use_cache: bool = True) -> List[str]:
     """
     Searches the official Warcraft Wiki via MediaWiki API.
+
+    Args:
+    - query: The search query.
+    - use_cache: Whether to use the local cache (defaults to True).
     """
     cache_key = f"wiki_api://{query}"
 

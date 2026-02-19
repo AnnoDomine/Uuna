@@ -1,9 +1,5 @@
 # Tools/toolsets/tools/database/save_discovery.py
-import sys
 from pathlib import Path
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
 
@@ -16,7 +12,9 @@ def _load_query(name: str) -> str:
         return f.read().strip()
 
 
-def save_discovery(build_id: int, table_name: str, column_name: str, discovery: str, confidence: float):
+def save_discovery(
+    build_id: int, table_name: str, column_name: str, discovery: str, confidence: float
+) -> dict:
     """
     Saves a new discovery about a column.
 

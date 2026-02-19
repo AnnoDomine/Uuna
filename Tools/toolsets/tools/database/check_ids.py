@@ -1,12 +1,7 @@
 # Tools/toolsets/tools/database/check_ids.py
-from typing import List, Any
-import sys
-import os
 import re
 from pathlib import Path
-
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, List
 
 from Tools.core.shared_db_instance import db
 
@@ -34,7 +29,7 @@ def check_ids(table_name: str, id_list: List[Any]) -> int:
     - table_name: The name of the table to check (e.g. 'Creature').
     - id_list: List of numeric IDs to look for.
     """
-    # 1. Input validation that should raise errors
+    # 1. Input validation
     safe_table = _sanitize_identifier(table_name)
 
     if not id_list:

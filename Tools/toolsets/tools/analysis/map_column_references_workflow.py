@@ -1,14 +1,10 @@
 # Tools/toolsets/tools/analysis/map_column_references_workflow.py
-import sys
-import os
 import json
+import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
-
-from Tools.core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 from .guess_table_reference import guess_table_reference
 
 # --- Constants ---
@@ -51,7 +47,6 @@ def _resolve_table_name_headless(
 ) -> str:
     """
     Resolves a table name using heuristics and returns a confirmed match or None.
-    If confidence is low, it adds a question to the pending_questions list.
     """
     mapping_key = f"{current_table}.{current_col}"
 
@@ -92,16 +87,13 @@ def _resolve_table_name_headless(
         return None
 
 
-def map_column_references_workflow(
-    db_client: DBClient, build_version: str, auto_import_previous: bool = True
-) -> Dict[str, Any]:
+def map_column_references_workflow(build_version: str, auto_import_previous: bool = True) -> Dict[str, Any]:
     """
     Workflow to automatically map column references for a build.
 
     Args:
-    - db_client: The database client instance.
     - build_version: The version string of the build.
-    - auto_import_previous: Whether to import mappings from the previous build.
+    - auto_import_previous: Whether to import mappings from the previous build (defaults to True).
     """
     print(f"=== REFERENCE MAPPING WORKFLOW - {build_version} ===")
 
@@ -114,7 +106,7 @@ def map_column_references_workflow(
     if auto_import_previous and not user_mappings:
         try:
             prev_build_sql = _load_query("get_previous_build")
-            prev_res = db_client.execute(prev_build_sql, [build_version]).fetchone()
+            prev_res = db.execute(prev_build_sql, [build_version]).fetchone()
             if prev_res:
                 prev_version = prev_res[0]
                 prev_map_path = f"Data/dbs/WoW_Data_{prev_version}_user_map.json"
@@ -125,7 +117,7 @@ def map_column_references_workflow(
             print(f"WARNING: Could not import previous build mappings: {e}")
 
     # --- Main Logic ---
-    all_tables_res = db_client.execute(
+    all_tables_res = db.execute(
         "SELECT table_name FROM information_schema.tables WHERE table_schema = 'archive'"
     ).fetchall()
     all_tables = [row[0] for row in all_tables_res]
@@ -141,7 +133,7 @@ def map_column_references_workflow(
             continue
 
         get_cols_sql = get_cols_template.format(table_name=table)
-        columns_res = db_client.execute(get_cols_sql).fetchall()
+        columns_res = db.execute(get_cols_sql).fetchall()
         columns = [col[0] for col in columns_res]
 
         for col in columns:
@@ -163,7 +155,7 @@ def map_column_references_workflow(
                         newly_confirmed_references[table] = []
 
                     count_sql = count_template.format(table_name=table, column_name=col)
-                    count_res = db_client.execute(count_sql).fetchone()
+                    count_res = db.execute(count_sql).fetchone()
                     val_count = count_res[0] if count_res else 0
 
                     newly_confirmed_references[table].append(

@@ -1,12 +1,7 @@
 # Tools/toolsets/tools/analysis/generate_relationship_map.py
 import json
-from typing import Callable
-import sys
-import os
 from pathlib import Path
-
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Callable
 
 from Tools.core.shared_db_instance import db
 from Tools.toolsets.tools.database.get_confirmed_mappings import get_confirmed_mappings
@@ -26,11 +21,10 @@ def _load_file(path: Path) -> str:
 def _get_mermaid_documentation() -> str:
     """
     Fetches Mermaid syntax documentation, with a caching mechanism.
-    (This is a simplified version of the original's caching).
     """
     try:
         sql = _load_file(QUERY_DIR / "get_mermaid_docs_cache.sql")
-        # In this context, we assume a simple cache check. The original had a time-based check.
+        # In this context, we assume a simple cache check.
         res = db.execute(sql, ["mermaid_docs", 7])
         if res.fetchall():
             return res.fetchone()[0]

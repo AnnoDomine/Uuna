@@ -1,5 +1,6 @@
 # Tools/tests/toolset_tests/tools/tinker/test_tinker_tools.py
-from unittest.mock import MagicMock
+from unittest.mock import patch
+
 from Tools.toolsets.tools.tinker.assess_complexity import assess_complexity
 from Tools.toolsets.tools.tinker.assign_potential_score import assign_potential_score
 
@@ -17,10 +18,9 @@ def test_assess_complexity_tier_3():
 
 
 def test_assign_potential_score_success():
-    mock_db = MagicMock()
+    with patch("Tools.toolsets.tools.tinker.assign_potential_score.db") as mock_db:
+        result = assign_potential_score("ev-123", 150)
 
-    result = assign_potential_score(mock_db, "ev-123", 150)
-
-    assert result["status"] == "success"
-    assert result["max_potential"] == 150
-    mock_db.execute.assert_called_once()
+        assert result["status"] == "success"
+        assert result["max_potential"] == 150
+        mock_db.execute.assert_called_once()

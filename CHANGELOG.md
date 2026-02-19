@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.15] - 2026-02-19
+### Added
+- **Expedition Group Toolset**: Initialized full research capabilities for lore agents, including Wiki and Wago.tools integration.
+- **Observer Logic Tools**: Added consistency checking and final verdict tools to the Observer role.
+- **Agent Tool Verification**: Implemented 68 standardized unit tests covering all primary agent actions and orchestration events.
+- **Global Tool Registry**: Standardized `global_tool_set.py` to ensure consistent access to core functions across all 9 roles.
+
+### Changed
+- **Tool Docstring Standardisation**: Refactored all Python tools to follow the "Short summary + Args list" format required for automated AI parsing.
+- **Legacy Cleanup**: Removed all manual `sys.path` modifications across the `Tools/` directory in favor of centralized module resolution.
+- **Mock Stability**: Enhanced test reliability by refactoring database mocks to support the Shared DB pattern.
+
+### Fixed
+- **Module Resolution**: Fixed missing imports in `perform_column_discovery.py`.
+- **Test Inconsistencies**: Stabilized `compare_builds` and `map_column_references_workflow` tests by correcting SQL string matching in mocks.
+
 ## [0.9.14] - 2026-02-18
 ### Added
 - **Automated Setup Script**: New `init.sh` for one-click environment preparation, including dependency checks for uv, Node.js, and Ollama.

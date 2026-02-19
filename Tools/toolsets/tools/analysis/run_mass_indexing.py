@@ -1,11 +1,6 @@
 # Tools/toolsets/tools/analysis/run_mass_indexing.py
-import sys
-import os
 from pathlib import Path
-from typing import Dict, Any, Optional
-
-# Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from typing import Any, Dict, Optional
 
 from Tools.core.shared_db_instance import db
 from .extract_features import extract_features_for_build
@@ -25,8 +20,8 @@ def run_mass_indexing(start_v: Optional[str] = None, end_v: Optional[str] = None
     Runs feature extraction for all pending builds in a range.
 
     Args:
-    - start_v: Optional start version string.
-    - end_v: Optional end version string.
+    - start_v: Optional start version string (e.g. '9.0.1.36216').
+    - end_v: Optional end version string (e.g. '11.0.2.56110').
     """
     print("INFO: Starting Mass Indexing run.")
 
