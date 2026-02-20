@@ -118,6 +118,6 @@ describe("useTaskDetails", () => {
 
         expect(result?.selectedTask).toBeUndefined();
         expect(result?.selectedEvent).toBeUndefined();
-        expect(result?.selectedTaskId).toBeNull();
+        expect(result?.selectedTaskId).toBe("");
     });
 });
