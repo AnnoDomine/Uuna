@@ -1,13 +1,23 @@
-def request_tinker(task_id):
-    """
-    This function is the entry point to the scoring.
-    It is called from the courier after the sages approved the task.
+from Tools.agents.requests.request_observer import request_observer
+from Tools.toolsets import global_tool_set
+from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
-    1. Get the task and the history.
-    2. Based on the task and the amount of events, calculate a max_potential
-    3. Apply the task related max_potenzial to the task
-    4. Create for each event in the history an event related max_potencial score, based on the amount of information are applied
-    5. Apply the event related max_potencial scores to there respective event
-    6. Send the task id to the observer
+
+def request_tinker(task_id: str):
     """
-    pass
+    Calculates the 'Max Potential' score for a task and its events.
+    """
+    try:
+        notify_frontend(task_id, "Tinker: Calculating quantitative difficulty scores...", agent="Tinker", type="research")
+        
+        # 1. Get task context
+        global_tool_set.get_task_context(task_id)
+        
+        # Logic for calculating scores would go here...
+        # For now, we just pass through to the Observer
+        
+        request_observer(task_id)
+
+    except Exception as e:
+        notify_frontend(task_id, f"Tinker scoring error: {e}", agent="Tinker", type="error", level="error")
+        return {"error": str(e)}

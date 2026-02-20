@@ -43,8 +43,8 @@ const Home: FC = () => {
                     <ScrollArea id="home-chat-scroll" autoScrollToBottom>
                         {chat.map((v) => (
                             <Text key={v.id} color={getChatColor(v.actor)}>
-                                [{new Date(v.timestamp).toLocaleString()}] {getActorName(v.actor)}:
-                                {"\n"}
+                                [{new Date(v.timestamp).toLocaleString()}]{" "}
+                                {getActorName(v.actor, v.agent)}:{"\n"}
                                 {v.message}
                             </Text>
                         ))}

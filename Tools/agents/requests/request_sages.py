@@ -1,7 +1,8 @@
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_courier import request_courier_from_sages
-from Tools.agents.requests.utils.get_valid_return_json import request_with_schema
+from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
+from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 
 class Approval:
@@ -9,53 +10,52 @@ class Approval:
     REVOKED = "revoked"
 
 
-def request_sages(task_id):
+def request_sages(task_id: str):
     """
-    The sages checks if the task is valid to send to the user.
-
-    1. Check the validity of the tesk flow and the information which would be present to the user
-    2. approve od revoke the task and sent the approval to the courier
-
-    Additional: If we have more than 50 events in a task, the task will be automatic approved with the information
-    'Task due high amount of research steps aborded.'
-
-    Additional: If an error os raised, we approve the task with the related error message as context
+    The Sages check if the task is valid to send to the user.
     """
     try:
-        task = global_tool_set.get_task_context(task_id)
-        if "error" in task:
-            raise Exception(task.get("error", f"No error spezified while getting task id: {task_id}"))
+        notify_frontend(task_id, "Sages: Reviewing task logic and consistency...", agent="Sages", type="research")
+        
+        task_ctx = global_tool_set.get_task_context(task_id)
+        if "error" in task_ctx:
+            raise Exception(task_ctx["error"])
 
-        history = task.get("history", [])
+        history = task_ctx.get("history", [])
         if len(history) > 50:
+            notify_frontend(task_id, "Sages: History limit reached. Auto-approving with notice.", agent="Sages", type="research", level="warning")
             request_courier_from_sages(
-                task_id, approval=Approval.APPROVED, context="Aborded task due the amount of research events."
+                task_id, approval=Approval.APPROVED, context="Aborted task due to high amount of research steps."
             )
+            return
 
         payload = {
             "messages": [
                 {
                     "role": "system",
-                    "content": "Review the task and the task history to decide if the collected information are logic and valid.",
+                    "content": "Review the task and the task history to decide if the collected information is logical and valid.",
                 },
                 {
                     "role": "user",
-                    "content": f"Return your approval and why you decided it as context. The approval can only have '{Approval.APPROVED}' or '{Approval.REVOKED}'.",
+                    "content": f"Return your approval and why you decided it as context. The approval can only be '{Approval.APPROVED}' or '{Approval.REVOKED}'.",
                 },
+                {"role": "system", "content": f"TASK CONTEXT:\n{task_ctx}"},
             ]
         }
 
-        response = {"approval": Approval, "context": "string"}
+        response_template = {"approval": Approval.APPROVED, "context": "string"}
 
-        approval_response = request_with_schema(response, payload, Agents.SAGES)
+        approval_response = request_with_schema(response_template, payload, Agents.SAGES)
+        
         if "error" in approval_response:
-            raise Exception(approval_response.get("error", "No spezified error while approve task"))
+            raise Exception(approval_response["error"])
 
-        request_courier_from_sages(task_id, **approval_response)
+        decision = approval_response["approval"]
+        notify_frontend(task_id, f"Sages: Verdict is '{decision.upper()}'. Reason: {approval_response['context']}", agent="Sages", type="research")
+
+        request_courier_from_sages(task_id, decision, approval_response["context"])
 
     except Exception as e:
-        error_response = {
-            "approval": Approval.APPROVED,
-            "context": str(e),
-        }
-        request_courier_from_sages(task_id, **error_response)
+        notify_frontend(task_id, f"Sages verification error: {e}", agent="Sages", type="error", level="error")
+        # Fallback: Auto-approve on error to not block the user, but with error context
+        request_courier_from_sages(task_id, Approval.APPROVED, f"Verification system error: {str(e)}")

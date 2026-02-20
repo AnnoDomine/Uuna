@@ -1,34 +1,41 @@
 import express from "express";
 import { useCallback, useEffect } from "react";
-import useAIStore from "../store/useAIStore.js";
+import useAIStore, { type FrontendSignal } from "../store/useAIStore.js";
 
-const PORT = 3800;
+const DEFAULT_PORT = 3800;
 
 const useExpress = () => {
-    const { addChat } = useAIStore();
+    const { receiveSignal } = useAIStore();
 
-    const receiveMessage = useCallback(
-        (message: string) => {
-            addChat(message);
+    const handleSignal = useCallback(
+        (signal: FrontendSignal) => {
+            receiveSignal(signal);
         },
-        [addChat],
+        [receiveSignal],
     );
 
     useEffect(() => {
+        const port = process.env.TUI_SIGNAL_PORT
+            ? Number.parseInt(process.env.TUI_SIGNAL_PORT, 10)
+            : DEFAULT_PORT;
         const app = express();
         app.use(express.json());
+
         app.post("/update", (req, res) => {
-            const { message } = req.body;
-            receiveMessage(message);
+            const signal: FrontendSignal = req.body;
+            handleSignal(signal);
             res.sendStatus(200);
         });
-        const server = app.listen(PORT, () => {
-            console.log(`Express server listening on port ${PORT}`);
+
+        const server = app.listen(port, () => {
+            console.log(`Signal receiver listening on port ${port}`);
         });
+
         return () => {
             server.close();
         };
-    }, [receiveMessage]);
+    }, [handleSignal]);
+
     return null;
 };
 

@@ -13,8 +13,19 @@ AGENT_DESCRIPTIONS = {
 }
 
 
-def getPromptHeader(role: Agents):
+def get_prompt_header(role: Agents) -> dict:
+    """
+    Generates the standardized system prompt header for a specific agent role.
+
+    Args:
+    - role: The agent role enum.
+    """
+    description = AGENT_DESCRIPTIONS.get(role, "You are a specialized agent in the Library.")
+    skills = get_skill_set(role)
+
+    content = f"{description}\n\nSKILLS AND PROCEDURES:\n{skills}"
+
     return {
         "role": "system",
-        "content": f"{AGENT_DESCRIPTIONS.get(role)}\n\nSKILLS:\n{get_skill_set(role)}",
+        "content": content,
     }

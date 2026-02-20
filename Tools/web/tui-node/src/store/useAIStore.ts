@@ -16,10 +16,12 @@ export enum EActors {
     SYSTEM = "system",
     USER = "user",
     LIBRARIAN = "librarian",
+    AGENT = "agent",
 }
 
 export type LogChatItem = {
     actor: EActors;
+    agent?: string;
     message: string;
     timestamp: number;
     id: string;
@@ -70,6 +72,15 @@ const writeChatLog = async (data: LogChatItem[]) => {
     }
 };
 
+export type FrontendSignal = {
+    task_id: string;
+    agent: string;
+    message: string;
+    type: "research" | "response" | "error";
+    level: string;
+    task_context?: object;
+};
+
 type AIStore = {
     isUninitialised: boolean;
     isLoading: boolean;
@@ -79,6 +90,7 @@ type AIStore = {
     error: string | null;
     chat: LogChatItem[];
     addChat: (newMessage: string) => void;
+    receiveSignal: (signal: FrontendSignal) => void;
     initialiseChat: () => Promise<void>;
 };
 
@@ -90,6 +102,40 @@ const useAIStore = create<AIStore>((set, get) => ({
     isErrored: false,
     error: null,
     chat: [],
+    receiveSignal: (signal) => {
+        const storeState = new Set(get().chat);
+
+        // Map the signal type to the internal state
+        if (signal.type === "error") {
+            set(() => ({ isErrored: true, isFetching: false, error: signal.message }));
+        } else if (signal.type === "research") {
+            set(() => ({ isFetching: true, isErrored: false }));
+        } else if (signal.type === "response") {
+            set(() => ({ isFetching: false, isSucceeded: true, isErrored: false }));
+        }
+
+        const signalMessage: LogChatItem = {
+            actor:
+                signal.type === "response"
+                    ? EActors.LIBRARIAN
+                    : signal.type === "error"
+                      ? EActors.SYSTEM
+                      : EActors.AGENT,
+            agent: signal.agent,
+            message: signal.message,
+            timestamp: Date.now(),
+            id: uuidv4(),
+        };
+
+        storeState.add(signalMessage);
+        const sortedChat = [...storeState].sort((a, b) => a.timestamp - b.timestamp);
+
+        set(() => ({
+            chat: sortedChat,
+        }));
+
+        writeChatLog(sortedChat);
+    },
     addChat: async (newMessage) => {
         const storeState = new Set(get().chat);
         // Reset loading states

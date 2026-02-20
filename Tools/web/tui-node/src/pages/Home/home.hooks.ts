@@ -44,17 +44,21 @@ USER REQUEST: ${value}`,
                 return "grey";
             case EActors.LIBRARIAN:
                 return "magenta";
+            case EActors.AGENT:
+                return "cyan";
             default:
                 return "white";
         }
     };
 
-    const getActorName = (actor: EActors) => {
+    const getActorName = (actor: EActors, agent?: string) => {
         switch (actor) {
             case EActors.USER:
                 return "You";
             case EActors.LIBRARIAN:
                 return "Librarian";
+            case EActors.AGENT:
+                return agent || "Agent";
             case EActors.SYSTEM:
                 return "System";
             default:

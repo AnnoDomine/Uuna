@@ -2,6 +2,7 @@ import { Text } from "ink";
 import { render } from "ink-testing-library";
 import type { FC } from "react";
 import { describe, expect, it, vi } from "vitest";
+import type { ScoreItem } from "../../../store/useTaskInspectorStore.js";
 import { useTaskDetails } from "./TaskDetails.hooks.js";
 
 const mockTasks = [
@@ -101,10 +102,10 @@ describe("useTaskDetails", () => {
         mockStore.mockReturnValueOnce({
             tasks: mockTasks,
             events: mockEvents,
-            scores: [],
-            selectedTaskId: null,
-            selectedEventId: null,
-        } as unknown as ReturnType<typeof useTaskDetails>);
+            scores: [] as ScoreItem[],
+            selectedTaskId: "",
+            selectedEventId: "",
+        });
 
         let result: ReturnType<typeof useTaskDetails> | undefined;
         render(

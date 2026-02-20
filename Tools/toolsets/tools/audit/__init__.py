@@ -2,3 +2,4 @@
 from .evaluate_agent_output import evaluate_agent_output as evaluate_agent_output
 from .check_logical_consistency import check_logical_consistency as check_logical_consistency
 from .grant_final_verdict import grant_final_verdict as grant_final_verdict
+from .get_agent_performance import get_agent_performance as get_agent_performance
