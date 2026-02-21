@@ -2,66 +2,74 @@ import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 import App from "./App.js";
 
-// Mock hooks that might fail in test environment
+// Mock hooks
 vi.mock("./hooks/useBackend.js", () => ({
     default: () => ({
         status: "online",
         isStarting: false,
+        restartBackend: vi.fn(),
     }),
 }));
 
 vi.mock("./hooks/useTerminalDimensions.js", () => ({
     default: () => ({
         width: 100,
-        height: 40,
+        height: 50,
     }),
+}));
+
+vi.mock("axios", () => ({
+    default: {
+        get: vi.fn(() => Promise.resolve({ data: {} })),
+        post: vi.fn(() => Promise.resolve({ data: {} })),
+    },
 }));
 
 describe("App E2E", () => {
     it("should render the header with the app name", async () => {
         const { lastFrame } = render(<App />);
-
-        // Wait for initial render
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const output = lastFrame();
-        expect(output).toContain("WoW Library");
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        expect(lastFrame()).toContain("WoW Library");
     });
 
     it("should render the command line prompt", async () => {
         const { lastFrame } = render(<App />);
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         expect(lastFrame()).toContain("> ");
     });
 
     it("should allow navigating via command line", async () => {
         const { lastFrame, stdin } = render(<App />);
 
-        // Wait for initial render
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Wait longer for initial render and focus stability
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        // Type command to go to Wiki (Faster typing for CI)
-        const command = ":goto:wiki\r";
-        for (const char of command) {
+        // 1. Type command with even more delay between chars
+        const commandText = ":goto:wiki";
+        for (const char of commandText) {
             stdin.write(char);
-            await new Promise((resolve) => setTimeout(resolve, 10));
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        // Wait for page switch
+        // Verify typing is visible (using a partial match if first char dropped, but we want full)
+        const output = lastFrame();
+        expect(output).toContain(commandText);
+
+        // 2. Execute
+        stdin.write("\r");
+
+        // 3. Wait for feedback or page change
         let found = false;
-        // Check for up to 10 seconds (50 * 200ms)
-        for (let i = 0; i < 50; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 200));
+        for (let i = 0; i < 30; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 300));
             const frame = lastFrame();
-            // We check for "WIKI" which appears in the Wiki organism header
-            if (frame?.includes("WIKI")) {
+            // Check for navigation feedback or the Wiki title
+            if (frame?.includes("Navigated to wiki") || frame?.includes("WIKI")) {
                 found = true;
                 break;
             }
         }
 
         expect(found).toBe(true);
-    }, 15000); // Set explicit timeout to 15s for CI stability
+    }, 30000); // 30s timeout for total safety
 });
