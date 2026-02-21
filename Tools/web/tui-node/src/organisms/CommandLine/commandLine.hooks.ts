@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useBackend from "../../../hooks/useBackend.js";
-import { ENavigationItems } from "../../../molecules/Navigation/navigation.enums.js";
-import { useSettings } from "../../../pages/Settings/settings.hooks.js";
-import { useStore } from "../../../store/useStore.js";
-import { API_BASE_URL } from "../../../utils/constants/globals.js";
+import useBackend from "../../hooks/useBackend.js";
 import { initMods } from "../../mods/index.js";
 import { modRegistry } from "../../mods/modRegistry.js";
+import { ENavigationItems } from "../../molecules/Navigation/navigation.enums.js";
+import useSettings from "../../pages/Settings/settings.hooks.js";
+import { useStore } from "../../store/useStore.js";
+import { API_BASE_URL } from "../../utils/constants/globals.js";
 
 // Initialize Mods once
 initMods();
@@ -48,30 +48,32 @@ export const useCommandLine = () => {
         const parts = input.slice(1).split(":");
 
         if (parts.length === 1) {
-            return COMMANDS.filter((c) => c.startsWith(parts[0]));
+            return COMMANDS.filter((c: string) => c.startsWith(parts[0] || ""));
         }
 
         const cmd = parts[0];
         const sub = parts[1] || "";
 
-        if (cmd === "goto") return PAGES.filter((p) => p.startsWith(sub));
+        if (cmd === "goto") {
+            return PAGES.filter((p: string) => p.startsWith(sub));
+        }
 
         if (cmd === "mod") {
             if (parts.length === 2) {
-                return modRegistry.getAllModNames().filter((m) => m.startsWith(sub));
+                return modRegistry.getAllModNames().filter((m: string) => m.startsWith(sub));
             }
-            const mod = modRegistry.getMod(parts[1]);
+            const mod = modRegistry.getMod(parts[1] || "");
             if (mod) return mod.getSuggestions(parts.slice(2));
         }
 
         if (cmd === "settings") {
             if (parts.length === 2) {
-                return Object.keys(configStructure).filter((k) => k.startsWith(sub));
+                return Object.keys(configStructure).filter((k: string) => k.startsWith(sub));
             }
             if (parts.length === 3) {
                 const group = parts[1];
                 if (group && configStructure[group]) {
-                    return configStructure[group].filter((s) => s.startsWith(sub));
+                    return configStructure[group].filter((s: string) => s.startsWith(sub));
                 }
             }
         }
@@ -88,7 +90,7 @@ export const useCommandLine = () => {
                     : (suggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
             setSuggestionIndex(nextIndex);
             const parts = input.split(":");
-            parts[parts.length - 1] = currentSuggestions[nextIndex];
+            parts[parts.length - 1] = currentSuggestions[nextIndex] as string;
             setInput(parts.join(":"));
         },
         [currentSuggestions, suggestionIndex, input],
