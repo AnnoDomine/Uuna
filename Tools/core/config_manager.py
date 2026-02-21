@@ -11,6 +11,7 @@ class AISettings(BaseModel):
     num_ctx: int = Field(default=2048, ge=512, le=32768)
     num_gpu: int = Field(default=0, ge=0, le=200)
     acceleration_mode: str = Field(default="cpu")
+    memory_limit: int = Field(default=3, ge=1, le=20)
 
     @validator("acceleration_mode")
     def validate_mode(cls, v):

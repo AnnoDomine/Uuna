@@ -35,16 +35,39 @@ def request_with_schema(
     obj: Union[dict, Type[BaseModel]], payload: dict, role: Agents, optional_parser: Optional[Callable[[dict], dict]] = None
 ) -> dict:
     """
-    Calls the AI with schema enforcement and automatic validation/retries.
-
-    Args:
-    - obj: A dictionary template OR a Pydantic Model class to generate the JSON schema.
-    - payload: The request payload containing messages.
-    - role: The agent role responsible for the request.
-    - optional_parser: An optional function to post-process the generated schema.
+    Calls the AI with schema enforcement, automatic validation/retries, and RAG context injection.
     """
+    from Tools.core.api.managers.vector_manager import VectorManager
+    
     ai = AIClient()
+    vm = VectorManager()
+    
+    # 1. RAG: Search Memory for relevant context
+    from Tools.core.config_manager import get_config
+    config = get_config()
+    limit = config.ai.memory_limit
+    
+    user_msgs = [m["content"] for m in payload.get("messages", []) if m["role"] == "user"]
+    search_query = user_msgs[-1] if user_msgs else ""
+    
+    memory_context = ""
+    if search_query:
+        # Search enough to allow quality filtering
+        raw_memories = vm.search_memory(role.value, search_query, limit=limit * 2)
+        # Sort by quality_score in metadata (DESC)
+        sorted_memories = sorted(
+            raw_memories, 
+            key=lambda x: x.get("metadata", {}).get("quality_score", 0), 
+            reverse=True
+        )
+        # Take requested amount of high-quality memories
+        top_memories = sorted_memories[:limit]
+        
+        if top_memories:
+            ctx_lines = [f"- {m['content']} (Quality: {m['metadata'].get('quality_score', 'N/A')}%)" for m in top_memories]
+            memory_context = "LONG-TERM MEMORY (HIGH QUALITY PREVIOUS FINDINGS):\n" + "\n".join(ctx_lines)
 
+    # 2. Schema Generation
     if isinstance(obj, type) and issubclass(obj, BaseModel):
         # Use Pydantic's built-in schema generation
         schema_dict = obj.model_json_schema()
@@ -57,17 +80,20 @@ def request_with_schema(
         schema = get_json_schema(obj, optional_parser)
 
     header = get_prompt_header(role)
-
+    
+    # 3. Assemble Payload with Memory Context
     schema_msg_content = f"Return ONLY a JSON object that strictly follows this schema:\n{schema}"
-    schema_message = {
-        "role": "system",
-        "content": schema_msg_content,
-    }
+    
+    messages = [header]
+    if memory_context:
+        messages.append({"role": "system", "content": memory_context})
+    
+    messages.append({"role": "system", "content": schema_msg_content})
+    messages.extend(payload.get("messages", []))
 
-    # Prepare final payload
     parsed_payload = payload.copy()
     parsed_payload["format"] = "json"
-    parsed_payload["messages"] = [header, schema_message, *payload.get("messages", [])]
+    parsed_payload["messages"] = messages
     parsed_payload["stream"] = False
 
     validation_tries = 0

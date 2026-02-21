@@ -1,5 +1,24 @@
 # Projekt History - WoW Datamine Toolkit
 
+## [0.10.0-alpha] - 2026-02-21 - "The Command-Driven Evolution"
+
+### Added
+- **Vim-style CommandLine**: Radikaler Umbau der TUI. Die statische Navigation wurde durch eine zentrale Kommandozeile ersetzt, die Befehle wie `:goto`, `:settings` und `:mod` unterstützt.
+- **Dynamic Auto-Completion**: Implementierung von `Ctrl+Tab` zur Navigation durch Befehle und tief verschachtelte Konfigurationspfade.
+- **TUI Mod-System**: Einführung einer modularen Erweiterungsschnittstelle. Neue Tools können nun einfach unter dem `:mod:`-Namespace registriert werden.
+- **Class-First Configuration**: Migration aller Einstellungen in `Data/settings.json`. Ein neuer `ConfigManager` nutzt Pydantic zur Laufzeit-Validierung und stellt die Struktur dem Frontend dynamisch zur Verfügung.
+- **Pydantic AI Orchestration**: Alle Agenten-Rollen wurden auf Pydantic-basierte Schemata umgestellt. Dies garantiert typsichere KI-Antworten und verbessert die Prozess-Transparenz durch erzwungene Begründungen (`reason`, `context`).
+- **Global RAG Integration**: Automatische semantische Suche im Langzeitgedächtnis (Vector-DB) für jeden KI-Request. Ergebnisse werden nach Qualität (Scoring) gefiltert und als Kontext injiziert.
+- **AI Learning Phase**: Der Observer extrahiert nun nach jedem erfolgreichen Task "Lessons Learned" für die beteiligten Agenten und speichert diese mit Qualitäts-Scores in der Vektor-DB.
+- **Isolated Pattern Training**: Ein neues Trainings-System erlaubt es, die KI in isolierten Loops (5 Runden, 3 Versuche) auf die Einhaltung spezifischer Pydantic-Pattern zu trainieren (steuerbar via `:mod:trainer`).
+
+### Changed
+- **SQL-Zero-Python Policy**: Vollständige Eliminierung von Hardcoded-SQL-Strings aus der Python-Logik. Alle Abfragen werden nun aus dem `queries/` Verzeichnis geladen.
+- **Hardened Security**: Integration von SQL-Injection-Schutz und Prompt-Sanitisierung als Standard in alle Kern-Komponenten.
+
+### Fixed
+- **TUI Focus Conflicts**: Behebung von Tasten-Überschneidungen durch ein überarbeitetes `EFocusAreal` System, das die CommandLine priorisiert.
+
 ## [0.9.15] - 2026-02-19 - "Clean Architecture & Industrial Testing"
 
 ### Added
