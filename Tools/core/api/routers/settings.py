@@ -14,7 +14,7 @@ async def list_settings():
     # Flatten the config for the UI for backward compatibility
     flat_settings = []
     
-    config_dict = config.dict()
+    config_dict = config.model_dump()
     for group, settings in config_dict.items():
         for key, value in settings.items():
             flat_settings.append({
@@ -53,14 +53,15 @@ async def update_setting(req: SettingUpdate):
         if not hasattr(group_obj, key):
             raise HTTPException(status_code=404, detail=f"Key {key} not found in group {group}")
             
-        # Get target type for casting
-        field = group_obj.__fields__[key]
-        target_type = field.type_
+        # Get target type for casting (Pydantic V2 style)
+        field = group_obj.model_fields[key]
+        target_type = field.annotation
         
         # Cast value (bool is tricky)
         if target_type is bool:
             casted_value = req.value.lower() in ("true", "1", "yes")
         else:
+            # Handle possible Optional types or Unions if necessary, but here we assume simple types
             casted_value = target_type(req.value)
             
         setattr(group_obj, key, casted_value)

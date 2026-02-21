@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from loguru import logger
 
 SETTINGS_PATH = "Data/settings.json"
@@ -13,7 +13,8 @@ class AISettings(BaseModel):
     acceleration_mode: str = Field(default="cpu")
     memory_limit: int = Field(default=3, ge=1, le=20)
 
-    @validator("acceleration_mode")
+    @field_validator("acceleration_mode")
+    @classmethod
     def validate_mode(cls, v):
         if v not in ["cpu", "gpu", "auto"]:
             raise ValueError("acceleration_mode must be 'cpu', 'gpu' or 'auto'")
@@ -46,11 +47,12 @@ class ConfigManager:
     def get_structure() -> Dict[str, list]:
         """Dynamically generates the structure from the AppConfig class."""
         structure = {}
-        for field_name, field in AppConfig.__fields__.items():
-            # Get the nested model (e.g., AISettings)
-            sub_model = field.type_
-            if hasattr(sub_model, "__fields__"):
-                structure[field_name] = list(sub_model.__fields__.keys())
+        # Pydantic V2 uses model_fields
+        for field_name, field in AppConfig.model_fields.items():
+            # Get the nested model class from the field annotation
+            sub_model = field.annotation
+            if hasattr(sub_model, "model_fields"):
+                structure[field_name] = list(sub_model.model_fields.keys())
         return structure
 
     @staticmethod
@@ -75,7 +77,8 @@ class ConfigManager:
         try:
             os.makedirs(os.path.dirname(SETTINGS_PATH), exist_ok=True)
             with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
-                json.dump(config.dict(), f, indent=4)
+                # Pydantic V2 uses model_dump
+                json.dump(config.model_dump(), f, indent=4)
         except Exception as e:
             logger.error(f"Failed to save config: {e}")
 

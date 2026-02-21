@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
+
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_archivist import request_archivist
+from Tools.agents.requests.request_cartographer import request_cartographer
+from Tools.agents.requests.request_expedition_group import request_expedition_group
 from Tools.agents.requests.request_librarian import send_librarian_response
 from Tools.agents.requests.request_sages import ApprovalStatus, request_sages
 from Tools.agents.requests.request_tinker import request_tinker
@@ -29,7 +32,9 @@ def request_courier_from_sages(task_id, approval: str, context: str):
         present_response(task_id)
         request_tinker(task_id)
     else:
-        notify_frontend(task_id, f"Courier: Sages revoked approval ({approval}). Re-routing...", agent="Courier", type="research")
+        notify_frontend(
+            task_id, f"Courier: Sages revoked approval ({approval}). Re-routing...", agent="Courier", type="research"
+        )
         new_event = global_tool_set.create_task_event(
             task_id, Agents.SAGES.value, Agents.COURIER.value, {"sages_response": approval, "approval_context": context}
         )
@@ -43,7 +48,9 @@ def request_courier(task_id: str, event_id: str):
     """
     Handles task routing and specialist selection.
     """
-    notify_frontend(task_id, "Courier: Analyzing task chain for next routing decision...", agent="Courier", type="research")
+    notify_frontend(
+        task_id, "Courier: Analyzing task chain for next routing decision...", agent="Courier", type="research"
+    )
     output = []
 
     try:
@@ -53,7 +60,13 @@ def request_courier(task_id: str, event_id: str):
 
         task_history = task_ctx.get("history", [])
         if len(task_history) > 80:
-            notify_frontend(task_id, "Courier: History limit reached. Forcing Sages verification.", agent="Courier", type="research", level="warning")
+            notify_frontend(
+                task_id,
+                "Courier: History limit reached. Forcing Sages verification.",
+                agent="Courier",
+                type="research",
+                level="warning",
+            )
             request_sages(task_id)
             return
 
@@ -75,16 +88,33 @@ def request_courier(task_id: str, event_id: str):
                     "role": "user",
                     "content": f"The name of the selected specialist should be one of: '{Agents.ARCHIVIST.value}', '{Agents.EXPEDITION_GROUP.value}', '{Agents.CARTOGRAPHER.value}', '{Agents.SAGES.value}'",
                 },
+                {
+                    "role": "user",
+                    "context": """
+                    SPECIALIST CONTEXT:\n
+                    ARCHIVIST: The Archivist is responsible for reverse-engineering the semantics of the WoW database and establishing verified relationships between tables.\n
+                    EXPEDITION_GROUP: As the research arm of the library, the expedition group is responsible for bridging the gap between raw database values and the rich history of Azeroth by performing targeted online research.\n
+                    CARTOGRAPHER: As the visualizer of the library, the cartographer is responsible for transforming complex relational data into clear, human-readable diagrams.\n
+                    SAGES: As the gatekeepers of truth,the sages is responsible for the final logical validation of all research before it is committed to the library's "permanent memory".\n
+                    \n
+                    If you think, the research is finished, the responsible specialist is the sages, as it finallize the research.\n
+                    """,
+                },
             ]
         }
 
         selection = request_with_schema(SpecialistSelection, select_payload, Agents.COURIER)
-        
+
         if "error" in selection:
             raise Exception(selection["error"])
 
         specialist = selection["specialist"]
-        notify_frontend(task_id, f"Courier: Routing task to specialist '{specialist}'", agent="Courier", type="research")
+        notify_frontend(
+            task_id,
+            f"Courier: Routing task to specialist '{specialist}' - Event number: {len(task_history)}",
+            agent="Courier",
+            type="research",
+        )
 
         new_event = global_tool_set.create_task_event(task_id, Agents.COURIER.value, specialist, output)
         if "error" in new_event:
@@ -94,10 +124,15 @@ def request_courier(task_id: str, event_id: str):
             case Agents.ARCHIVIST.value:
                 request_archivist(task_id, new_event["event_id"])
                 return
+            case Agents.EXPEDITION_GROUP.value:
+                request_expedition_group(task_id, new_event["event_id"])
+                return
+            case Agents.CARTOGRAPHER.value:
+                request_cartographer(task_id, new_event["event_id"])
+                return
             case Agents.SAGES.value:
                 request_sages(task_id)
                 return
-            # Add other cases as implemented...
 
         # Fallback to Sages if no valid specialist was chosen
         request_sages(task_id)

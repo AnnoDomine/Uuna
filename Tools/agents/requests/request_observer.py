@@ -1,5 +1,4 @@
 from typing import List
-import json
 from pathlib import Path
 from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
@@ -115,7 +114,7 @@ def request_observer(task_id: str):
                         "role": "system",
                         "content": "You are the Observer. Analyze the research task and extract high-value 'Lessons Learned' for each involved agent. Focus on facts, table relations, or successful research strategies.",
                     },
-                    {"role": "user", "content": f"TASK: {task_ctx['task']}\n\nEVALUATIONS:\n{json.dumps(verdict.dict())}"},
+                    {"role": "user", "content": f"TASK: {task_ctx['task']}\n\nEVALUATIONS:\n{verdict.model_dump_json()}"},
                 ]
             }
 
