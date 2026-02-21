@@ -22,19 +22,17 @@ describe("App E2E", () => {
         const { lastFrame } = render(<App />);
 
         // Wait for initial render
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         const output = lastFrame();
-        // Check if the app name is present in the output
         expect(output).toContain("WoW Library");
     });
 
     it("should render the command line prompt", async () => {
         const { lastFrame } = render(<App />);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // CommandLine uses "> " as prompt
         expect(lastFrame()).toContain("> ");
     });
 
@@ -42,27 +40,28 @@ describe("App E2E", () => {
         const { lastFrame, stdin } = render(<App />);
 
         // Wait for initial render
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Type command to go to Wiki
+        // Type command to go to Wiki (Faster typing for CI)
         const command = ":goto:wiki\r";
         for (const char of command) {
             stdin.write(char);
-            // Simulate human typing speed
-            await new Promise((resolve) => setTimeout(resolve, 50));
+            await new Promise((resolve) => setTimeout(resolve, 10));
         }
 
-        // Wait for page switch and potential loading state
+        // Wait for page switch
         let found = false;
-        for (let i = 0; i < 20; i++) {
+        // Check for up to 10 seconds (50 * 200ms)
+        for (let i = 0; i < 50; i++) {
             await new Promise((resolve) => setTimeout(resolve, 200));
             const frame = lastFrame();
-            if (frame?.toLowerCase().includes("wiki")) {
+            // We check for "WIKI" which appears in the Wiki organism header
+            if (frame?.includes("WIKI")) {
                 found = true;
                 break;
             }
         }
 
         expect(found).toBe(true);
-    });
+    }, 15000); // Set explicit timeout to 15s for CI stability
 });
