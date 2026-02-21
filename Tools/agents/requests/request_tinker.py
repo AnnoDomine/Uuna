@@ -1,21 +1,10 @@
-from typing import List
-from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_observer import request_observer
+from Tools.agents.requests.agent_models import TinkerAssessment
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tinker_tool_set import assign_potential_score
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
-
-
-class EventPotential(BaseModel):
-    event_id: str = Field(..., description="The UUID of the event.")
-    potential_score: int = Field(..., description="The calculated potential score (difficulty) for this event.", ge=0, le=1000)
-    reasoning: str = Field(..., description="A brief explanation why this score was assigned.")
-
-
-class TinkerAssessment(BaseModel):
-    assessments: List[EventPotential] = Field(..., description="List of potential scores for each task event.")
 
 
 def request_tinker(task_id: str):

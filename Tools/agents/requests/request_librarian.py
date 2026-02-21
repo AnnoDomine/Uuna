@@ -1,20 +1,10 @@
-from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests import request_courier
+from Tools.agents.requests.agent_models import LibrarianSummary, LibrarianResponse
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 from Tools.core.security_utils import sanitize_user_prompt
-
-
-class LibrarianSummary(BaseModel):
-    summary: str = Field(..., description="The comprehensive summary of all researched information.")
-
-
-class LibrarianResponse(BaseModel):
-    knowledge: str = Field(..., description="The summarized knowledge found in the internal base, or 'None' if nothing relevant exists.")
-    confidence: int = Field(..., description="Confidence score from 0 to 100 regarding the quality of the information.", ge=0, le=100)
-    needs_more_research: bool = Field(..., description="True if the internal knowledge is insufficient and a deep archive search is required.")
 
 
 def send_librarian_response(task_id):
@@ -98,9 +88,11 @@ def request_librarian(prompts, builds):
                 raise Exception("Failed to create initial event.")
 
             request_courier.request_courier(task_id, new_event["event_id"])
+            return {"status": "researching", "task_id": task_id, "initial_knowledge": knowledge}
         else:
             # Knowledge is enough, finalize immediately
             send_librarian_response(task_id)
+            return {"status": "complete", "task_id": task_id, "knowledge": knowledge}
 
     except Exception as e:
         # We don't have a task_id yet if creation failed, but we should log it

@@ -1,21 +1,19 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
+from typing import List, Optional
 
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.core.ai_client import AIClient
-from Tools.core.security_utils import sanitize_user_prompt
 from Tools.agents.training.pattern_trainer import run_pattern_training
+from Tools.agents.requests.request_librarian import request_librarian
 
-# Imports for training models
-from Tools.agents.requests.request_courier import SpecialistSelection
-from Tools.agents.requests.request_librarian import LibrarianResponse
-from Tools.agents.requests.request_sages import SageVerdict
-from Tools.agents.requests.request_observer import ObserverVerdict
-from Tools.agents.requests.request_tinker import TinkerAssessment
+# Imports for training models from centralized file
+from Tools.agents.requests.agent_models import (
+    SpecialistSelection, LibrarianResponse, SageVerdict, 
+    ObserverVerdict, TinkerAssessment, LoreResearchStatus, 
+    SecurityAuditStatus
+)
 from Tools.toolsets.tools.courier.orchestration_helper import DefaultToolSelection
-from Tools.agents.requests.request_expedition_group import LoreResearchStatus
-from Tools.agents.requests.request_sentinel import SecurityAuditStatus
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -49,18 +47,22 @@ async def train_ai(req: TrainRequest, background_tasks: BackgroundTasks):
 
 class AskRequest(BaseModel):
     prompt: str
+    builds: Optional[List[str]] = None
 
 
 @router.post("/ask")
 async def ask_ai(req: AskRequest):
     try:
-        # Sanitize user input to prevent prompt injection
-        safe_prompt = sanitize_user_prompt(req.prompt)
+        # If no builds provided, use a default or empty list (librarian will handle it)
+        builds = req.builds if req.builds else []
         
-        ai = AIClient()
-        # "The Librarian" is the standard role for user interaction in this system
-        # Run in threadpool to avoid blocking the event loop (and thus the health check)
-        answer = await run_in_threadpool(ai.ask, Agents.LIBRARIAN, safe_prompt)
-        return answer
+        # request_librarian handles sanitization, RAG, and task spawning
+        # Run in threadpool to avoid blocking the API
+        result = await run_in_threadpool(request_librarian, req.prompt, builds)
+        
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

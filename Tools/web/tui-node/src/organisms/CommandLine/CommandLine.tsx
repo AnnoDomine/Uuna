@@ -12,15 +12,22 @@ const CommandLine: React.FC = () => {
         id: "main-command-line",
         areal: EFocusAreal.COMMAND,
         autoFocus: true,
+        ctrlQToExit: true,
         keyMap: (inputStr, key) => {
             if (key.return) {
                 handleExecute(input);
-            } else if (key.backspace) {
+                return;
+            }
+            if (key.backspace) {
                 setInput(input.slice(0, -1));
-            } else if (key.tab && key.ctrl) {
+                return;
+            }
+            if (key.tab && key.ctrl) {
                 // Ctrl + Tab for auto-completion
                 handleCycleSuggestion(key.shift ? "prev" : "next");
-            } else if (!key.ctrl && !key.meta && inputStr) {
+                return;
+            }
+            if (!key.ctrl && !key.meta && inputStr) {
                 setInput(input + inputStr);
             }
         },

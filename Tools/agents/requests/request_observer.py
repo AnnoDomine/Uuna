@@ -1,7 +1,8 @@
-from typing import List
 from pathlib import Path
-from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
+from Tools.agents.requests.agent_models import (
+    ObserverVerdict, ResearchLearning
+)
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.observer_tool_set import grant_final_verdict
 from Tools.core.ai_schema_validator import request_with_schema
@@ -15,29 +16,6 @@ def _load_query(name: str) -> str:
     """Loads a SQL query from the outsourced directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
-
-
-class EventEvaluation(BaseModel):
-    event_id: str = Field(..., description="The UUID of the event.")
-    quality_score: int = Field(..., description="The awarded quality points (0 to Max Potential).", ge=0)
-    honesty_rating: str = Field(..., description="Rating of the agent's honesty regarding their confidence (e.g., 'Excellent', 'Fair', 'Poor').")
-    feedback: str = Field(..., description="Qualitative feedback for the agent.")
-
-
-class ObserverVerdict(BaseModel):
-    evaluations: List[EventEvaluation] = Field(..., description="Detailed evaluation for each event in the task history.")
-    audit_status: str = Field(..., description="Overall quality audit result (e.g., 'EXCELLENT', 'GOOD', 'FAIR', 'POOR').")
-    overall_summary: str = Field(..., description="A comprehensive summary of the research quality and findings.")
-
-
-class AgentLesson(BaseModel):
-    role: str = Field(..., description="The role of the agent who learned the lesson.")
-    lesson: str = Field(..., description="A concise, factual statement of what was learned or improved (e.g., 'Table X column Y refers to Z').")
-    quality_score: int = Field(..., description="The quality score associated with this lesson (0-100).", ge=0, le=100)
-
-
-class ResearchLearning(BaseModel):
-    lessons: List[AgentLesson] = Field(..., description="List of lessons learned by the agents during this task.")
 
 
 def request_observer(task_id: str):

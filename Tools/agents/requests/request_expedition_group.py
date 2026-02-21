@@ -1,17 +1,12 @@
-from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_sentinel import request_sentinel
+from Tools.agents.requests.agent_models import LoreResearchStatus
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.expedition_group_tool_set import EXPEDITION_GROUP_TOOLS
 from Tools.toolsets.tools.courier.orchestration_helper import request_tool_selection, is_event_finished
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 TOOLS_MAP = {f.__name__: f for f in EXPEDITION_GROUP_TOOLS}
-
-
-class LoreResearchStatus(BaseModel):
-    is_finished: bool = Field(..., description="True if the lore context has been fully established.")
-    reason: str = Field(..., description="Explanation of what was found and why it's sufficient or what's missing.")
 
 
 def request_expedition_group(task_id: str, event_id: str):

@@ -5,6 +5,7 @@ import { initMods } from "../../mods/index.js";
 import { modRegistry } from "../../mods/modRegistry.js";
 import { ENavigationItems } from "../../molecules/Navigation/navigation.enums.js";
 import useSettings from "../../pages/Settings/settings.hooks.js";
+import useAIStore from "../../store/useAIStore.js";
 import { useStore } from "../../store/useStore.js";
 import { API_BASE_URL } from "../../utils/constants/globals.js";
 
@@ -22,6 +23,7 @@ export const useCommandLine = () => {
 
     const { setCurrentPage } = useStore();
     const { handleUpdateSetting, fetchSettings } = useSettings();
+    const { addChat } = useAIStore();
     const { restartBackend } = useBackend();
 
     // Fetch dynamic structure from Backend Class (Pydantic)
@@ -96,9 +98,21 @@ export const useCommandLine = () => {
         [currentSuggestions, suggestionIndex, input],
     );
 
+    const handleAiRequest = useCallback(
+        (input: string) => {
+            addChat(input);
+            setInput("");
+            setSuggestionIndex(-1);
+        },
+        [addChat],
+    );
+
     const handleExecute = useCallback(
         (rawInput: string) => {
-            if (!rawInput.startsWith(":")) return;
+            if (!rawInput.startsWith(":")) {
+                handleAiRequest(rawInput);
+                return;
+            }
             const parts = rawInput.slice(1).split(":");
             const command = parts[0];
             const subParts = parts.slice(1);
@@ -152,7 +166,14 @@ export const useCommandLine = () => {
             setInput("");
             setSuggestionIndex(-1);
         },
-        [setCurrentPage, handleUpdateSetting, restartBackend, fetchSettings, updateInfo],
+        [
+            setCurrentPage,
+            handleUpdateSetting,
+            restartBackend,
+            fetchSettings,
+            updateInfo,
+            handleAiRequest,
+        ],
     );
 
     useEffect(() => {

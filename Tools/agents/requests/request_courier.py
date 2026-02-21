@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-
 from Tools.agents.get_agent_skill_set import Agents
+from Tools.agents.requests.agent_models import SpecialistSelection
 from Tools.agents.requests.request_archivist import request_archivist
 from Tools.agents.requests.request_cartographer import request_cartographer
 from Tools.agents.requests.request_expedition_group import request_expedition_group
@@ -10,10 +9,6 @@ from Tools.agents.requests.request_tinker import request_tinker
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
-
-
-class SpecialistSelection(BaseModel):
-    specialist: Agents = Field(..., description="The name of the next specialist to handle the task.")
 
 
 def present_response(task_id):

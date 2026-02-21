@@ -157,10 +157,13 @@ const useAIStore = create<AIStore>((set, get) => ({
             set(() => ({
                 chat: [...storeState].sort((a, b) => a.timestamp - b.timestamp),
             }));
+            const { currentBuild } = (await import("./useStore.js")).useStore.getState();
+
             const { data } = await axios.post<AIAnswer>(
                 `${API_BASE_URL}/ai/ask`,
                 {
                     prompt: userMessage.message,
+                    builds: [currentBuild],
                 },
                 /**
                  * Timeout -> 10 min

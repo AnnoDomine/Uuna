@@ -1,6 +1,7 @@
 import os
 import re
 from functools import partial
+from enum import Enum
 
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
 agents_dir = os.path.join(current_file_dir, "skills")
@@ -8,7 +9,7 @@ agents_dir = os.path.join(current_file_dir, "skills")
 ANCHOR_REGEX = r"\[\*\*.*?\*\*\]\((.+?)\)"
 
 
-class Agents:
+class Agents(str, Enum):
     ARCHIVIST = "archivist"
     CARTOGRAPHER = "cartographer"
     COURIER = "courier"

@@ -1,20 +1,9 @@
-from enum import Enum
-from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_courier import request_courier_from_sages
+from Tools.agents.requests.agent_models import ApprovalStatus, SageVerdict
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
-
-
-class ApprovalStatus(str, Enum):
-    APPROVED = "approved"
-    REVOKED = "revoked"
-
-
-class SageVerdict(BaseModel):
-    approval: ApprovalStatus = Field(..., description="Verdict on the task logic.")
-    context: str = Field(..., description="The rationale or instructions for the next steps.")
 
 
 def request_sages(task_id: str):

@@ -1,5 +1,4 @@
 import sys
-import duckdb
 import os
 import json
 
@@ -20,8 +19,8 @@ class DatabaseLogHandler:
     Enriches logs with Task and Build context for the Observer.
     """
 
-    def __init__(self, db_path: str, log_type: str):
-        self.db_path = db_path
+    def __init__(self, db_client, log_type: str):
+        self.db = db_client
         self.log_type = log_type
         self.query_path_log = "Tools/core/api/queries/logs/insert_event_log.sql"
         self.query_path_get_builds = "Tools/core/api/queries/logs/get_build_ids.sql"
@@ -35,13 +34,12 @@ class DatabaseLogHandler:
         try:
             with open(self.query_path_get_builds, "r") as f:
                 sql = f.read().strip()
-            with duckdb.connect(self.db_path) as con:
-                res = con.execute(sql, [task_id]).fetchone()
-                if res and res[0]:
-                    builds = res[0]
-                    if isinstance(builds, str):
-                        builds = json.loads(builds)
-                    return ", ".join(builds)
+            res = self.db.execute(sql, [task_id]).fetchone()
+            if res and res[0]:
+                builds = res[0]
+                if isinstance(builds, str):
+                    builds = json.loads(builds)
+                return ", ".join(builds)
         except Exception:
             pass
         return "N/A"
@@ -87,7 +85,8 @@ class DatabaseLogHandler:
             try:
                 with open(self.query_path_log, "r") as f:
                     sql_log = f.read().strip()
-                with duckdb.connect(self.db_path) as con:
-                    con.execute(sql_log, [task_id, event_id, role, full_log_entry])
+                # Use the db client instead of direct connect
+                self.db.execute(sql_log, [task_id, event_id, role, full_log_entry])
             except Exception as e:
+                # Use standard print to avoid recursion if the error is within the logger itself
                 print(f"CRITICAL: DB Logger failed: {e}", file=sys.stderr)
