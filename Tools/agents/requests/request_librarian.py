@@ -1,9 +1,20 @@
+from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests import request_courier
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 from Tools.core.security_utils import sanitize_user_prompt
+
+
+class LibrarianSummary(BaseModel):
+    summary: str = Field(..., description="The comprehensive summary of all researched information.")
+
+
+class LibrarianResponse(BaseModel):
+    knowledge: str = Field(..., description="The summarized knowledge found in the internal base, or 'None' if nothing relevant exists.")
+    confidence: int = Field(..., description="Confidence score from 0 to 100 regarding the quality of the information.", ge=0, le=100)
+    needs_more_research: bool = Field(..., description="True if the internal knowledge is insufficient and a deep archive search is required.")
 
 
 def send_librarian_response(task_id):
@@ -23,8 +34,7 @@ def send_librarian_response(task_id):
             ]
         }
 
-        response_template = {"summary": "string"}
-        final_summary = request_with_schema(response_template, payload, Agents.LIBRARIAN)
+        final_summary = request_with_schema(LibrarianSummary, payload, Agents.LIBRARIAN)
 
         if "summary" in final_summary:
             notify_frontend(task_id, final_summary["summary"], agent="Librarian", type="response")
@@ -56,14 +66,20 @@ def request_librarian(prompts, builds):
             ]
         }
 
-        response_template = {"knowledge": "string", "confidence": 0}
-        researched = request_with_schema(response_template, check_payload, Agents.LIBRARIAN)
+        researched = request_with_schema(LibrarianResponse, check_payload, Agents.LIBRARIAN)
         
         if "error" in researched:
             raise Exception(researched.get("error", "AI request failed"))
 
-        knowledge, confidence = researched["knowledge"], researched["confidence"]
-        output.append({"knowledge_context": knowledge, "knowledge_confidence": confidence})
+        knowledge = researched["knowledge"]
+        confidence = researched["confidence"]
+        needs_research = researched["needs_more_research"]
+
+        output.append({
+            "knowledge_context": knowledge, 
+            "knowledge_confidence": confidence,
+            "ai_decided_research": needs_research
+        })
 
         # Create the central task
         new_task = global_tool_set.create_research_task(output, assigned_builds=builds)
@@ -73,7 +89,7 @@ def request_librarian(prompts, builds):
         task_id = new_task["task_id"]
         notify_frontend(task_id, "Librarian: Request received. Analyzing knowledge base...", agent="Librarian", type="research")
 
-        if knowledge == "None" or confidence < 80:
+        if needs_research:
             # Need deeper research via courier
             notify_frontend(task_id, "Librarian: Knowledge insufficient. Spawning research chain...", agent="Librarian", type="research")
             

@@ -1,8 +1,9 @@
 import json
-from typing import Callable, Optional
+from typing import Callable, Optional, Type, Union
 
 from genson import SchemaBuilder
 from jsonschema import ValidationError, validate
+from pydantic import BaseModel
 
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.core.ai_client import AIClient
@@ -31,19 +32,30 @@ def _get_invalid_schema_payload(schema: str, response: str) -> dict:
 
 
 def request_with_schema(
-    obj: dict, payload: dict, role: Agents, optional_parser: Optional[Callable[[dict], dict]] = None
+    obj: Union[dict, Type[BaseModel]], payload: dict, role: Agents, optional_parser: Optional[Callable[[dict], dict]] = None
 ) -> dict:
     """
     Calls the AI with schema enforcement and automatic validation/retries.
 
     Args:
-    - obj: An example dictionary used to generate the expected JSON schema.
+    - obj: A dictionary template OR a Pydantic Model class to generate the JSON schema.
     - payload: The request payload containing messages.
     - role: The agent role responsible for the request.
     - optional_parser: An optional function to post-process the generated schema.
     """
     ai = AIClient()
-    schema = get_json_schema(obj, optional_parser)
+
+    if isinstance(obj, type) and issubclass(obj, BaseModel):
+        # Use Pydantic's built-in schema generation
+        schema_dict = obj.model_json_schema()
+        schema_dict["additionalProperties"] = False
+        if optional_parser:
+            schema_dict = optional_parser(schema_dict)
+        schema = json.dumps(schema_dict, indent=2)
+    else:
+        # Fallback to legacy dictionary-based schema
+        schema = get_json_schema(obj, optional_parser)
+
     header = get_prompt_header(role)
 
     schema_msg_content = f"Return ONLY a JSON object that strictly follows this schema:\n{schema}"

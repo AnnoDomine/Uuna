@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 from Tools.core.db_client import DBClient
 from Tools.core.security_utils import sanitize_identifier
+from Tools.core.config_manager import get_config
 
 # CONFIG
 MASTER_DB = "Data/WoW_Master.duckdb"
@@ -222,8 +223,8 @@ def run_ingester(limit=None):
             continue
 
         b_log.info(f"Syncing {len(tables)} tables...")
-        max_workers = int(os.getenv("MAX_WORKERS", "4"))
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        config = get_config()
+        with ThreadPoolExecutor(max_workers=config.ingestion.workers) as executor:
             executor.map(lambda t: process_table_master(t, version, b_id), tables)
 
         con = get_con()
@@ -240,6 +241,7 @@ def run_ingester(limit=None):
 
 if __name__ == "__main__":
     limit_val = os.getenv("MAX_BUILDS", "0")
-    base_logger.info(f"Starting Master Ingester... (Limit: {limit_val}, Workers: {os.getenv('MAX_WORKERS', '4')})")
+    config = get_config()
+    base_logger.info(f"Starting Master Ingester... (Limit: {limit_val}, Workers: {config.ingestion.workers})")
     limit = int(limit_val) if limit_val.isdigit() else 0
     run_ingester(limit if limit > 0 else None)

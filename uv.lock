@@ -970,7 +970,7 @@ wheels = [
 
 [[package]]
 name = "uunawantsomething"
-version = "0.9.12"
+version = "0.10.0a0"
 source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },

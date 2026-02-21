@@ -1,6 +1,6 @@
 [project]
 name = "uunawantsomething"
-version = "0.9.12"
+version = "0.10.0-alpha"
 description = "Universal toolkit for World of Warcraft datamining"
 readme = "README.md"
 requires-python = ">=3.12"

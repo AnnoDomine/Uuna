@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0-alpha] - 2026-02-21
+### Added
+- **Command-Line Interface (TUI)**: Replaced sidebar navigation with a powerful command-driven UI (Vim-style). Supports `:goto`, `:settings`, and `:mod`.
+- **Mod System**: Introduced a modular extension system for the TUI, allowing third-party tools to register commands under the `:mod:` prefix.
+- **Centralized Configuration**: Migrated database-stored settings to `Data/settings.json` with a dedicated Python `ConfigManager` and Pydantic validation.
+- **Pydantic AI Schemas**: Refactored the entire orchestration layer (Librarian, Courier, Archivist, etc.) to use Pydantic models for structured, type-safe AI interactions.
+- **Dynamic Auto-Completion**: Added `Ctrl+Tab` support for command and settings path completion in the TUI.
+
+### Changed
+- **SQL Outsourcing**: Removed all remaining hardcoded SQL strings from Python logic into dedicated `.sql` files.
+- **Orchestration Hardening**: Tightened specialized agent models with Enums and explicit rationale fields.
+- **Real-time Configuration**: Core components (AIClient, Ingester) now read settings fresh from JSON for every operation.
+
 ## [0.9.15] - 2026-02-19
 ### Added
 - **Expedition Group Toolset**: Initialized full research capabilities for lore agents, including Wiki and Wago.tools integration.

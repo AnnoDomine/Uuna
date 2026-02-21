@@ -1,11 +1,16 @@
+from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_archivist import request_archivist
 from Tools.agents.requests.request_librarian import send_librarian_response
-from Tools.agents.requests.request_sages import Approval, request_sages
+from Tools.agents.requests.request_sages import ApprovalStatus, request_sages
 from Tools.agents.requests.request_tinker import request_tinker
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
+
+
+class SpecialistSelection(BaseModel):
+    specialist: Agents = Field(..., description="The name of the next specialist to handle the task.")
 
 
 def present_response(task_id):
@@ -19,7 +24,7 @@ def request_courier_from_sages(task_id, approval: str, context: str):
     - If approved, send the task id to the tinker to start scoring and the librarian to present the research to the user
     - If revoked, create a new event and restart the research queue
     """
-    if approval == Approval.APPROVED:
+    if approval == ApprovalStatus.APPROVED:
         notify_frontend(task_id, "Courier: Task approved by Sages. Finalizing...", agent="Courier", type="research")
         present_response(task_id)
         request_tinker(task_id)
@@ -73,8 +78,7 @@ def request_courier(task_id: str, event_id: str):
             ]
         }
 
-        response_template = {"specialist": "string"}
-        selection = request_with_schema(response_template, select_payload, Agents.COURIER)
+        selection = request_with_schema(SpecialistSelection, select_payload, Agents.COURIER)
         
         if "error" in selection:
             raise Exception(selection["error"])

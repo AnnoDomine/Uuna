@@ -1,3 +1,4 @@
+from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_courier import request_courier
 from Tools.toolsets import global_tool_set
@@ -6,6 +7,12 @@ from Tools.toolsets.tools.courier.orchestration_helper import request_tool_selec
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 TOOLS_MAP = {f.__name__: f for f in SENTINEL_TOOLS}
+
+
+class SecurityAuditStatus(BaseModel):
+    is_finished: bool = Field(..., description="True if the data has been fully audited and sanitized.")
+    security_verdict: str = Field(..., description="The final security assessment (e.g., 'CLEAN', 'SENSITIVE_DATA_REDACTED', 'FLAGGED').")
+    reason: str = Field(..., description="Explanation of the findings and actions taken.")
 
 
 def request_sentinel(task_id: str, event_id: str):
@@ -44,8 +51,10 @@ def request_sentinel(task_id: str, event_id: str):
             tool_result = tool_func(**props)
             output.append({"tool": tool_name, "result": tool_result})
             
-            # Check if objective is reached
-            is_finish = is_event_finished(task_id, event_ctx, tool_result, Agents.SENTINEL)
+            # Check if objective is reached with specialized model
+            is_finish = is_event_finished(
+                task_id, event_ctx, tool_result, Agents.SENTINEL, response_model=SecurityAuditStatus
+            )
             current_input = output
 
         # Return to Courier

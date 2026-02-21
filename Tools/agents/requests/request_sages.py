@@ -1,3 +1,5 @@
+from enum import Enum
+from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_courier import request_courier_from_sages
 from Tools.core.ai_schema_validator import request_with_schema
@@ -5,9 +7,14 @@ from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 
-class Approval:
+class ApprovalStatus(str, Enum):
     APPROVED = "approved"
     REVOKED = "revoked"
+
+
+class SageVerdict(BaseModel):
+    approval: ApprovalStatus = Field(..., description="Verdict on the task logic.")
+    context: str = Field(..., description="The rationale or instructions for the next steps.")
 
 
 def request_sages(task_id: str):
@@ -25,7 +32,7 @@ def request_sages(task_id: str):
         if len(history) > 50:
             notify_frontend(task_id, "Sages: History limit reached. Auto-approving with notice.", agent="Sages", type="research", level="warning")
             request_courier_from_sages(
-                task_id, approval=Approval.APPROVED, context="Aborted task due to high amount of research steps."
+                task_id, approval=ApprovalStatus.APPROVED, context="Aborted task due to high amount of research steps."
             )
             return
 
@@ -37,15 +44,13 @@ def request_sages(task_id: str):
                 },
                 {
                     "role": "user",
-                    "content": f"Return your approval and why you decided it as context. The approval can only be '{Approval.APPROVED}' or '{Approval.REVOKED}'.",
+                    "content": f"Return your approval and why you decided it as context. The approval can only be '{ApprovalStatus.APPROVED.value}' or '{ApprovalStatus.REVOKED.value}'.",
                 },
                 {"role": "system", "content": f"TASK CONTEXT:\n{task_ctx}"},
             ]
         }
 
-        response_template = {"approval": Approval.APPROVED, "context": "string"}
-
-        approval_response = request_with_schema(response_template, payload, Agents.SAGES)
+        approval_response = request_with_schema(SageVerdict, payload, Agents.SAGES)
         
         if "error" in approval_response:
             raise Exception(approval_response["error"])
@@ -58,4 +63,4 @@ def request_sages(task_id: str):
     except Exception as e:
         notify_frontend(task_id, f"Sages verification error: {e}", agent="Sages", type="error", level="error")
         # Fallback: Auto-approve on error to not block the user, but with error context
-        request_courier_from_sages(task_id, Approval.APPROVED, f"Verification system error: {str(e)}")
+        request_courier_from_sages(task_id, ApprovalStatus.APPROVED, f"Verification system error: {str(e)}")

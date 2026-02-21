@@ -1,17 +1,20 @@
 import inspect
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Type
+from pydantic import BaseModel, Field
 
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 
-def _parse_tool_props_schema(schema: dict) -> dict:
-    """Helper to refine the tool selection schema."""
-    schema["properties"]["tool"]["description"] = "The selected tool to use"
-    schema["properties"]["props"]["additionalProperties"] = True
-    schema["properties"]["props"]["description"] = "Input parameters for the selected tool"
-    return schema
+class DefaultToolSelection(BaseModel):
+    tool: str = Field(..., description="The name of the tool to execute.")
+    props: Dict[str, Any] = Field(default_factory=dict, description="The dictionary of arguments for the tool.")
+
+
+class DefaultEventStatus(BaseModel):
+    is_finished: bool = Field(..., description="True if the objective of the current event is fully achieved.")
+    reason: str = Field(..., description="The rationale behind the decision.")
 
 
 def get_tool_definitions(functions: List[Callable]) -> List[Dict[str, Any]]:
@@ -68,7 +71,13 @@ def parse_tools_to_prompt(tools: List[Callable]) -> str:
     return separator + separator.join(tool_list) + separator
 
 
-def request_tool_selection(task_id: str, event: dict, role: Agents, tools: List[Callable]) -> dict:
+def request_tool_selection(
+    task_id: str, 
+    event: dict, 
+    role: Agents, 
+    tools: List[Callable],
+    response_model: Type[BaseModel] = DefaultToolSelection
+) -> dict:
     """
     Asks the agent to select the best tool for the current task context.
     """
@@ -91,8 +100,7 @@ def request_tool_selection(task_id: str, event: dict, role: Agents, tools: List[
             ],
         }
 
-        response_template = {"tool": "string", "props": {}}
-        result = request_with_schema(response_template, payload, role, _parse_tool_props_schema)
+        result = request_with_schema(response_model, payload, role)
 
         if "tool" in result:
             notify_frontend(task_id, f"{role.value}: Executing tool '{result['tool']}'", agent=role.value, type="research")
@@ -104,7 +112,13 @@ def request_tool_selection(task_id: str, event: dict, role: Agents, tools: List[
         return {"error": str(e)}
 
 
-def is_event_finished(task_id: str, input_data: any, output_data: any, role: Agents) -> bool:
+def is_event_finished(
+    task_id: str, 
+    input_data: any, 
+    output_data: any, 
+    role: Agents,
+    response_model: Type[BaseModel] = DefaultEventStatus
+) -> bool:
     """
     Asks the agent if the current event is fully resolved.
     """
@@ -119,13 +133,12 @@ def is_event_finished(task_id: str, input_data: any, output_data: any, role: Age
             ]
         }
 
-        response_template = {"is_finished": False}
-        res = request_with_schema(response_template, payload, role)
+        res = request_with_schema(response_model, payload, role)
 
         finished = res.get("is_finished", False) in [True, "true", "1", 1]
         
         if finished:
-            notify_frontend(task_id, f"{role.value}: Event completed.", agent=role.value, type="research")
+            notify_frontend(task_id, f"{role.value}: Event completed. Reason: {res.get('reason', 'N/A')}", agent=role.value, type="research")
             
         return finished
 

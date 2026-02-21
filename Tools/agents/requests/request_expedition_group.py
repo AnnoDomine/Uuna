@@ -1,3 +1,4 @@
+from pydantic import BaseModel, Field
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.request_sentinel import request_sentinel
 from Tools.toolsets import global_tool_set
@@ -6,6 +7,11 @@ from Tools.toolsets.tools.courier.orchestration_helper import request_tool_selec
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 TOOLS_MAP = {f.__name__: f for f in EXPEDITION_GROUP_TOOLS}
+
+
+class LoreResearchStatus(BaseModel):
+    is_finished: bool = Field(..., description="True if the lore context has been fully established.")
+    reason: str = Field(..., description="Explanation of what was found and why it's sufficient or what's missing.")
 
 
 def request_expedition_group(task_id: str, event_id: str):
@@ -44,8 +50,10 @@ def request_expedition_group(task_id: str, event_id: str):
             tool_result = tool_func(**props)
             output.append({"tool": tool_name, "result": tool_result})
             
-            # Check if objective is reached
-            is_finish = is_event_finished(task_id, event_ctx, tool_result, Agents.EXPEDITION_GROUP)
+            # Check if objective is reached with specialized model
+            is_finish = is_event_finished(
+                task_id, event_ctx, tool_result, Agents.EXPEDITION_GROUP, response_model=LoreResearchStatus
+            )
             current_input = output
 
         # Transition to Sentinel for data cleaning/security check
