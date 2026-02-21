@@ -2,6 +2,7 @@ import sqlite3
 import os
 import glob
 import sys
+from Tools.core.security_utils import sanitize_identifier
 
 
 def search_in_db(db_path, value):
@@ -19,12 +20,13 @@ def search_in_db(db_path, value):
         found_any = False
         for table in tables:
             try:
-                cursor.execute(f'PRAGMA table_info("{table}")')
-                columns = [col[1] for col in cursor.fetchall()]
+                safe_table = sanitize_identifier(table)
+                cursor.execute(f'PRAGMA table_info("{safe_table}")')
+                columns = [sanitize_identifier(col[1]) for col in cursor.fetchall()]
 
                 # We search for exact match as string or number
                 clauses = [f'"{col}" = ?' for col in columns]
-                query = f'SELECT COUNT(*) FROM "{table}" WHERE ' + " OR ".join(clauses)
+                query = f'SELECT COUNT(*) FROM "{safe_table}" WHERE ' + " OR ".join(clauses)
 
                 cursor.execute(query, [value] * len(columns))
                 count = cursor.fetchone()[0]

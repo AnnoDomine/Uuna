@@ -3,6 +3,7 @@ import os
 import json
 import difflib
 import sys
+from Tools.core.security_utils import sanitize_identifier
 
 GLOBAL_MAP_PATH = "Data/dbs/Global_Column_Map.json"
 SETTINGS_DB = "Data/dbs/Settings.db"
@@ -228,20 +229,23 @@ def map_references(db_path, use_global=True):
     for table in tables:
         if table in ("builds", "sqlite_sequence"):
             continue
-        cursor.execute(f'PRAGMA table_info("{table}")')
-        columns = [col[1] for col in cursor.fetchall()]
+        
+        safe_table = sanitize_identifier(table)
+        cursor.execute(f'PRAGMA table_info("{safe_table}")')
+        columns = [sanitize_identifier(col[1]) for col in cursor.fetchall()]
 
         for col in columns:
             if ";" in col or col in ("ID", "build_id"):
                 continue
-
+            
+            safe_col = sanitize_identifier(col)
             potential_target_base = None
-            if col.endswith("ID"):
-                potential_target_base = col[:-2]
-            elif col.endswith("_ID"):
-                potential_target_base = col[:-3]
-            elif col in tables or any(t.lower() == col.lower() for t in tables):
-                potential_target_base = col
+            if safe_col.endswith("ID"):
+                potential_target_base = safe_col[:-2]
+            elif safe_col.endswith("_ID"):
+                potential_target_base = safe_col[:-3]
+            elif safe_col in tables or any(t.lower() == safe_col.lower() for t in tables):
+                potential_target_base = safe_col
 
             if potential_target_base:
                 clean_target = potential_target_base
@@ -254,18 +258,19 @@ def map_references(db_path, use_global=True):
                                 break
 
                 match = resolve_table_name(
-                    clean_target, tables, user_mappings, global_mappings, mapping_path, table, col, use_global
+                    clean_target, tables, user_mappings, global_mappings, mapping_path, safe_table, safe_col, use_global
                 )
                 if match:
-                    if table not in references:
-                        references[table] = []
+                    safe_match = sanitize_identifier(match)
+                    if safe_table not in references:
+                        references[safe_table] = []
                     try:
                         cursor.execute(
-                            f'SELECT COUNT(*) FROM "{table}" WHERE "{col}" NOT IN (0, -1) AND "{col}" IS NOT NULL'
+                            f'SELECT COUNT(*) FROM "{safe_table}" WHERE "{safe_col}" NOT IN (0, -1) AND "{safe_col}" IS NOT NULL'
                         )
                         val_count = cursor.fetchone()[0]
-                        references[table].append({"column": col, "target_table": match, "active_entries": val_count})
-                        print(f"  LINK: {table}.{col} -> {match} ({val_count})")
+                        references[safe_table].append({"column": safe_col, "target_table": safe_match, "active_entries": val_count})
+                        print(f"  LINK: {safe_table}.{safe_col} -> {safe_match} ({val_count})")
                     except Exception:
                         pass
 

@@ -4,6 +4,7 @@ import sys
 import json
 from loguru import logger
 from Tools.core.db_client import DBClient
+from Tools.core.security_utils import sanitize_identifier
 
 MASTER_DB = "Data/WoW_Master.duckdb"
 QUERIES_DIR = "Tools/analysis/queries/feature_extractor"
@@ -58,34 +59,36 @@ def process_build_features(build_version):
     for idx, table in enumerate(tables, 1):
         run_info = f"{idx}/{total_tables}"
         t_log = logger.bind(run_info=run_info, process="Indexing", build=build_version)
-
+        
         try:
-            table_exists = con.execute(sql_check_table, (table,)).fetchone()[0]
+            # Sanitize table name before use
+            safe_table = sanitize_identifier(table)
+            table_exists = con.execute(sql_check_table, (safe_table,)).fetchone()[0]
             if not table_exists:
-                t_log.warning(f"Table {table} MISSING in archive. Logged for re-sync.")
-                con.execute(sql_log_error, (build_id, table, "MISSING_TABLE", "Missing in archive schema."))
+                t_log.warning(f"Table {safe_table} MISSING in archive. Logged for re-sync.")
+                con.execute(sql_log_error, (build_id, safe_table, "MISSING_TABLE", "Missing in archive schema."))
                 continue
 
-            cols_info = con.execute(f'PRAGMA table_info(archive."{table}")').df()
+            cols_info = con.execute(f'PRAGMA table_info(archive."{safe_table}")').df()
             if cols_info.empty:
                 continue
 
-            columns = [c for c in cols_info["name"].tolist() if c not in ("_row_hash", "build_id")]
-            build_rows = con.execute(sql_get_row_count, (build_id, table)).fetchone()[0]
+            columns = [sanitize_identifier(c) for c in cols_info["name"].tolist() if c not in ("_row_hash", "build_id")]
+            build_rows = con.execute(sql_get_row_count, (build_id, safe_table)).fetchone()[0]
 
             if idx % 50 == 0 or idx == 1:
-                t_log.info(f"Processing: {table} ({build_rows} rows)")
+                t_log.info(f"Processing: {safe_table} ({build_rows} rows)")
 
             for col in columns:
                 total_cols += 1
                 try:
-                    stats_query = sql_get_stats_tpl.format(table=table, col=col)
-                    stats = con.execute(stats_query, (build_id, table)).fetchone()
+                    stats_query = sql_get_stats_tpl.format(table=safe_table, col=col)
+                    stats = con.execute(stats_query, (build_id, safe_table)).fetchone()
                     if not stats:
                         continue
 
-                    samples_query = sql_get_samples_tpl.format(table=table, col=col)
-                    sample_data = con.execute(samples_query, (build_id, table)).fetchall()
+                    samples_query = sql_get_samples_tpl.format(table=safe_table, col=col)
+                    sample_data = con.execute(samples_query, (build_id, safe_table)).fetchall()
                     samples = [row[0] for row in sample_data]
 
                     con.execute(

@@ -3,6 +3,7 @@ from Tools.agents.requests import request_courier
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
+from Tools.core.security_utils import sanitize_user_prompt
 
 
 def send_librarian_response(task_id):
@@ -42,13 +43,16 @@ def request_librarian(prompts, builds):
     output = [{"user_prompts": prompts}, {"builds": builds}]
 
     try:
+        # Sanitize user prompts to prevent injection
+        safe_prompts = sanitize_user_prompt(prompts)
+
         check_payload = {
             "messages": [
                 {
                     "role": "system",
                     "content": "Search your knowledge and return it with a confidence score (0-100). If you have no knowledge, confidence is 100 and knowledge is 'None'.",
                 },
-                {"role": "user", "content": f"BUILD:{','.join(builds)}\nPROMPT:\n{prompts}"},
+                {"role": "user", "content": f"BUILD:{','.join(builds)}\nPROMPT:\n{safe_prompts}"},
             ]
         }
 

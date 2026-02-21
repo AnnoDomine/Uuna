@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import re
+from Tools.core.security_utils import sanitize_identifier
 
 
 def get_db_path(version):
@@ -15,16 +16,18 @@ def get_tables(db_path):
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = {}
     for row in cursor.fetchall():
-        table_name = row[0]
+        table_name = sanitize_identifier(row[0])
         if table_name in ("builds", "sqlite_sequence"):
             continue
         cursor.execute(f"PRAGMA table_info('{table_name}')")
         cols = [col[1] for col in cursor.fetchall()]
+        
         cursor.execute(f"SELECT COUNT(*) FROM '{table_name}'")
         count = cursor.fetchone()[0]
         tables[table_name] = {"columns": cols, "count": count}
     conn.close()
     return tables
+
 
 
 def get_available_builds():

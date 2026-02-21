@@ -7,6 +7,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 from Tools.core.db_client import DBClient
+from Tools.core.security_utils import sanitize_identifier
 
 # CONFIG
 MASTER_DB = "Data/WoW_Master.duckdb"
@@ -123,35 +124,36 @@ def process_table_master(table, version, build_id):
 
         con = get_con()
         t_log.info("Creating temp table...")
-        # Unique table name for multi-worker support
-        temp_table = f"archive.tmp_{table}_{version.replace('.', '_')}"
+        # Sanitize table name and generate temp name
+        safe_table = sanitize_identifier(table)
+        temp_table = sanitize_identifier(f"tmp_{safe_table}_{version.replace('.', '_')}")
 
         sql_init_temp = load_query("init_temp_table").format(csv_path=csv_path, sep=sep, temp_table=temp_table)
         t_log.info("Ensuring table exists...")
-        sql_ensure_table = load_query("ensure_archive_table").format(table=table, temp_table=temp_table)
+        sql_ensure_table = load_query("ensure_archive_table").format(table=safe_table, temp_table=temp_table)
         t_log.info("Inserting rows...")
         load_query("insert_unique_rows")
         t_log.info("Inserting build map...")
         sql_insert_map = load_query("insert_build_map")
 
         t_log.info("Cleanup potential old temp table...")
-        con.execute(f"DROP TABLE IF EXISTS {temp_table}")
+        con.execute(f"DROP TABLE IF EXISTS archive.{temp_table}")
 
         con.execute(sql_init_temp)
         t_log.info("Ensuring table exists...")
         con.execute(sql_ensure_table)
 
         # Schema Evolution: Add missing columns (case-insensitive check)
-        existing_cols_real = con.execute(f"PRAGMA table_info('archive.\"{table}\"')").df()["name"].tolist()
+        existing_cols_real = con.execute(f"PRAGMA table_info('archive.\"{safe_table}\"')").df()["name"].tolist()
         existing_cols_lower = {c.lower() for c in existing_cols_real}
 
-        temp_cols_df = con.execute(f"PRAGMA table_info('{temp_table}')").df()
-        temp_cols = temp_cols_df["name"].tolist()
+        temp_cols_df = con.execute(f"PRAGMA table_info('archive.{temp_table}')").df()
+        temp_cols = [sanitize_identifier(c) for c in temp_cols_df["name"].tolist()]
 
         for c in temp_cols:
             if c.lower() not in existing_cols_lower:
-                t_log.info(f'Schema Evolution: Adding column {c} to archive."{table}"')
-                con.execute(f'ALTER TABLE archive."{table}" ADD COLUMN "{c}" VARCHAR')
+                t_log.info(f'Schema Evolution: Adding column {c} to archive."{safe_table}"')
+                con.execute(f'ALTER TABLE archive."{safe_table}" ADD COLUMN "{c}" VARCHAR')
             elif c not in existing_cols_real:
                 t_log.warning(f"Column casing mismatch for {c}. Existing: {existing_cols_real}. Skipping.")
 
@@ -161,10 +163,10 @@ def process_table_master(table, version, build_id):
 
         t_log.info("Inserting rows...")
         insert_sql = f"""
-            INSERT INTO archive."{table}" ({col_list_str}, _row_hash)
+            INSERT INTO archive."{safe_table}" ({col_list_str}, _row_hash)
             SELECT {col_list_str}, {hash_expr} as _row_hash
-            FROM {temp_table}
-            WHERE {hash_expr} NOT IN (SELECT _row_hash FROM archive."{table}")
+            FROM archive.{temp_table}
+            WHERE {hash_expr} NOT IN (SELECT _row_hash FROM archive."{safe_table}")
         """
         con.execute(insert_sql)
 
@@ -172,14 +174,14 @@ def process_table_master(table, version, build_id):
         con.execute(
             sql_insert_map.format(
                 build_id=build_id,
-                table=table,
+                table=safe_table,
                 hash_expr=hash_expr,
-                temp_table=temp_table,
+                temp_table=f"archive.{temp_table}",
             )
         )
 
         t_log.info("Dropping temp table...")
-        con.execute(f"DROP TABLE {temp_table}")
+        con.execute(f"DROP TABLE archive.{temp_table}")
 
         t_log.info("Close connection...")
         con.close()
