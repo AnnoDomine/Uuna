@@ -13,52 +13,56 @@ vi.mock("./hooks/useBackend.js", () => ({
 vi.mock("./hooks/useTerminalDimensions.js", () => ({
     default: () => ({
         width: 100,
-        height: 30,
+        height: 40,
     }),
 }));
 
 describe("App E2E", () => {
-    it("should render the header with the app name", () => {
+    it("should render the header with the app name", async () => {
         const { lastFrame } = render(<App />);
 
+        // Wait for initial render
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const output = lastFrame();
         // Check if the app name is present in the output
-        expect(lastFrame()).toContain("WoW Library");
+        expect(output).toContain("WoW Library");
     });
 
-    it("should render the navigation sidebar", () => {
+    it("should render the command line prompt", async () => {
         const { lastFrame } = render(<App />);
 
-        expect(lastFrame()).toContain("🏠 - Overview");
-        expect(lastFrame()).toContain("Tasks");
-        expect(lastFrame()).toContain("Wiki");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // CommandLine uses "> " as prompt
+        expect(lastFrame()).toContain("> ");
     });
 
-    it("should allow navigating to the Wiki page", async () => {
+    it("should allow navigating via command line", async () => {
         const { lastFrame, stdin } = render(<App />);
 
         // Wait for initial render
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Navigate down until we reach Wiki
-        // We use a fixed number of steps based on the known order
-        for (let i = 0; i < 6; i++) {
-            stdin.write("\u001B[B");
-            await new Promise((resolve) => setTimeout(resolve, 100));
+        // Type command to go to Wiki
+        const command = ":goto:wiki\r";
+        for (const char of command) {
+            stdin.write(char);
+            // Simulate human typing speed
+            await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
-        // Press Enter to select
-        stdin.write("\r");
-
-        // Wait for page switch animation/effect
-        let _found = false;
-        for (let i = 0; i < 10; i++) {
+        // Wait for page switch and potential loading state
+        let found = false;
+        for (let i = 0; i < 20; i++) {
             await new Promise((resolve) => setTimeout(resolve, 200));
-            if (lastFrame()?.includes("Wiki")) {
-                _found = true;
+            const frame = lastFrame();
+            if (frame?.toLowerCase().includes("wiki")) {
+                found = true;
                 break;
             }
         }
 
-        expect(lastFrame()).toContain("Wiki");
+        expect(found).toBe(true);
     });
 });

@@ -46,8 +46,7 @@ const CommandLine: React.FC = () => {
                 <Text color="white">{input}</Text>
                 <Text color="white" backgroundColor="#414868">
                     {" "}
-                </Text>{" "}
-                {/* Cursor Placeholder */}
+                </Text>
             </Box>
         </Box>
     );
