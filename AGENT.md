@@ -2,7 +2,7 @@
 
 Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
 
-This document serves as the technical context for AI agents and developers. The project is a universal toolkit for World of Warcraft datamining, utilizing a multi-agent orchestration system.
+This document serves as the technical context for AI agents and developers. The project is a universal toolkit for World of Warcraft datamining, utilizing a multi-agent orchestration system. **Currently in Version 1.0.0-rc (Release Candidate).**
 
 ## Communication & Naming
 

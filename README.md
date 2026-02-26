@@ -1,4 +1,4 @@
-# Grand Library - WoW Datamine Toolkit
+# Grand Library - WoW Datamine Toolkit (V1.0.0-rc)
 
 Welcome to the **Grand Library**, a high-performance, AI-orchestrated research platform for World of Warcraft data analysis. This toolkit transforms raw database files (DB2) from Classic to Midnight into semantically meaningful game intelligence using a multi-agent "Relay-Race" system.
 
@@ -40,66 +40,40 @@ To ensure absolute integrity and prevent AI agents from "gaming the system," we 
 - **API Gateway**: All database operations are proxied through a FastAPI middleware (`db_service.py`) to prevent concurrency locks.
 - **Shared DB Pattern**: High-level tools utilize a centralized `db` instance (`shared_db_instance.py`) to streamline orchestration and prompt clarity.
 - **Task Inspector**: Real-time TUI monitoring of the multi-agent relay race, providing granular visibility into events, agent reasoning, and scoring.
+- **Command-Driven UI**: Vim-style CommandLine (`:goto`, `:settings`, `:mod`) for high-speed expert interaction.
 
 ---
 
 ## 🚀 Getting Started
 
-
-
 ### 1. Installation
 
 The easiest way to get started is using the automated initialization script:
 
-
-
 ```bash
-
 # Clone the repository
-
 git clone https://github.com/AnnoDomine/Uuna.git
-
 cd Uuna
 
-
-
 # Run the automated setup
-
 bash init.sh
-
 ```
 
-
-
 The script will check for prerequisites (uv, Node.js, Ollama), set up the environment, initialize the database, and run hardware optimization.
-
-
 
 ### 2. Management & Development
 
 The project includes a `manage.py` utility to centralize common tasks:
 
-
-
 ```bash
-
 # Initialize the environment (Folders & DBs)
-
 uv run manage.py init
 
-
-
 # Analyze hardware and configure AI settings
-
 uv run manage.py optimize
 
-
-
 # Start the Database Service (API Gateway)
-
 uv run manage.py serve
-
-
 
 # Run the Master Ingester (Syncs DB2 to DuckDB)
 uv run manage.py ingest --limit 50
@@ -108,7 +82,7 @@ uv run manage.py ingest --limit 50
 uv run manage.py test
 
 # Autonomous research run
-uv run python Tools/agents/ai_researcher_agent.py --start 7.3.5.25600 --limit 10
+uv run python Tools/agents/ai_researcher_agent.py --start 11.1.0.59000 --limit 10
 ```
 
 ---
