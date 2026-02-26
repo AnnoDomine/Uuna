@@ -1,21 +1,24 @@
 # Tools/tests/toolsets/tools/database/test_find_value.py
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 import sys
 import os
-import pandas as pd
 
 # Ensure the parent directory is in the Python path for module resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")))
 
-from toolsets.tools.database.find_value import find_value
-from core.db_client import DBClient, DBResult
+from Tools.toolsets.tools.database.find_value import find_value
+from Tools.core.db_client import DBResult
+
 
 class TestFindValue(unittest.TestCase):
-
     def setUp(self):
         """Set up a mock DBClient before each test."""
-        self.mock_db_client = MagicMock(spec=DBClient)
+        self.db_patcher = patch("Tools.toolsets.tools.database.find_value.db")
+        self.mock_db = self.db_patcher.start()
+
+    def tearDown(self):
+        self.db_patcher.stop()
 
     def test_finds_value_in_one_table(self):
         """
@@ -24,34 +27,42 @@ class TestFindValue(unittest.TestCase):
         """
         # --- Mock Setup ---
         # 1. Mock the response for getting all tables
-        mock_tables_result = DBResult({
-            "columns": ["table_name"],
-            "results": [("item_effects",), ("spell_names",)]
-        })
+        mock_tables_result = DBResult({"columns": ["table_name"], "results": [("item_effects",), ("spell_names",)]})
 
         # 2. Mock the response for DESCRIBE on the first table 'item_effects'
-        mock_describe_item_effects = DBResult({
-            "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
-            "results": [("id", "INTEGER", "NO", "PRI", None, None), ("description", "VARCHAR", "YES", "", None, None)]
-        })
+        mock_describe_item_effects = DBResult(
+            {
+                "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
+                "results": [
+                    ("id", "INTEGER", "NO", "PRI", None, None),
+                    ("description", "VARCHAR", "YES", "", None, None),
+                ],
+            }
+        )
 
         # 3. Mock the response for the COUNT query on 'item_effects'
-        mock_count_item_effects = DBResult({
-            "columns": ["count(*)"],
-            "results": [(3,)] # Simulate 3 matches found
-        })
-        
+        mock_count_item_effects = DBResult(
+            {
+                "columns": ["count(*)"],
+                "results": [(3,)],  # Simulate 3 matches found
+            }
+        )
+
         # 4. Mock the response for DESCRIBE on the second table 'spell_names'
-        mock_describe_spell_names = DBResult({
-            "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
-            "results": [("id", "INTEGER", "NO", "PRI", None, None), ("name", "VARCHAR", "YES", "", None, None)]
-        })
-        
+        mock_describe_spell_names = DBResult(
+            {
+                "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
+                "results": [("id", "INTEGER", "NO", "PRI", None, None), ("name", "VARCHAR", "YES", "", None, None)],
+            }
+        )
+
         # 5. Mock the response for the COUNT query on 'spell_names'
-        mock_count_spell_names = DBResult({
-            "columns": ["count(*)"],
-            "results": [(0,)] # Simulate 0 matches found
-        })
+        mock_count_spell_names = DBResult(
+            {
+                "columns": ["count(*)"],
+                "results": [(0,)],  # Simulate 0 matches found
+            }
+        )
 
         # Configure the side_effect to return different mocks based on the query
         def mock_execute_side_effect(sql, params=None):
@@ -67,11 +78,11 @@ class TestFindValue(unittest.TestCase):
                 return mock_count_spell_names
             return DBResult({"results": [], "columns": []})
 
-        self.mock_db_client.execute.side_effect = mock_execute_side_effect
+        self.mock_db.execute.side_effect = mock_execute_side_effect
 
         # --- Test Execution ---
         search_term = "Frostbolt"
-        result = find_value(self.mock_db_client, search_term)
+        result = find_value(search_term)
 
         # --- Assertions ---
         self.assertIn("item_effects", result)
@@ -87,10 +98,12 @@ class TestFindValue(unittest.TestCase):
         mock_build_id_result = DBResult({"columns": ["id"], "results": [(123,)]})
         mock_tables_result = DBResult({"columns": ["table_name"], "results": [("item_effects",)]})
         # Note: Added 'build_id' to the columns
-        mock_describe_result = DBResult({
-            "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
-            "results": [("id", "INTEGER", "NO", "PRI", None, None), ("build_id", "INTEGER", "YES", "", None, None)]
-        })
+        mock_describe_result = DBResult(
+            {
+                "columns": ["column_name", "column_type", "null", "key", "default", "extra"],
+                "results": [("id", "INTEGER", "NO", "PRI", None, None), ("build_id", "INTEGER", "YES", "", None, None)],
+            }
+        )
         mock_count_result = DBResult({"columns": ["count(*)"], "results": [(1,)]})
 
         def mock_execute_side_effect(sql, params=None):
@@ -106,15 +119,20 @@ class TestFindValue(unittest.TestCase):
                 self.assertIn(123, params)
                 return mock_count_result
             return DBResult({"results": [], "columns": []})
-        
-        self.mock_db_client.execute.side_effect = mock_execute_side_effect
+
+        self.mock_db.execute.side_effect = mock_execute_side_effect
 
         # --- Test Execution ---
-        result = find_value(self.mock_db_client, "TestValue", build_version="10.2.5.52762")
+        result = find_value("TestValue", build_version="10.2.5.52762")
 
         # --- Assertions ---
         self.assertIn("item_effects", result)
         self.assertEqual(result["item_effects"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
 
 if __name__ == "__main__":
     unittest.main()

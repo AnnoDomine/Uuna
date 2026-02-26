@@ -5,13 +5,14 @@ import { type EFocusAreal, useFocusStore } from "../store/useFocusStore.js";
 import { ELogTypes } from "../types/global.enums.js";
 import quitApplication from "../utils/helpers/quitApplication.js";
 
-type InputCallback = (input: string, key: Key) => void;
+export type InputCallback = (input: string, key: Key) => void;
 
 interface UseScopedInputOptions {
     id: string;
     areal: EFocusAreal;
     keyMap?: InputCallback;
     autoFocus?: boolean;
+    ctrlQToExit?: boolean;
 }
 
 /**
@@ -20,7 +21,13 @@ interface UseScopedInputOptions {
  * This hook manages Ink's focus and ensures that the provided input callback (keyMap)
  * only executes when the component is both focused and part of the active Areal.
  */
-export const useScopedInput = ({ id, areal, keyMap, autoFocus = false }: UseScopedInputOptions) => {
+export const useScopedInput = ({
+    id,
+    areal,
+    keyMap,
+    autoFocus = false,
+    ctrlQToExit = false,
+}: UseScopedInputOptions) => {
     const { activeAreal, setActiveAreal } = useFocusStore();
     const { addLog, setEnabled, enabled } = useDebugStore();
 
@@ -45,10 +52,18 @@ export const useScopedInput = ({ id, areal, keyMap, autoFocus = false }: UseScop
     // 3. Handle Keyboard Input with Scoped Activation
     useInput(
         (input, key) => {
-            if (input === "q") {
+            if (input === "q" && !ctrlQToExit) {
                 addLog({
                     type: ELogTypes.INFO,
                     message: "Quit requested via 'q' key",
+                    process: "useScopedInput",
+                });
+                quitApplication();
+            }
+            if (input === "q" && ctrlQToExit && (key.ctrl || key.meta)) {
+                addLog({
+                    type: ELogTypes.INFO,
+                    message: "Quit requested via 'Ctrl+Q' key",
                     process: "useScopedInput",
                 });
                 quitApplication();

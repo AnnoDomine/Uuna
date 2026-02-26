@@ -14,6 +14,8 @@ export interface IAgentStats {
     taskCount: number;
 }
 
+export type ScoreRow = [number, string, string | null, number, string];
+
 export interface IScoreboardResponse {
-    scores: any[][]; // Raw fetchall() response from backend [[id, task_id, event_id, percent, created_at], ...]
+    scores: ScoreRow[]; // Raw fetchall() response from backend [[id, task_id, event_id, percent, created_at], ...]
 }

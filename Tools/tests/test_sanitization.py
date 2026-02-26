@@ -3,9 +3,10 @@ import sys
 import os
 
 # Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from toolsets.tools.research.fetch_web_content import sanitize_html
+from Tools.toolsets.tools.research.fetch_web_content import sanitize_html
+
 
 class TestSanitization(unittest.TestCase):
     def test_script_removal(self):
@@ -34,6 +35,7 @@ class TestSanitization(unittest.TestCase):
         self.assertIn("Title", result)
         self.assertIn("Paragraph", result)
         self.assertIn("Item 1", result)
+
 
 if __name__ == "__main__":
     unittest.main()

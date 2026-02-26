@@ -3,17 +3,19 @@ import os
 from typing import List, Dict, Any
 from uuid import UUID
 
+
 class EventLogManager:
     """
     Manager for retrieving logs from the Chronicle.
     Used by the Observer and Tinker for retrospective analysis.
     """
+
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.queries_path = "Tools/core/api/queries/logs"
 
     def _load_query(self, name: str) -> str:
-        with open(os.path.join(self.queries_path, f"{name}.sql"), 'r') as f:
+        with open(os.path.join(self.queries_path, f"{name}.sql"), "r") as f:
             return f.read().strip()
 
     def get_logs_by_task(self, task_id: UUID) -> List[Dict[str, Any]]:

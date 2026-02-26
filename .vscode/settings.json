@@ -1,14 +1,40 @@
 {
-    "svn.ignoreMissingSvnWarning": true,
-    "[typescript]": {
-        "editor.defaultFormatter": "biomejs.biome"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "biomejs.biome"
-    },
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.biome": "explicit",
-        "source.organizeImports.biome": "explicit"
-    }
+	"svn.ignoreMissingSvnWarning": true,
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.ruff": "explicit",
+		"source.organizeImports.ruff": "explicit"
+	},
+	// TypeScript / React (TUI)
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	// Python (Core)
+	"[python]": {
+		"editor.defaultFormatter": "charliermarsh.ruff",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.ruff": "explicit",
+			"source.organizeImports.ruff": "explicit"
+		}
+	},
+	"python.interpreterPath": "${workspaceFolder}/.venv/bin/python",
+	"python.linting.enabled": true,
+	"python.linting.ruffEnabled": true,
+	"ruff.importStrategy": "fromEnvironment",
+	// General
+	"files.insertFinalNewline": true,
+	"files.trimTrailingWhitespace": true,
+	"editor.rulers": [120],
+	"biome.configurationPath": "Tools/web/tui-node/biome.json"
 }

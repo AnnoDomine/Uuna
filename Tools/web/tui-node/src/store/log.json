@@ -1,0 +1,752 @@
+[
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743041378,
+    "actor": "system",
+    "id": "baadd4c3-527d-4a8a-9cf7-be4fff2556fc"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743041671,
+    "actor": "system",
+    "id": "9be9d09a-adfd-467d-a876-8724b0a8575d"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743041941,
+    "actor": "system",
+    "id": "c458d7c7-f23d-4485-a04f-df8970b6f33a"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743042241,
+    "actor": "system",
+    "id": "40cdcbb7-f486-4173-82a0-46f9666e389b"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743045846,
+    "actor": "system",
+    "id": "0a3a70f2-9ac0-4aad-80b1-8f2f4b8ff4c3"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743046163,
+    "actor": "system",
+    "id": "7e066319-1d1b-4503-aa85-41d1db25e29d"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743046376,
+    "actor": "system",
+    "id": "b1fa688e-6132-456c-aa31-7811d55921cd"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743046677,
+    "actor": "system",
+    "id": "56284920-7dab-4336-b08a-e2105e4b96ec"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743046943,
+    "actor": "system",
+    "id": "69564dad-0e15-469c-b24a-c42734a16d36"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743047417,
+    "actor": "system",
+    "id": "f4c83e08-10e4-43d9-8d06-6cb027b9ff7d"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743050846,
+    "actor": "system",
+    "id": "34cf497c-ed2e-4d33-bba4-165afbebc6ee"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743051802,
+    "actor": "system",
+    "id": "993d7bc4-295d-4f6d-b9c7-8a5e443c2e54"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743051817,
+    "actor": "system",
+    "id": "feee79b1-a4c2-4874-83fe-01210bb20114"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743051818,
+    "actor": "system",
+    "id": "a400f63f-24d4-4c4e-af8c-e6c7c0767543"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743052010,
+    "actor": "system",
+    "id": "dee7e361-8ce3-4a44-b502-c8064f3c441d"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743052340,
+    "actor": "system",
+    "id": "739d1ea6-bfc8-4423-9fe8-ed5d00dd9096"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743055874,
+    "actor": "system",
+    "id": "dc71b07d-72b1-4f0b-9426-9e5aec6d323f"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743056218,
+    "actor": "system",
+    "id": "f2d05965-bd30-44c8-83eb-eb91fa4dddc2"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743056468,
+    "actor": "system",
+    "id": "523a402b-1f3d-4c21-96d8-b4e768a435f5"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743056767,
+    "actor": "system",
+    "id": "c1603c9d-7045-432f-8670-b888b3bc4ec5"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743056984,
+    "actor": "system",
+    "id": "31a5849a-3ece-496f-bf6f-743b1083f9a0"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743057302,
+    "actor": "system",
+    "id": "37a18431-445d-4a18-94c4-6253f3cb0c49"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743060854,
+    "actor": "system",
+    "id": "a3a2aa27-03bb-4fd4-9476-495fe5b7be50"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743061274,
+    "actor": "system",
+    "id": "3bbea22b-017d-4d5d-96c9-94989b7ac8fd"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743061497,
+    "actor": "system",
+    "id": "2aab704e-2beb-4a17-8666-c9f462387a0b"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743061773,
+    "actor": "system",
+    "id": "e7a5dafc-a431-4e09-b4a6-159e0797d87f"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743061958,
+    "actor": "system",
+    "id": "e40001f3-9693-4d87-b52f-6dc2cdc091cc"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743062251,
+    "actor": "system",
+    "id": "f04cb462-d4d4-4a54-8c17-ab29af95eb1f"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743065827,
+    "actor": "system",
+    "id": "600ab8b6-8d61-46ed-ac82-76b561a909d4"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743066217,
+    "actor": "system",
+    "id": "a3d3d6af-63de-4210-812d-1582ff539984"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743066468,
+    "actor": "system",
+    "id": "05a68d8f-bc89-4956-80d4-b7e616e67474"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743066890,
+    "actor": "system",
+    "id": "04cdc162-0a63-418b-9832-c7d3700540ee"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743067033,
+    "actor": "system",
+    "id": "a66108da-d449-4c16-b4ce-14c38766a331"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743067275,
+    "actor": "system",
+    "id": "2706925a-f54f-4df9-9f8e-8e2313f547fe"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743070879,
+    "actor": "system",
+    "id": "dea206b0-452c-41a3-b978-a8b3452b2cc8"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743071217,
+    "actor": "system",
+    "id": "28e11a7c-7c7c-40c1-8305-485c74e7046a"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743071539,
+    "actor": "system",
+    "id": "fe2b0ad9-cb1e-4cf6-8b01-6b977cab8267"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743071872,
+    "actor": "system",
+    "id": "689cd698-ccfa-4237-9397-cdce211fa589"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743072006,
+    "actor": "system",
+    "id": "e2e04d1f-4ff7-42f9-b8f5-3c387416f4fd"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743072290,
+    "actor": "system",
+    "id": "8d8f5832-453e-48c5-9d5a-b23261237e96"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743075879,
+    "actor": "system",
+    "id": "08f17774-4037-4c57-a80c-8f25f8f9c4d4"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743076172,
+    "actor": "system",
+    "id": "f44ee409-1df1-4a6d-aba1-e2efab2a9269"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743076513,
+    "actor": "system",
+    "id": "472da409-4d12-419d-b2ce-5e1a6ec81569"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743076801,
+    "actor": "system",
+    "id": "475030a0-34c6-4120-9ca8-d8c69e5c8c9a"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743077006,
+    "actor": "system",
+    "id": "3a211536-dfaf-4fdf-bf1a-8369279289c6"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743077333,
+    "actor": "system",
+    "id": "873476fb-2cf4-4e71-b80c-b2db4f30ebc4"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743080827,
+    "actor": "system",
+    "id": "441bf5cc-240a-4697-a0c8-8123abb822b0"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743081214,
+    "actor": "system",
+    "id": "7804c461-6ba3-412e-a617-26eb713201e4"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743081513,
+    "actor": "system",
+    "id": "a554b42d-10a4-4213-b3c6-02f06b0a5d3c"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743081820,
+    "actor": "system",
+    "id": "46347061-da48-4122-bd8d-e9bd99d0951a"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743082033,
+    "actor": "system",
+    "id": "b99e4773-24e2-4db0-b6b7-8737be9ab6d1"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743082354,
+    "actor": "system",
+    "id": "7caf1783-aeb0-4bcb-b66e-6062cf09bfe0"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743085891,
+    "actor": "system",
+    "id": "713ec6b5-b4e4-404e-a561-75a70b603432"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743086300,
+    "actor": "system",
+    "id": "f3752672-0261-400e-a504-58f30300cb47"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743086540,
+    "actor": "system",
+    "id": "c3f30837-262d-473b-8406-d4267f84786d"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743086801,
+    "actor": "system",
+    "id": "9d0da663-fd14-434f-9622-cd1b1966ea19"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743087006,
+    "actor": "system",
+    "id": "843d25c7-c740-47fe-977c-c44e01c08cf2"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743087301,
+    "actor": "system",
+    "id": "4f449a37-a5d7-45e7-9fb0-a7871b4c6a28"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743090858,
+    "actor": "system",
+    "id": "02b5fb87-80c0-429e-a416-a211a16b5b9c"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743091143,
+    "actor": "system",
+    "id": "018689ec-c3c3-4687-ab4d-5697c19e8698"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743091551,
+    "actor": "system",
+    "id": "d1b89c38-d694-49d7-9ab5-9f6ed3656b7d"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743091842,
+    "actor": "system",
+    "id": "ba8564f1-e845-43c2-92c8-2f611215c0f3"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743092005,
+    "actor": "system",
+    "id": "69582db7-e45f-4dd1-a6eb-4dfc3351c9c6"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743092339,
+    "actor": "system",
+    "id": "1384991e-0758-4085-8bbc-54154d42c910"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743095899,
+    "actor": "system",
+    "id": "70029852-9eb6-46a1-8a8c-d175180744f9"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743096205,
+    "actor": "system",
+    "id": "87cb3777-67f0-4fc7-aa07-6e9fce4c7b74"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743096606,
+    "actor": "system",
+    "id": "48a5d4c9-8b0e-4ba3-8bc6-3656502ef9f4"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743096940,
+    "actor": "system",
+    "id": "ee3af06c-8821-41b4-984d-839b394a8a94"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743097075,
+    "actor": "system",
+    "id": "5d8bf015-5c68-4f55-bc1c-0d36aefc8c6d"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743097339,
+    "actor": "system",
+    "id": "1f166aca-73cb-41ba-88c1-cfe5ccca42d2"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743100927,
+    "actor": "system",
+    "id": "8d747bf8-db1b-4a8b-92ad-5df052a1269c"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743101234,
+    "actor": "system",
+    "id": "cbc9a65b-6308-4de2-91e9-bb4e4640802e"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743101576,
+    "actor": "system",
+    "id": "8187c6f7-c2fd-4d8d-b546-6e2d2c897db5"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743101875,
+    "actor": "system",
+    "id": "67fe9cba-4146-44bd-b4a9-1d193e805da8"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743102059,
+    "actor": "system",
+    "id": "bd7e1163-f9a6-4937-b671-677bc2f64c2f"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743102362,
+    "actor": "system",
+    "id": "0ae68943-fd7b-4c0b-a929-d9a29250fc11"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743105874,
+    "actor": "system",
+    "id": "28fa4925-9634-47f9-a1e9-1d89215e2598"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743106166,
+    "actor": "system",
+    "id": "8aa8025d-6761-4ec7-8079-eb87d5370929"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743106630,
+    "actor": "system",
+    "id": "e64d8b92-2f03-4c02-8972-dd72bfbdbe74"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743106864,
+    "actor": "system",
+    "id": "62c5ee86-7370-4e03-9dac-e5c6f593e9e8"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743107093,
+    "actor": "system",
+    "id": "bc53e3f5-7739-4eb2-a04a-8d580ca92a93"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743107296,
+    "actor": "system",
+    "id": "7a87753f-d763-40bc-b2ce-e1575915f407"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743110874,
+    "actor": "system",
+    "id": "099c736b-8f39-4746-96bc-ecc7fcf7b0c1"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743111294,
+    "actor": "system",
+    "id": "7cca9b5a-e9a1-4584-9d5c-65fd5c8bfd5c"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743111644,
+    "actor": "system",
+    "id": "c256fb06-d64c-417a-b56a-cf3c9018741c"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743111885,
+    "actor": "system",
+    "id": "ecffdf09-461e-4c63-b39d-019991bf7eec"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743112091,
+    "actor": "system",
+    "id": "7c648ad3-af3e-4a63-aedb-18d1e2e366ea"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743112432,
+    "actor": "system",
+    "id": "74c68bae-8ca1-4e68-9ef9-e16b856eb612"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743115874,
+    "actor": "system",
+    "id": "3b4034db-bdf9-435d-a28b-a0a3ac68fc6d"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743116292,
+    "actor": "system",
+    "id": "bc64bf91-c50b-46ae-b32c-1df32c6f56ca"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743116629,
+    "actor": "system",
+    "id": "39229a55-f429-452e-9207-43829b9d6760"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743116911,
+    "actor": "system",
+    "id": "4dd59e31-6e2b-427d-8bce-10ed200fdc42"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743117080,
+    "actor": "system",
+    "id": "26c9c379-836b-4368-a3eb-5885d03da21e"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743117375,
+    "actor": "system",
+    "id": "53c76e41-aeea-4ac2-80f4-a1f0aeb4a418"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743120926,
+    "actor": "system",
+    "id": "f89f2402-40bb-45d8-83f3-59cf83135fe3"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743121349,
+    "actor": "system",
+    "id": "7538b123-ba7e-43cd-8678-62c2a81f3f4b"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743121636,
+    "actor": "system",
+    "id": "5c26f369-a585-4487-b168-278387bc5c04"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743121946,
+    "actor": "system",
+    "id": "7edaef71-cafe-4e8a-96f8-793950027750"
+  },
+  {
+    "type": "TRACE",
+    "message": "Backend is healthy",
+    "process": "BackendService",
+    "timestamp": 1771743122140,
+    "actor": "system",
+    "id": "975124c3-ee95-47fe-a1fc-ff7eb3f5c447"
+  },
+  {
+    "type": "INFO",
+    "message": "Backend health check result: true",
+    "timestamp": 1771743122485,
+    "actor": "system",
+    "id": "015fda87-010c-4067-851a-b3293e69cb04"
+  }
+]

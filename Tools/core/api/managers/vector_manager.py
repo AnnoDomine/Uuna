@@ -5,6 +5,7 @@ import json
 from loguru import logger
 from .embedding_handler import EmbeddingHandler
 
+
 class VectorManager:
     def __init__(self, db_path="Data/knowledge/role_memory.duckdb"):
         self.db_path = os.path.abspath(db_path)
@@ -41,14 +42,14 @@ class VectorManager:
         embedding = self.embedding_handler.get_embedding(content)
         if not embedding:
             return None
-        
+
         mem_id = str(uuid.uuid4())
         try:
             with duckdb.connect(self.db_path) as conn:
                 conn.execute("INSTALL vss; LOAD vss;")
                 conn.execute(
                     "INSERT INTO memory (id, role, content, metadata, embedding) VALUES (?, ?, ?, ?, ?)",
-                    (mem_id, role, content, json.dumps(metadata), embedding)
+                    (mem_id, role, content, json.dumps(metadata), embedding),
                 )
             return mem_id
         except Exception as e:
@@ -59,7 +60,7 @@ class VectorManager:
         query_embedding = self.embedding_handler.get_embedding(query_text)
         if not query_embedding:
             return []
-        
+
         try:
             # Use read_only=True for searches to avoid locks
             with duckdb.connect(self.db_path, read_only=True) as conn:
@@ -73,16 +74,18 @@ class VectorManager:
                     LIMIT ?
                 """
                 res = conn.execute(sql, [query_embedding, role, limit]).fetchall()
-                
+
                 results = []
                 for row in res:
-                    results.append({
-                        "id": row[0],
-                        "role": row[1],
-                        "content": row[2],
-                        "metadata": json.loads(row[3]),
-                        "score": row[4]
-                    })
+                    results.append(
+                        {
+                            "id": row[0],
+                            "role": row[1],
+                            "content": row[2],
+                            "metadata": json.loads(row[3]),
+                            "score": row[4],
+                        }
+                    )
                 return results
         except Exception as e:
             logger.error(f"Failed to search memory: {e}")

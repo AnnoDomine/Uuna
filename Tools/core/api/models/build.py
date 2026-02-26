@@ -1,6 +1,6 @@
-from typing import Optional
 from datetime import datetime
 from .base import DBModel
+
 
 class Build(DBModel):
     id: int

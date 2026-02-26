@@ -91,7 +91,7 @@ class BackendService {
 
         this.process.unref();
         addLog({
-            type: ELogTypes.SUCCESS as any,
+            type: ELogTypes.INFO,
             message: "Backend spawn initiated",
             process: "BackendService",
         });

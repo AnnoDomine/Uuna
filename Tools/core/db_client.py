@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from loguru import logger
+
 
 class DBResult:
     def __init__(self, data):
@@ -8,7 +8,7 @@ class DBResult:
 
     def fetchall(self):
         return self.data.get("results", [])
-    
+
     def fetchone(self):
         results = self.data.get("results", [])
         return results[0] if results else None
@@ -24,6 +24,7 @@ class DBResult:
             return 1
         return len(self.data.get("results", []))
 
+
 class DBClient:
     def __init__(self, url="http://127.0.0.1:8002"):
         self.url = url
@@ -31,11 +32,18 @@ class DBClient:
     def execute(self, sql, params=None):
         if params is None:
             params = []
+
+        # Determine endpoint: Modifying operations MUST go to /execute
+        # Even if they contain a SELECT (e.g., INSERT INTO ... SELECT)
+        modifying_keywords = ["INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "SET"]
+        is_modifying = any(keyword in sql.upper() for keyword in modifying_keywords)
         
-        # Determine endpoint
-        is_query = any(keyword in sql.upper() for keyword in ["SELECT", "PRAGMA", "SHOW", "DESCRIBE"])
-        endpoint = "/query" if is_query else "/execute"
-        
+        if is_modifying:
+            endpoint = "/execute"
+        else:
+            is_query = any(keyword in sql.upper() for keyword in ["SELECT", "PRAGMA", "SHOW", "DESCRIBE", "WITH", "EXPLAIN"])
+            endpoint = "/query" if is_query else "/execute"
+
         try:
             r = requests.post(f"{self.url}{endpoint}", json={"sql": sql, "params": params}, timeout=600)
             r.raise_for_status()

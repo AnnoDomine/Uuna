@@ -1,25 +1,103 @@
-name: Python CI
+name: Uuna Stability CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master, dev, stage]
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
 
 jobs:
-  lint:
+  stability-tests:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pandas requests ruff
-    - name: Lint with ruff
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        ruff check .
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies with uv
+        run: |
+          uv sync --frozen --all-extras
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v3
+        with:
+          node-version: "24"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install TUI dependencies
+        run: |
+          cd Tools/web/tui-node
+          pnpm install --frozen-lockfile
+
+      - name: Lint with ruff
+        run: |
+          uv run ruff check .
+
+      - name: Lint and Type-check TUI
+        run: |
+          cd Tools/web/tui-node
+          pnpm biome check .
+          pnpm tsc --noEmit
+
+      - name: Run Stability Tests (3x)
+        env:
+          GENERATE_REPORTS: "true"
+        run: |
+          chmod +x Tools/tests/run_all_tests_stable.sh
+          ./Tools/tests/run_all_tests_stable.sh
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            Data/test-reports/*.xml
+
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: Data/test-reports/
+
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            Data/logs/*.log
+            Tools/web/tui-node/npm-debug.log

@@ -1,52 +1,53 @@
 # Tools/toolsets/tools/system/get_task_context.py
-import os
 from pathlib import Path
-from typing import Dict, Any, List
-import sys
+from typing import Any, Dict
 
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-
-from core.db_client import DBClient
+from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path(__file__).parent / "queries" / "get_task_context"
 
+
 def _load_query(name: str) -> str:
-    with open(QUERY_DIR / f"{name}.sql", 'r') as f:
+    """Loads a SQL query from the tool's query directory."""
+    with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
-def get_task_context(db_client: DBClient, task_id: str) -> Dict[str, Any]:
+
+def get_task_context(task_id: str) -> Dict[str, Any]:
     """
-    Retrieves the full history and original intent of a research task.
-    Helps agents understand what has already been discovered and by whom.
+    Retrieves the full history and intent of a research task.
+
+    Args:
+    - task_id: The UUID of the task to retrieve.
     """
     try:
+        import json
         sql = _load_query("get_history")
-        res = db_client.execute(sql, [task_id]).fetchall()
-        
+        res = db.execute(sql, [task_id]).fetchall()
+
         if not res:
             return {"error": f"Task ID {task_id} not found."}
-            
+
         history = []
-        # Index 0: task_id, 1: original_query, 2: task_status
+        # Index 0: task_id, 1: original_query, 2: task_status, 3: assigned_builds
+        builds = res[0][3]
+        if isinstance(builds, str):
+            try:
+                builds = json.loads(builds)
+            except Exception:
+                pass
+
         task_info = {
-            "task_id": res[0][0],
-            "original_query": res[0][1],
-            "status": res[0][2]
+            "task_id": res[0][0], 
+            "original_query": res[0][1], 
+            "status": res[0][2],
+            "assigned_builds": builds
         }
-        
+
         for row in res:
-            if row[3]: # if event_id exists
-                history.append({
-                    "event_id": row[3],
-                    "agent": row[4],
-                    "output": row[5],
-                    "confidence": row[6]
-                })
-                
-        return {
-            "task": task_info,
-            "history": history
-        }
+            if row[4]:  # if event_id exists (index shifted by 1)
+                history.append({"event_id": row[4], "agent": row[5], "output": row[6], "confidence": row[7]})
+
+        return {"task": task_info, "history": history}
     except Exception as e:
         return {"error": str(e)}
