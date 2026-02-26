@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Dict, Any, Optional
 from .base import DBModel
 
+
 class TaskEvent(DBModel):
     event_id: UUID
     task_id: UUID

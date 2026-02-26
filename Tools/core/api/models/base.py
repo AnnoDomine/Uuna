@@ -1,12 +1,12 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, Type, ClassVar
+from pydantic import BaseModel
+from typing import Dict, Type, ClassVar
 from datetime import datetime
 from uuid import UUID
-import json
+
 
 class DBModel(BaseModel):
     """Base class for all internal toolkit tables."""
-    
+
     # Type mapping: Python -> DuckDB
     TYPE_MAP: ClassVar[Dict[Type, str]] = {
         str: "VARCHAR",
@@ -16,7 +16,7 @@ class DBModel(BaseModel):
         datetime: "TIMESTAMP",
         UUID: "UUID",
         dict: "JSON",
-        list: "JSON"
+        list: "JSON",
     }
 
     @classmethod
@@ -32,7 +32,7 @@ class DBModel(BaseModel):
         """Generates the CREATE TABLE statement."""
         schema = cls.get_schema()
         table = cls.get_table_name()
-        
+
         columns = []
         for name, field in cls.model_fields.items():
             # Get the base type
@@ -40,23 +40,23 @@ class DBModel(BaseModel):
             # Handle Optional/Union
             if hasattr(base_type, "__args__"):
                 base_type = base_type.__args__[0]
-            
+
             db_type = cls.TYPE_MAP.get(base_type, "VARCHAR")
-            
+
             # Special handling for Primary Keys
             pk_suffix = ""
             # Logic: A column is a PK if it's {model}_id, {table_singular}_id, or just 'id'
             model_prefix = cls.__name__.lower()
-            table_prefix = cls.get_table_name().lower().rstrip('s')
-            
+            table_prefix = cls.get_table_name().lower().rstrip("s")
+
             is_pk_candidate = (
-                name == f"{model_prefix}_id" or 
-                name == f"{table_prefix}_id" or 
-                name == "id" or
-                (name == "task_id" and cls.__name__ == "Task") or
-                (name == "event_id" and cls.__name__ == "TaskEvent") or
-                (name == "log_id" and cls.__name__ == "EventLog") or
-                (name == "score_id" and cls.__name__ == "ScoreBoard")
+                name == f"{model_prefix}_id"
+                or name == f"{table_prefix}_id"
+                or name == "id"
+                or (name == "task_id" and cls.__name__ == "Task")
+                or (name == "event_id" and cls.__name__ == "TaskEvent")
+                or (name == "log_id" and cls.__name__ == "EventLog")
+                or (name == "score_id" and cls.__name__ == "ScoreBoard")
             )
 
             if is_pk_candidate:
@@ -79,4 +79,4 @@ class DBModel(BaseModel):
             seq_sql = f"CREATE SEQUENCE IF NOT EXISTS {schema}.{table}_seq;\n"
 
         cols_str = ",\n    ".join(columns)
-        return f"{seq_sql}CREATE TABLE IF NOT EXISTS {schema}.\"{table}\" (\n    {cols_str}\n);"
+        return f'{seq_sql}CREATE TABLE IF NOT EXISTS {schema}."{table}" (\n    {cols_str}\n);'

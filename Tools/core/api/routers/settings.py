@@ -1,16 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any
-import duckdb
-import os
+from Tools.core.config_manager import ConfigManager, get_config
 
 router = APIRouter(prefix="/settings", tags=["settings"])
-DB_PATH = 'Data/WoW_Master.duckdb'
-QUERIES_PATH = "Tools/core/api/queries/settings"
-
-def _load_query(name: str) -> str:
-    with open(os.path.join(QUERIES_PATH, f"{name}.sql"), 'r') as f:
-        return f.read().strip()
 
 class SettingUpdate(BaseModel):
     key: str
@@ -18,20 +10,67 @@ class SettingUpdate(BaseModel):
 
 @router.get("/list")
 async def list_settings():
-    sql = _load_query("get_settings")
+    config = get_config()
+    # Flatten the config for the UI for backward compatibility
+    flat_settings = []
+    
+    config_dict = config.model_dump()
+    for group, settings in config_dict.items():
+        for key, value in settings.items():
+            flat_settings.append({
+                "key": f"{group}.{key}",
+                "value": str(value),
+                "description": f"Setting in group {group}"
+            })
+            
+    return {"settings": flat_settings}
+
+@router.get("/structure")
+async def get_settings_structure():
+    """Returns the dynamic structure of all settings groups and keys."""
     try:
-        with duckdb.connect(DB_PATH) as con:
-            res = con.execute(sql).fetchall()
-            return {"settings": [{"key": r[0], "value": r[1], "description": r[2]} for r in res]}
+        return ConfigManager.get_structure()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/update")
 async def update_setting(req: SettingUpdate):
-    sql = _load_query("update_setting")
     try:
-        with duckdb.connect(DB_PATH) as con:
-            con.execute(sql, [req.value, req.key])
+        config = ConfigManager.load_config()
+        
+        # Support dot notation: "ai.num_thread"
+        parts = req.key.split(".")
+        if len(parts) != 2:
+            raise HTTPException(status_code=400, detail="Key must be in format 'group.key'")
+        
+        group, key = parts
+        
+        if not hasattr(config, group):
+            raise HTTPException(status_code=404, detail=f"Group {group} not found")
+            
+        group_obj = getattr(config, group)
+        
+        if not hasattr(group_obj, key):
+            raise HTTPException(status_code=404, detail=f"Key {key} not found in group {group}")
+            
+        # Get target type for casting (Pydantic V2 style)
+        field = group_obj.model_fields[key]
+        target_type = field.annotation
+        
+        # Cast value (bool is tricky)
+        if target_type is bool:
+            casted_value = req.value.lower() in ("true", "1", "yes")
+        else:
+            # Handle possible Optional types or Unions if necessary, but here we assume simple types
+            casted_value = target_type(req.value)
+            
+        setattr(group_obj, key, casted_value)
+        
+        # Save validated config
+        ConfigManager.save_config(config)
+        
         return {"status": "success", "message": f"Setting {req.key} updated."}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=f"Invalid value for {req.key}: {ve}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

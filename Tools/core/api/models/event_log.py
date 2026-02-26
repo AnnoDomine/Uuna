@@ -1,6 +1,7 @@
 from uuid import UUID
 from .base import DBModel
 
+
 class EventLog(DBModel):
     log_id: int
     event_id: UUID

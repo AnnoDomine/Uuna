@@ -1,42 +1,31 @@
 import { Box, Text } from "ink";
 import type { FC } from "react";
-import Table from "../../atoms/Table/Table.js";
-import useTasks from "./tasks.hooks.js";
+import EventList from "../../organisms/TaskInspector/EventList/EventList.js";
+import TaskDetails from "../../organisms/TaskInspector/TaskDetails/TaskDetails.js";
+import TaskList from "../../organisms/TaskInspector/TaskList/TaskList.js";
+import { useTasksPage } from "./tasks.hooks.js";
 
 const Tasks: FC = () => {
-    const { tasks, isLoading, error } = useTasks();
+    const { error } = useTasksPage();
 
-    // Map data for the Table component
-    const tableData = tasks.map((task) => ({
-        ID: task.id.slice(0, 8),
-        Title: task.title,
-        Status: task.status.toUpperCase(),
-        Progress: `${task.progress}%`,
-        Updated: new Date(task.updated_at).toLocaleTimeString(),
-    }));
+    if (error) {
+        return (
+            <Box flexDirection="column" flexGrow={1} padding={1} width="100%">
+                <Text color="red">{error}</Text>
+            </Box>
+        );
+    }
 
     return (
-        <Box flexDirection="column" flexGrow={1} padding={1}>
-            <Box marginBottom={1}>
-                <Text color="#7aa2f7" bold>
-                    RESEARCH TASK MONITORING
-                </Text>
-            </Box>
+        <Box flexDirection="row" flexGrow={1} padding={1} width="100%">
+            {/* COLUMN 1: TASKS (25%) */}
+            <TaskList />
 
-            {isLoading && tasks.length === 0 && (
-                <Text color="yellow">Syncing with task queue...</Text>
-            )}
-            {error && <Text color="red">{error}</Text>}
+            {/* COLUMN 2: EVENTS (25%) - Visible only if task selected */}
+            <EventList />
 
-            {!isLoading && tasks.length === 0 && (
-                <Text color="gray">No active or historical tasks found.</Text>
-            )}
-
-            {tasks.length > 0 && (
-                <Box borderStyle="single" borderColor="#414868">
-                    <Table data={tableData} headerStyles={{ color: "magenta" }} />
-                </Box>
-            )}
+            {/* COLUMN 3: DETAILS (50%) - Split View */}
+            <TaskDetails />
         </Box>
     );
 };

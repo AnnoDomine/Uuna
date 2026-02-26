@@ -1,0 +1,15 @@
+2026-02-14 13:07:43.268 | INFO     | Tools.core.api.managers.vector_manager:_init_db:32 - Vector Database initialized at /home/hackmnin/private/UunaWantSomething/Data/knowledge/role_memory.duckdb
+INFO:     Started server process [299282]
+INFO:     Waiting for application startup.
+2026-02-14 13:07:43.972 | DEBUG    | Tools.core.api.migrations.manager:apply_model:34 - Migration for Task already applied. Skipping.
+2026-02-14 13:07:44.247 | DEBUG    | Tools.core.api.migrations.manager:apply_model:34 - Migration for TaskEvent already applied. Skipping.
+2026-02-14 13:07:44.457 | DEBUG    | Tools.core.api.migrations.manager:apply_model:34 - Migration for EventLog already applied. Skipping.
+2026-02-14 13:07:44.664 | DEBUG    | Tools.core.api.migrations.manager:apply_model:34 - Migration for ScoreBoard already applied. Skipping.
+2026-02-14 13:07:44.876 | DEBUG    | Tools.core.api.migrations.manager:apply_model:34 - Migration for Build already applied. Skipping.
+2026-02-14 13:07:44.912 | INFO     | Tools.core.api.main:startup_event:39 - Library API and Database Schemas are ready.
+[2026-02-14 13:07:44 - INFO - Task: N/A - Event: N/A - Role: System - Builds: [N/A]]: Library API and Database Schemas are ready.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('127.0.0.1INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [298782]

@@ -51,7 +51,7 @@ class TaskService {
         const { addLog } = useDebugStore.getState();
         try {
             addLog({
-                type: EFocusAreal as any,
+                type: ELogTypes.DEBUG,
                 message: `Fetching details for task ${taskId}`,
                 process: "TaskService",
             });

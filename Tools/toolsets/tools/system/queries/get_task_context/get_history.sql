@@ -2,6 +2,7 @@ SELECT
     t.task_id, 
     t.query as original_query, 
     t.status as task_status,
+    t.assigned_builds,
     e.event_id, 
     e.target_role, 
     e.output_data, 

@@ -4,6 +4,7 @@ export enum EFocusAreal {
     NAVIGATION = "navigation",
     CONTENT = "content",
     LOGS = "logs",
+    COMMAND = "command",
 }
 
 interface FocusState {
@@ -12,6 +13,6 @@ interface FocusState {
 }
 
 export const useFocusStore = create<FocusState>((set) => ({
-    activeAreal: EFocusAreal.NAVIGATION,
+    activeAreal: EFocusAreal.COMMAND,
     setActiveAreal: (areal) => set({ activeAreal: areal }),
 }));

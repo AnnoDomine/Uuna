@@ -1,9 +1,11 @@
 import axios from "axios";
-import { useInput } from "ink";
-import type { ControlledScrollViewRef } from "ink-scroll-view";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useImmer } from "use-immer";
+import useBackend from "../../hooks/useBackend.js";
+import { useScopedInput } from "../../hooks/useScopedInput.js";
 import useDebugStore from "../../store/useDebugStore.js";
+import { EFocusAreal } from "../../store/useFocusStore.js";
+import { useStore } from "../../store/useStore.js";
 import { ELogTypes } from "../../types/global.enums.js";
 import { API_BASE_URL } from "../../utils/constants/globals.js";
 import type { ISetting, ISettingsResponse } from "./settings.types.js";
@@ -12,10 +14,10 @@ const useSettings = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [settings, updateSettings] = useImmer<ISetting[]>([]);
-
-    const [scrollOffset, setScrollOffset] = useState(0);
-    const scrollRef = useRef<ControlledScrollViewRef>(null);
     const { addLog } = useDebugStore();
+
+    const { restartBackend } = useBackend();
+    const { isRestarting } = useStore();
 
     const fetchSettings = useCallback(async () => {
         setIsLoading(true);
@@ -33,10 +35,6 @@ const useSettings = () => {
                 message: `Loaded ${response.data.settings.length} settings`,
                 process: "useSettings",
             });
-
-            setTimeout(() => {
-                scrollRef.current?.remeasure();
-            }, 100);
         } catch (_err) {
             setError("Failed to fetch settings from API.");
             addLog({
@@ -81,34 +79,26 @@ const useSettings = () => {
         }
     };
 
-    const handleItemFocus = useCallback((index: number) => {
-        const scroll = scrollRef.current;
-        if (!scroll) return;
-
-        const position = scroll.getItemPosition(index);
-        if (!position) return;
-
-        const viewportHeight = scroll.getViewportHeight();
-        if (viewportHeight === 0) return;
-
-        setScrollOffset((current) => {
-            let newOffset = current;
-            if (position.top < current) {
-                newOffset = position.top;
-            } else if (position.top + position.height > current + viewportHeight) {
-                newOffset = position.top + position.height - viewportHeight;
+    // RESTART BACKEND: Scoped Focus + Return logic
+    const { isFocused: isRestartFocused } = useScopedInput({
+        id: "btn-restart-backend",
+        areal: EFocusAreal.CONTENT,
+        keyMap: (_input, key) => {
+            if (key.return) {
+                restartBackend();
             }
-            return newOffset;
-        });
-    }, []);
+        },
+    });
 
-    // Keyboard scrolling (Manual)
-    useInput((_input, key) => {
-        if (key.upArrow) setScrollOffset((prev) => Math.max(0, prev - 1));
-        if (key.downArrow) {
-            const max = scrollRef.current?.getBottomOffset() || 0;
-            setScrollOffset((prev) => Math.min(max, prev + 1));
-        }
+    // RELOAD: Scoped Focus + Return logic
+    const { isFocused: isReloadFocused } = useScopedInput({
+        id: "btn-reload-settings",
+        areal: EFocusAreal.CONTENT,
+        keyMap: (_input, key) => {
+            if (key.return) {
+                fetchSettings();
+            }
+        },
     });
 
     useEffect(() => {
@@ -119,11 +109,12 @@ const useSettings = () => {
         settings,
         isLoading,
         error,
-        scrollOffset,
-        scrollRef,
         fetchSettings,
         handleUpdateSetting,
-        handleItemFocus,
+        isRestarting,
+        restartBackend,
+        isRestartFocused,
+        isReloadFocused,
     };
 };
 

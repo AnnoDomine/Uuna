@@ -1,6 +1,5 @@
 import { Text } from "ink";
 import type { FC } from "react";
-import React from "react";
 
 interface ButtonProps {
     label: string;
@@ -9,13 +8,12 @@ interface ButtonProps {
     isActive?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({ label, onPress, color = "cyan", isActive = false }) => {
+const Button: FC<ButtonProps> = ({ label, color = "cyan", isActive = false }) => {
     return (
         <Text
             color={isActive ? "white" : color}
             backgroundColor={isActive ? color : undefined}
             bold
-            onPress={onPress}
         >
             {` [ ${label} ] `}
         </Text>

@@ -1,26 +1,26 @@
 # Tools/toolsets/tools/research/get_wago_structure.py
 import requests
-from typing import Optional
-import sys
-import os
-from pathlib import Path
 
-# Ensure path resolution
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-
-from core.db_client import DBClient
 from .fetch_web_content import _check_cache, _save_cache
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
 
-def get_wago_structure(db_client: DBClient, table_name: str, build_version: str, use_cache: bool = True) -> str:
+
+def get_wago_structure(table_name: str, build_version: str, use_cache: bool = True) -> str:
     """
     Fetches the DB2 structure (headers) from wago.tools for a given table and build.
+
+    Args:
+    - table_name: The name of the DB2 table.
+    - build_version: The WoW build version (e.g. '10.0.0.12345').
+    - use_cache: Whether to use the local cache (defaults to True).
     """
     csv_url = f"https://wago.tools/db2/{table_name}/csv?build={build_version}"
 
     if use_cache:
-        cached = _check_cache(db_client, csv_url)
+        cached = _check_cache(csv_url)
         if cached:
             print(f"INFO: Using cached Wago structure for {table_name}")
             return cached
@@ -39,7 +39,7 @@ def get_wago_structure(db_client: DBClient, table_name: str, build_version: str,
             if header_line:
                 result = f"Wago.tools Headers for {table_name}: {header_line}"
                 if use_cache:
-                    _save_cache(db_client, csv_url, result, "wago_structure")
+                    _save_cache(csv_url, result, "wago_structure")
                 return result
 
         return f"INFO: Wago.tools: No headers found for {table_name} in build {build_version}."
