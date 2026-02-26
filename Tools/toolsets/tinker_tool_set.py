@@ -2,9 +2,11 @@
 
 from .tools.tinker.assess_complexity import assess_complexity
 from .tools.tinker.assign_potential_score import assign_potential_score
+from .tools.tinker.assess_output_volume import assess_output_volume
 
 # The Tinker defines the "Reward Space" by analyzing task complexity.
 TINKER_TOOLS = [
     assess_complexity,
     assign_potential_score,
+    assess_output_volume,
 ]

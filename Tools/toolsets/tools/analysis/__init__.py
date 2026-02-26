@@ -1,9 +1,9 @@
 # Tools/toolsets/tools/analysis/__init__.py
-from .compare_builds import compare_builds
-from .extract_features import extract_features_for_build
-from .generate_relationship_map import generate_relationship_map
-from .guess_table_reference import guess_table_reference
-from .map_column_references_workflow import map_column_references_workflow
-from .perform_column_discovery import perform_column_discovery
-from .perform_column_mapping import perform_column_mapping
-from .run_mass_indexing import run_mass_indexing
+from .compare_builds import compare_builds as compare_builds
+from .extract_features import extract_features_for_build as extract_features_for_build
+from .generate_relationship_map import generate_relationship_map as generate_relationship_map
+from .guess_table_reference import guess_table_reference as guess_table_reference
+from .map_column_references_workflow import map_column_references_workflow as map_column_references_workflow
+from .perform_column_discovery import perform_column_discovery as perform_column_discovery
+from .perform_column_mapping import perform_column_mapping as perform_column_mapping
+from .run_mass_indexing import run_mass_indexing as run_mass_indexing

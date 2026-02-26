@@ -9,6 +9,10 @@ Data/dbs/*.db
 Data/logs/*.log
 Data/DB2_CSV/
 Data/DB2/
+Tools/**/*.log
+Tools/**/*.json
+Tools/web/src/store/*.json
+!Tools/web/**/*.json
 
 # Windows / OS
 Thumbs.db
@@ -18,18 +22,37 @@ Desktop.ini
 # VS Code
 .vscode/*
 !.vscode/settings.json
+!.vscode/extensions.json
 
 # WoW Addon Specific
 *.bak
 *.old
 *.lua.bak
 
+# Node
+node_modules
+
+
+
+# From dev defined (To AI: Do not remove)
+#########################################
+########## FROM DEV START ###############
+#########################################
+
 # Environment AI related
 ADDITIONAL_CONTEXT.md
-AGENT.md
 HISTORY.md
 *.jpg
 .venv
 Data
 .gemini
 addons
+AGENT.md
+.agents
+.ruff_cache
+.pytest_cache
+!docs/wiki/data
+
+#########################################
+######### FROM DEV END ##################
+#########################################

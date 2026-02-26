@@ -1,0 +1,39 @@
+name: Branch Enforcement Policy
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - stage
+
+jobs:
+  enforce-branching:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Branching Rules
+        shell: bash
+        run: |
+          BASE_BRANCH="${{ github.base_ref }}"
+          HEAD_BRANCH="${{ github.head_ref }}"
+          
+          echo "Base branch: $BASE_BRANCH"
+          echo "Head branch: $HEAD_BRANCH"
+          
+          # Rule 1: main/master only accepts PRs from stage
+          if [[ "$BASE_BRANCH" == "main" || "$BASE_BRANCH" == "master" ]]; then
+            if [[ "$HEAD_BRANCH" != "stage" ]]; then
+              echo "❌ ERROR: PRs to '$BASE_BRANCH' are only allowed from 'stage'. (Got: '$HEAD_BRANCH')"
+              exit 1
+            fi
+          fi
+          
+          # Rule 2: stage only accepts PRs from dev
+          if [[ "$BASE_BRANCH" == "stage" ]]; then
+            if [[ "$HEAD_BRANCH" != "dev" ]]; then
+              echo "❌ ERROR: PRs to 'stage' are only allowed from 'dev'. (Got: '$HEAD_BRANCH')"
+              exit 1
+            fi
+          fi
+          
+          echo "✅ Branching rules satisfied."

@@ -1,24 +1,24 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
 import uuid
 import json
-from ..models.task import Task
-from ..models.task_event import TaskEvent
 import duckdb
 import os
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
-DB_PATH = 'Data/WoW_Master.duckdb'
+DB_PATH = "Data/WoW_Master.duckdb"
 QUERIES_PATH = "Tools/core/api/queries/tasks"
 
+
 def _load_query(name: str) -> str:
-    with open(os.path.join(QUERIES_PATH, f"{name}.sql"), 'r') as f:
+    with open(os.path.join(QUERIES_PATH, f"{name}.sql"), "r") as f:
         return f.read().strip()
+
 
 class TaskCreateRequest(BaseModel):
     objective: str
     initiator: str = "User"
+
 
 @router.post("/create")
 async def create_task(req: TaskCreateRequest):
@@ -32,6 +32,7 @@ async def create_task(req: TaskCreateRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/{task_id}")
 async def get_task(task_id: str):
     sql = _load_query("get_task")
@@ -40,3 +41,58 @@ async def get_task(task_id: str):
         if not res:
             raise HTTPException(status_code=404, detail="Task not found")
         return {"task": res}
+
+
+@router.get("/list/all")
+async def list_tasks():
+    try:
+        sql = _load_query("list_tasks")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql)
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"tasks": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/{task_id}/events")
+async def get_task_events(task_id: str):
+    try:
+        sql = _load_query("get_task_events")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql, [task_id])
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"events": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/{task_id}/scores")
+async def get_task_scores(task_id: str):
+    try:
+        sql = _load_query("get_task_scores")
+        with duckdb.connect(DB_PATH) as con:
+            cursor = con.execute(sql, [task_id])
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            result = []
+            for row in rows:
+                result.append(dict(zip(columns, row)))
+
+        return {"scores": result}
+    except Exception:
+        # Fallback empty list if table doesn't exist or other error
+        return {"scores": []}

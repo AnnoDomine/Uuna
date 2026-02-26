@@ -1,72 +1,65 @@
 # Tools/tests/toolset_tests/tools/analysis/test_generate_relationship_map.py
 import unittest
 from unittest.mock import MagicMock, patch
+from Tools.toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
+from Tools.core.db_client import DBResult
+
 import sys
-import os
-import json
 
-# Add Tools to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+grm_module = sys.modules["Tools.toolsets.tools.analysis.generate_relationship_map"]
 
-import toolsets.tools.analysis.generate_relationship_map
-grm_module = sys.modules['toolsets.tools.analysis.generate_relationship_map']
-from toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
-from core.db_client import DBClient, DBResult
 
 class TestGenerateRelationshipMap(unittest.TestCase):
-
     def test_orchestration_flow(self):
-        with patch.object(grm_module, 'get_confirmed_mappings') as mock_get_mappings, \
-             patch.object(grm_module, 'save_mermaid_diagram') as mock_save_diagram, \
-             patch('core.db_client.DBClient') as MockDBClient:
-            
+        with (
+            patch.object(grm_module, "get_confirmed_mappings") as mock_get_mappings,
+            patch.object(grm_module, "save_mermaid_diagram") as mock_save_diagram,
+            patch("Tools.toolsets.tools.analysis.generate_relationship_map.db") as mock_db,
+        ):
             # --- Mock Setup ---
-            mock_db_client = MockDBClient.return_value
             # Simulate cache miss for mermaid docs
-            mock_db_client.execute.return_value = DBResult({"results": []})
+            mock_db.execute.return_value = DBResult({"results": []})
 
             # 2. Mock the AI function
             mock_ai_response = {"mermaid": "erDiagram\nFAKE_DATA", "description": "A fake diagram"}
             mock_ask_ai_func = MagicMock(return_value=mock_ai_response)
-            
+
             # 3. Configure the patched tool mocks
             mock_mappings_data = [("table1", "col1", "table2")]
             mock_get_mappings.return_value = mock_mappings_data
-            
+
             mock_save_status = "SUCCESS: Diagram saved to Data/maps/Build_Map_11.0.0.mmd"
             mock_save_diagram.return_value = mock_save_status
-            
+
             # --- Test Data ---
             build_version = "11.0.0"
 
             # --- Test Execution ---
-            result = generate_relationship_map(mock_db_client, mock_ask_ai_func, build_version)
+            result = generate_relationship_map(mock_ask_ai_func, build_version)
 
             # --- Assertions ---
             # Assert that the dependent tools were called correctly
-            mock_get_mappings.assert_called_once_with(mock_db_client, build_version)
+            mock_get_mappings.assert_called_once_with(build_version)
             mock_ask_ai_func.assert_called_once()
-            
+
             # Assert that the save function was called with the mermaid code from the AI
             mock_save_diagram.assert_called_once_with(
-                name="Build_Map",
-                content=mock_ai_response["mermaid"],
-                build_version=build_version
+                name="Build_Map", content=mock_ai_response["mermaid"], build_version=build_version
             )
-            
+
             # Assert that the final status is the one returned by the save function
             assert result == mock_save_status
 
     def test_no_mappings_found(self):
-        with patch.object(grm_module, 'get_confirmed_mappings', return_value=[]):
-            mock_db_client = MagicMock()
+        with patch.object(grm_module, "get_confirmed_mappings", return_value=[]):
             mock_ask_ai_func = MagicMock()
 
-            result = generate_relationship_map(mock_db_client, mock_ask_ai_func, "11.0.0")
+            result = generate_relationship_map(mock_ask_ai_func, "11.0.0")
 
             # Assert no AI call or save was attempted
             mock_ask_ai_func.assert_not_called()
             assert result.startswith("INFO: No confirmed mappings found")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

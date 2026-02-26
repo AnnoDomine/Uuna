@@ -1,0 +1,44 @@
+import { Box, Text } from "ink";
+import Spinner from "ink-spinner";
+import type { FC } from "react";
+import ScrollableSelection from "../../../molecules/ScrollableSelection/ScrollableSelection.js";
+import { EFocusAreal } from "../../../store/useFocusStore.js";
+import { useEventList } from "./EventList.hooks.js";
+
+const EventList: FC = () => {
+    const { eventItems, selectedTaskId, selectedEventId, selectEvent, isLoadingEvents } =
+        useEventList();
+
+    if (!selectedTaskId) {
+        return null;
+    }
+
+    return (
+        <Box
+            width="25%"
+            flexDirection="column"
+            borderStyle="single"
+            borderColor={selectedEventId ? "white" : "green"}
+            marginRight={1}
+        >
+            <Box marginBottom={1} paddingX={1}>
+                {isLoadingEvents && <Spinner type="timeTravel" />}
+                <Text bold color="cyan">
+                    EVENTS ({eventItems.length})
+                </Text>
+            </Box>
+            <ScrollableSelection
+                id="event-list-selection"
+                items={eventItems}
+                onSelect={(eventId) => selectEvent(eventId)}
+                options={{
+                    height: "100%",
+                    areal: EFocusAreal.CONTENT,
+                    mark_first_item_after_select: false,
+                }}
+            />
+        </Box>
+    );
+};
+
+export default EventList;

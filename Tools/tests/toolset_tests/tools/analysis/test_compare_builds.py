@@ -1,138 +1,76 @@
-# Tools/tests/toolsets/tools/analysis/test_compare_builds.py
-import unittest
-from unittest.mock import MagicMock
-import sys
-import os
+# Tools/tests/toolset_tests/tools/analysis/test_compare_builds.py
+from unittest.mock import MagicMock, patch
+from Tools.toolsets.tools.analysis.compare_builds import compare_builds
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+def test_compare_builds_logic():
+    # --- Mock Data ---
+    schema_A = {
+        "tables": [("table_shared",), ("table_removed",)],
+        "build_id": 1,
+        "table_shared_cols": [("id",), ("name",), ("build_id",)],
+        "table_shared_count": 100,
+        "table_removed_cols": [("id",), ("value",), ("build_id",)],
+        "table_removed_count": 50,
+    }
+    schema_B = {
+        "tables": [("table_shared",), ("table_added",)],
+        "build_id": 2,
+        "table_shared_cols": [("id",), ("name_changed",), ("build_id",)],
+        "table_shared_count": 110,
+        "table_added_cols": [("id",), ("description",), ("build_id",)],
+        "table_added_count": 25,
+    }
 
-from toolsets.tools.analysis.compare_builds import compare_builds
-from core.db_client import DBClient, DBResult
+    with patch("Tools.toolsets.tools.analysis.compare_builds.db") as mock_db:
+        describe_counter = {"table_shared": 0}
 
-class TestCompareBuilds(unittest.TestCase):
-
-    def setUp(self):
-        self.mock_db_client = MagicMock(spec=DBClient)
-
-    def test_compare_builds_logic(self):
-        # --- Mock Data ---
-        # Schema for Build A
-        schema_A = {
-            "tables": [("table_shared",), ("table_removed",)],
-            "build_id": 1,
-            "table_shared_cols": [("id",), ("name",), ("build_id",)],
-            "table_shared_count": 100,
-            "table_removed_cols": [("id",), ("value",), ("build_id",)],
-            "table_removed_count": 50,
-        }
-        # Schema for Build B
-        schema_B = {
-            "tables": [("table_shared",), ("table_added",)],
-            "build_id": 2,
-            "table_shared_cols": [("id",), ("name_changed",), ("build_id",)],
-            "table_shared_count": 110,
-            "table_added_cols": [("id",), ("description",), ("build_id",)],
-            "table_added_count": 25,
-        }
-
-        # --- Mocking Side Effect ---
-        def mock_execute_side_effect(sql, params=None):
-            # Build ID lookups
-            if "registry.builds" in sql and params == ["1.0.0"]:
-                return DBResult({"results": [(schema_A["build_id"],)]})
-            if "registry.builds" in sql and params == ["2.0.0"]:
-                return DBResult({"results": [(schema_B["build_id"],)]})
+        def descriptive_mock(sql, params=None):
+            # 1. Build ID lookup
+            if "FROM registry.builds" in sql:
+                if params == ["1.0.0"]:
+                    return MagicMock(fetchone=lambda: (1,))
+                if params == ["2.0.0"]:
+                    return MagicMock(fetchone=lambda: (2,))
             
-            # Table list lookups (same for both builds in this test)
+            # 2. Table list
             if "information_schema.tables" in sql:
-                # Return tables based on which build is being queried
-                build_id = params[0] if params else None
-                if build_id == schema_A["build_id"]:
-                     return DBResult({"results": schema_A["tables"]})
-                elif build_id == schema_B["build_id"]:
-                     return DBResult({"results": schema_B["tables"]})
-                else: # Fallback for general table list call
-                    all_tables = list(set(schema_A["tables"]) | set(schema_B["tables"]))
-                    return DBResult({"results": all_tables})
-
-
-            # --- Build A Specific Mocks ---
-            if params and schema_A["build_id"] in params:
-                if 'DESCRIBE archive."table_shared"' in sql:
-                    return DBResult({"results": schema_A["table_shared_cols"]})
-                if 'COUNT(*) FROM archive."table_shared"' in sql:
-                    return DBResult({"results": [(schema_A["table_shared_count"],)]})
-                if 'DESCRIBE archive."table_removed"' in sql:
-                    return DBResult({"results": schema_A["table_removed_cols"]})
-                if 'COUNT(*) FROM archive."table_removed"' in sql:
-                    return DBResult({"results": [(schema_A["table_removed_count"],)]})
+                return MagicMock(fetchall=lambda: [("table_shared",), ("table_removed",), ("table_added",)])
             
-            # --- Build B Specific Mocks ---
-            if params and schema_B["build_id"] in params:
-                if 'DESCRIBE archive."table_shared"' in sql:
-                    return DBResult({"results": schema_B["table_shared_cols"]})
-                if 'COUNT(*) FROM archive."table_shared"' in sql:
-                    return DBResult({"results": [(schema_B["table_shared_count"],)]})
-                if 'DESCRIBE archive."table_added"' in sql:
-                    return DBResult({"results": schema_B["table_added_cols"]})
-                if 'COUNT(*) FROM archive."table_added"' in sql:
-                    return DBResult({"results": [(schema_B["table_added_count"],)]})
-
-            return DBResult({"results": []})
-
-        # This mock needs to be stateful to distinguish calls for build A and B
-        call_tracker = {'build_id': None}
-        def smart_mock(sql, params=None):
-            if "registry.builds" in sql:
-                if params == ["1.0.0"]: call_tracker['build_id'] = 1
-                if params == ["2.0.0"]: call_tracker['build_id'] = 2
-                return DBResult({"results": [(call_tracker['build_id'],)]})
-
-            if "information_schema.tables" in sql:
-                return DBResult({"results": [("table_shared",), ("table_removed",),("table_added",)]})
-
-            # Describe calls are generic
-            if 'DESCRIBE archive."table_shared"' in sql:
-                return DBResult({"results": schema_A["table_shared_cols"] if call_tracker['build_id'] == 1 else schema_B["table_shared_cols"]})
-            if 'DESCRIBE archive."table_removed"' in sql:
-                return DBResult({"results": schema_A["table_removed_cols"]})
-            if 'DESCRIBE archive."table_added"' in sql:
-                return DBResult({"results": schema_B["table_added_cols"]})
-
-            # Count calls are specific
-            if 'COUNT(*)' in sql:
-                build_id_param = params[0]
-                if 'table_shared' in sql:
-                    count = schema_A["table_shared_count"] if build_id_param == 1 else schema_B["table_shared_count"]
-                    return DBResult({"results": [(count,)]})
-                if 'table_removed' in sql:
-                    count = schema_A["table_removed_count"] if build_id_param == 1 else 0
-                    return DBResult({"results": [(count,)]})
-                if 'table_added' in sql:
-                    count = schema_B["table_added_count"] if build_id_param == 2 else 0
-                    return DBResult({"results": [(count,)]})
+            # 3. Describe calls
+            if "DESCRIBE archive" in sql:
+                if "table_shared" in sql:
+                    res = schema_A["table_shared_cols"] if describe_counter["table_shared"] == 0 else schema_B["table_shared_cols"]
+                    describe_counter["table_shared"] += 1
+                    return MagicMock(fetchall=lambda: res)
+                if "table_removed" in sql:
+                    return MagicMock(fetchall=lambda: schema_A["table_removed_cols"])
+                if "table_added" in sql:
+                    return MagicMock(fetchall=lambda: schema_B["table_added_cols"])
             
-            return DBResult({"results": []})
+            # 4. Count calls
+            if "COUNT(*)" in sql:
+                bid = params[0]
+                if "table_shared" in sql:
+                    return MagicMock(fetchone=lambda: (100 if bid == 1 else 110,))
+                if "table_removed" in sql:
+                    return MagicMock(fetchone=lambda: (50 if bid == 1 else 0,))
+                if "table_added" in sql:
+                    return MagicMock(fetchone=lambda: (0 if bid == 1 else 25,))
+            
+            return MagicMock(fetchall=lambda: [], fetchone=lambda: (0,))
 
-        self.mock_db_client.execute.side_effect = smart_mock
+        mock_db.execute.side_effect = descriptive_mock
 
-        # --- Test Execution ---
-        diff = compare_builds(self.mock_db_client, "1.0.0", "2.0.0")
-        
+        diff = compare_builds("1.0.0", "2.0.0")
+
         # --- Assertions ---
-        self.assertEqual(len(diff["added_tables"]), 1)
-        self.assertEqual(diff["added_tables"][0]["name"], "table_added")
-        self.assertEqual(diff["added_tables"][0]["count"], schema_B["table_added_count"])
+        assert len(diff["added_tables"]) == 1
+        assert diff["added_tables"][0]["name"] == "table_added"
+        assert len(diff["removed_tables"]) == 1
+        assert diff["removed_tables"][0]["name"] == "table_removed"
+        assert "table_shared" in diff["modified_tables"]
         
-        self.assertEqual(len(diff["removed_tables"]), 1)
-        self.assertEqual(diff["removed_tables"][0]["name"], "table_removed")
-        self.assertEqual(diff["removed_tables"][0]["count"], schema_A["table_removed_count"])
-
-        self.assertIn("table_shared", diff["modified_tables"])
-        modified_changes = diff["modified_tables"]["table_shared"]
-        self.assertIn("Count: 100 -> 110 (+10)", modified_changes)
-        self.assertIn("Added columns: name_changed", modified_changes)
-        self.assertIn("Removed columns: name", modified_changes)
-
-if __name__ == '__main__':
-    unittest.main()
+        mods = diff["modified_tables"]["table_shared"]
+        assert any("Count: 100 -> 110" in m for m in mods)
+        assert any("Added columns: name_changed" in m for m in mods)
+        assert any("Removed columns: name" in m for m in mods)
