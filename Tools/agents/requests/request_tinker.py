@@ -1,5 +1,4 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.request_observer import request_observer
 from Tools.agents.requests.agent_models import TinkerAssessment
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tinker_tool_set import assign_potential_score
@@ -11,6 +10,8 @@ def request_tinker(task_id: str):
     """
     Calculates the 'Max Potential' score for a task and its events.
     """
+    from Tools.agents.requests.request_observer import request_observer
+
     try:
         notify_frontend(task_id, "Tinker: Calculating quantitative difficulty scores...", agent="Tinker", type="research")
         

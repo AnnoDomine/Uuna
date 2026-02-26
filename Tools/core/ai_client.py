@@ -56,8 +56,8 @@ class AIClient:
                 return data[wrapper]
         return data
 
-    def ask_direct(self, payload: dict, temperature: float = 0.1) -> Dict[str, Any]:
-        return self.make_request(payload, temperature)
+    def ask_direct(self, payload: dict, temperature: float = 0.1, role: str = "system") -> Dict[str, Any]:
+        return self.make_request(payload, role, temperature)
 
     def ask(self, role: Agents, prompt: str, temperature: float = 0.1) -> Dict[str, Any]:
         """Bridge to the local LLM via Ollama."""

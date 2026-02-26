@@ -12,6 +12,7 @@ interface AppState {
 
 interface AppActions {
     setCurrentPage: BasicFunction<[ENavigationItems]>;
+    setCurrentBuild: BasicFunction<[string]>;
     setApiOnline: BasicFunction<[boolean]>;
     setAgents: BasicFunction<[number]>;
     setRestarting: BasicFunction<[boolean]>;
@@ -24,6 +25,7 @@ export const useStore = create<AppState & AppActions>((set) => ({
     currentBuild: "Midnight 12.0.0",
     isRestarting: false,
     setCurrentPage: (page) => set({ currentPage: page }),
+    setCurrentBuild: (build) => set({ currentBuild: build }),
     setApiOnline: (status) => set({ apiOnline: status }),
     setAgents: (count) => set({ activeAgents: count }),
     setRestarting: (status) => set({ isRestarting: status }),

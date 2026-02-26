@@ -1,5 +1,4 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.request_courier import request_courier_from_sages
 from Tools.agents.requests.agent_models import ApprovalStatus, SageVerdict
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
@@ -10,6 +9,8 @@ def request_sages(task_id: str):
     """
     The Sages check if the task is valid to send to the user.
     """
+    from Tools.agents.requests.request_courier import request_courier_from_sages
+
     try:
         notify_frontend(task_id, "Sages: Reviewing task logic and consistency...", agent="Sages", type="research")
         

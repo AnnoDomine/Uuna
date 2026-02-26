@@ -3,10 +3,12 @@ import { useImmer } from "use-immer";
 import { type InputCallback, useScopedInput } from "../../hooks/useScopedInput.js";
 import useAIStore, { EActors } from "../../store/useAIStore.js";
 import { EFocusAreal } from "../../store/useFocusStore.js";
+import { useStore } from "../../store/useStore.js";
 
 export const useHome = () => {
     const { chat, addChat, isUninitialised, isLoading, isFetching, isErrored, error } =
         useAIStore();
+    const { setCurrentBuild } = useStore();
 
     const showSpinner = isUninitialised || isLoading || isFetching;
 
@@ -21,9 +23,11 @@ export const useHome = () => {
         if (selectedBuild === val) {
             // De-select
             setSelectedBuild("");
+            setCurrentBuild("Midnight 12.0.0"); // Fallback to default
             return;
         }
         setSelectedBuild(val);
+        setCurrentBuild(val);
     };
 
     const handleSubmit = () => {

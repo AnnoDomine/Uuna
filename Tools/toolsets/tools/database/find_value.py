@@ -44,6 +44,8 @@ def find_value(search_term: str, build_version: Optional[str] = None) -> Dict[st
     count_with_build_template = _load_query("count_matches_with_build.sql")
 
     for table in tables:
+        if table == "build_data_map":
+            continue
         try:
             # 2. Get columns for the current table
             describe_sql = describe_template.format(table_name=table)

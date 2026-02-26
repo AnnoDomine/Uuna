@@ -2,18 +2,18 @@
 from pathlib import Path
 from typing import Optional
 
-import requests
+# We use curl_cffi to impersonate a real browser TLS fingerprint
+# This is essential to bypass Cloudflare 403 Forbidden errors.
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 from Tools.core.shared_db_instance import db
 
-USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-)
 QUERY_DIR = Path(__file__).parent / "queries" / "cache"
 
 
 def _load_query(name: str) -> str:
+    """Loads a SQL query from the tool's query directory."""
     with open(QUERY_DIR / f"{name}.sql", "r") as f:
         return f.read().strip()
 
@@ -52,7 +52,8 @@ def sanitize_html(html_content: str) -> str:
 
 def fetch_web_content(url: str, use_cache: bool = True) -> str:
     """
-    Fetches, sanitizes, and optionally caches web content from a given URL.
+    Fetches, sanitizes, and optionally caches web content.
+    Uses curl_cffi to impersonate Chrome and bypass bot protection.
 
     Args:
     - url: The target URL to fetch.
@@ -64,18 +65,43 @@ def fetch_web_content(url: str, use_cache: bool = True) -> str:
             print(f"INFO: Using cached content for: {url}")
             return cached
 
-    print(f"INFO: Fetching web content: {url}")
+    print(f"INFO: Fetching web content via curl_cffi (impersonate=chrome): {url}")
     try:
-        headers = {"User-Agent": USER_AGENT, "Referer": "https://warcraft.wiki.gg/"}
-        response = requests.get(url, headers=headers, timeout=15)
+        # Use headers that look like a real browser based on provided data
+        headers = {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "accept-language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cache-control": "no-cache",
+            "pragma": "no-cache",
+            "sec-ch-ua": '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "referer": "https://www.google.com/"
+        }
+        
+        # impersonate="chrome" handles TLS fingerprinting and HTTP/2 pseudo-headers automatically
+        response = requests.get(
+            url, 
+            headers=headers, 
+            impersonate="chrome120", 
+            timeout=20,
+            allow_redirects=True
+        )
+        
         response.raise_for_status()
-
+        
         sanitized = sanitize_html(response.text)
 
         if use_cache and sanitized:
             _save_cache(url, sanitized, "html")
 
         return sanitized
+            
     except Exception as e:
         error_msg = f"ERROR: Could not fetch content from {url} - {e}"
         print(error_msg)

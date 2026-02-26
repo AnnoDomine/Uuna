@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, Callable, Dict, List, Type
+import json
+from typing import Any, Callable, Dict, List, Type, Union
 from pydantic import BaseModel, Field
 
 from Tools.agents.get_agent_skill_set import Agents
@@ -73,10 +74,11 @@ def parse_tools_to_prompt(tools: List[Callable]) -> str:
 
 def request_tool_selection(
     task_id: str, 
-    event: dict, 
+    event: Union[dict, list], 
     role: Agents, 
     tools: List[Callable],
-    response_model: Type[BaseModel] = DefaultToolSelection
+    response_model: Type[BaseModel] = DefaultToolSelection,
+    task_context: dict = None
 ) -> dict:
     """
     Asks the agent to select the best tool for the current task context.
@@ -84,14 +86,24 @@ def request_tool_selection(
     notify_frontend(task_id, f"{role.value}: Selecting optimal tool...", agent=role.value, type="research")
 
     try:
-        event_input = event.get("input_data", "No input data")
+        # Handle both initial event (dict) and loop history (list)
+        if isinstance(event, dict):
+            event_input = event.get("input_data", "No input data")
+        else:
+            # For lists, provide a summarized string representation of the history
+            event_input = json.dumps(event, indent=2)
+
+        task_info = ""
+        if task_context:
+            task_info = f"\nTASK CONTEXT:\n- Objective: {task_context.get('task', {}).get('original_query')}\n- BUILDS: {task_context.get('task', {}).get('assigned_builds')}\n"
+
         tools_prompt = parse_tools_to_prompt(tools)
 
         payload = {
             "messages": [
                 {
                     "role": "system",
-                    "content": "Based on the EVENT INPUT, select the best tool and provide the necessary parameters.",
+                    "content": f"You are the {role.value}. Based on the EVENT INPUT and the TASK CONTEXT, select the best tool and provide the necessary parameters.{task_info}",
                 },
                 {
                     "role": "user",
@@ -123,13 +135,17 @@ def is_event_finished(
     Asks the agent if the current event is fully resolved.
     """
     try:
+        # Format complex data for the prompt
+        formatted_input = json.dumps(input_data, indent=2) if not isinstance(input_data, str) else input_data
+        formatted_output = json.dumps(output_data, indent=2) if not isinstance(output_data, str) else output_data
+
         payload = {
             "messages": [
                 {
                     "role": "system",
                     "content": "Compare the input from the current event with the output and decide if the event is finished.",
                 },
-                {"role": "user", "content": f"INPUT:\n{input_data}\n\nOUTPUT:\n{output_data}"},
+                {"role": "user", "content": f"INPUT:\n{formatted_input}\n\nOUTPUT:\n{formatted_output}"},
             ]
         }
 

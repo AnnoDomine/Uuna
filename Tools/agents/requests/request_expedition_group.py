@@ -1,10 +1,9 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.request_sentinel import request_sentinel
-from Tools.agents.requests.agent_models import LoreResearchStatus
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.expedition_group_tool_set import EXPEDITION_GROUP_TOOLS
 from Tools.toolsets.tools.courier.orchestration_helper import request_tool_selection, is_event_finished
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
+from Tools.agents.requests.agent_models import LoreResearchStatus
 
 TOOLS_MAP = {f.__name__: f for f in EXPEDITION_GROUP_TOOLS}
 
@@ -13,6 +12,8 @@ def request_expedition_group(task_id: str, event_id: str):
     """
     Handles online research and lore exploration for the Expedition Group.
     """
+    from Tools.agents.requests.request_sentinel import request_sentinel
+
     is_finish = False
     request_try = 0
     output = []
@@ -20,6 +21,10 @@ def request_expedition_group(task_id: str, event_id: str):
     try:
         notify_frontend(task_id, "Expedition Group: Starting online research...", agent="Expedition Group", type="research")
         
+        task_ctx = global_tool_set.get_task_context(task_id=task_id)
+        if "error" in task_ctx:
+            raise Exception(task_ctx["error"])
+
         event_ctx = global_tool_set.get_event_data(event_id=event_id)
         if "error" in event_ctx:
             raise Exception(event_ctx["error"])
@@ -29,8 +34,10 @@ def request_expedition_group(task_id: str, event_id: str):
         while not is_finish and request_try < 5:
             request_try += 1
 
-            # Decide tool to use
-            tool_call = request_tool_selection(task_id, current_input, Agents.EXPEDITION_GROUP, EXPEDITION_GROUP_TOOLS)
+            # Decide tool to use with task context
+            tool_call = request_tool_selection(
+                task_id, current_input, Agents.EXPEDITION_GROUP, EXPEDITION_GROUP_TOOLS, task_context=task_ctx
+            )
             if "error" in tool_call:
                 raise Exception(tool_call["error"])
             
@@ -45,9 +52,9 @@ def request_expedition_group(task_id: str, event_id: str):
             tool_result = tool_func(**props)
             output.append({"tool": tool_name, "result": tool_result})
             
-            # Check if objective is reached with specialized model
+            # Check if objective is reached with specialized model and full history
             is_finish = is_event_finished(
-                task_id, event_ctx, tool_result, Agents.EXPEDITION_GROUP, response_model=LoreResearchStatus
+                task_id, event_ctx, output, Agents.EXPEDITION_GROUP, response_model=LoreResearchStatus
             )
             current_input = output
 

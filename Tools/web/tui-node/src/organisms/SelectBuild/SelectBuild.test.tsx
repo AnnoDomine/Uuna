@@ -60,10 +60,10 @@ describe("useSelectBuild", () => {
 
         expect(result?.parsedBuilds).toHaveLength(2);
         expect(result?.parsedBuilds[0]).toEqual({
-            id: "10.0.0.12345",
-            value: "10.0.0.12345",
-            label: "10.0.0.12345",
-            meta: mockBuilds[0],
+            id: "10.0.0.12346",
+            value: "10.0.0.12346",
+            label: "10.0.0.12346",
+            meta: mockBuilds[1],
         });
     });
 

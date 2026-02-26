@@ -89,6 +89,8 @@ type AIStore = {
     isErrored: boolean;
     error: string | null;
     chat: LogChatItem[];
+    selectedBuild: string;
+    setSelectedBuild: (build: string) => void;
     addChat: (newMessage: string) => void;
     receiveSignal: (signal: FrontendSignal) => void;
     initialiseChat: () => Promise<void>;
@@ -102,6 +104,8 @@ const useAIStore = create<AIStore>((set, get) => ({
     isErrored: false,
     error: null,
     chat: [],
+    selectedBuild: "",
+    setSelectedBuild: (build) => set(() => ({ selectedBuild: build })),
     receiveSignal: (signal) => {
         const storeState = new Set(get().chat);
 
@@ -128,7 +132,7 @@ const useAIStore = create<AIStore>((set, get) => ({
         };
 
         storeState.add(signalMessage);
-        const sortedChat = [...storeState].sort((a, b) => a.timestamp - b.timestamp);
+        const sortedChat = [...storeState].sort((a, b) => a.timestamp - b.timestamp).slice(-100);
 
         set(() => ({
             chat: sortedChat,
@@ -157,13 +161,15 @@ const useAIStore = create<AIStore>((set, get) => ({
             set(() => ({
                 chat: [...storeState].sort((a, b) => a.timestamp - b.timestamp),
             }));
-            const { currentBuild } = (await import("./useStore.js")).useStore.getState();
+            const { builds } = (await import("./useBuildsStore.js")).useBuildsStore.getState();
+
+            const usedBuild = get().selectedBuild || builds.reverse()[0].version;
 
             const { data } = await axios.post<AIAnswer>(
                 `${API_BASE_URL}/ai/ask`,
                 {
                     prompt: userMessage.message,
-                    builds: [currentBuild],
+                    builds: [usedBuild],
                 },
                 /**
                  * Timeout -> 10 min
@@ -181,10 +187,11 @@ const useAIStore = create<AIStore>((set, get) => ({
                 id: uuidv4(),
             };
             storeState.add(aiMessage);
+            const finalChat = [...storeState].sort((a, b) => a.timestamp - b.timestamp).slice(-100);
             set(() => ({
-                chat: [...storeState].sort((a, b) => a.timestamp - b.timestamp),
+                chat: finalChat,
             }));
-            await writeChatLog([...storeState].sort((a, b) => a.timestamp - b.timestamp));
+            await writeChatLog(finalChat);
             set(() => ({
                 isSucceeded: true,
             }));

@@ -47,7 +47,7 @@ def request_with_schema(
     config = get_config()
     limit = config.ai.memory_limit
     
-    user_msgs = [m["content"] for m in payload.get("messages", []) if m["role"] == "user"]
+    user_msgs = [m.get("content", "") for m in payload.get("messages", []) if m.get("role") == "user"]
     search_query = user_msgs[-1] if user_msgs else ""
     
     memory_context = ""

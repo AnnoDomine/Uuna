@@ -15,6 +15,7 @@ con = None
 # Security configuration
 FORBIDDEN_DESTRUCTIVE = re.compile(r"\b(DROP|DELETE|TRUNCATE|GRANT|REVOKE|DETACH)\b", re.IGNORECASE)
 ALLOWED_QUERY_START = re.compile(r"^\s*(SELECT|PRAGMA|DESCRIBE|SHOW|EXPLAIN|WITH)\b", re.IGNORECASE)
+ALLOWED_EXECUTE_START = re.compile(r"^\s*(INSERT|UPDATE|CREATE|ALTER|PRAGMA|SET)\b", re.IGNORECASE)
 
 
 def validate_sql(sql: str, read_only: bool = False):
@@ -25,19 +26,28 @@ def validate_sql(sql: str, read_only: bool = False):
     
     # 1. Block multiple statements (semicolon injection)
     if ";" in clean_sql:
-        # Only allow a single semicolon if it's at the very end
-        if not clean_sql.endswith(";") or clean_sql.count(";") > 1:
-            raise HTTPException(status_code=403, detail="Multiple SQL statements per request are forbidden.")
+        # Only allow multiple statements if they are all within the ALLOWED range
+        # For simplicity, we check if it's a series of CREATE/INSERT
+        statements = [s.strip() for s in clean_sql.split(";") if s.strip()]
+        if len(statements) > 1:
+            for s in statements:
+                if read_only and not ALLOWED_QUERY_START.match(s):
+                    raise HTTPException(status_code=403, detail="Forbidden multi-statement in query endpoint.")
+                if not read_only and not ALLOWED_EXECUTE_START.match(s):
+                    raise HTTPException(status_code=403, detail="Forbidden multi-statement in execute endpoint.")
 
     # 2. Check for destructive keywords (always forbidden for this API)
     if FORBIDDEN_DESTRUCTIVE.search(clean_sql):
         match = FORBIDDEN_DESTRUCTIVE.search(clean_sql).group(1)
         raise HTTPException(status_code=403, detail=f"Destructive operation '{match.upper()}' is forbidden.")
 
-    # 3. Restrict /query to read-only operations
+    # 3. Check allowed starts based on endpoint
     if read_only:
         if not ALLOWED_QUERY_START.match(clean_sql):
             raise HTTPException(status_code=403, detail="Only read-only operations (SELECT, PRAGMA, etc.) are allowed on the /query endpoint.")
+    else:
+        if not ALLOWED_EXECUTE_START.match(clean_sql):
+            raise HTTPException(status_code=403, detail="Forbidden operation start in execute endpoint.")
 
 
 @app.on_event("startup")

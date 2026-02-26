@@ -1,5 +1,4 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.request_courier import request_courier
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.archivist_tool_set import ARCHIVIST_TOOLS
 from Tools.toolsets.tools.courier.orchestration_helper import request_tool_selection, is_event_finished
@@ -12,6 +11,8 @@ def request_archivist(task_id: str, event_id: str):
     """
     Handles the DB research loop for the Archivist role.
     """
+    from Tools.agents.requests.request_courier import request_courier
+
     is_finish = False
     request_try = 0
     output = []
@@ -19,6 +20,10 @@ def request_archivist(task_id: str, event_id: str):
     try:
         notify_frontend(task_id, "Archivist: Accessing DuckDB archive...", agent="Archivist", type="research")
         
+        task_ctx = global_tool_set.get_task_context(task_id=task_id)
+        if "error" in task_ctx:
+            raise Exception(task_ctx["error"])
+
         event_ctx = global_tool_set.get_event_data(event_id=event_id)
         if "error" in event_ctx:
             raise Exception(event_ctx["error"])
@@ -28,8 +33,10 @@ def request_archivist(task_id: str, event_id: str):
         while not is_finish and request_try < 5:
             request_try += 1
 
-            # Decide tool to use
-            tool_call = request_tool_selection(task_id, current_input, Agents.ARCHIVIST, ARCHIVIST_TOOLS)
+            # Decide tool to use with task context
+            tool_call = request_tool_selection(
+                task_id, current_input, Agents.ARCHIVIST, ARCHIVIST_TOOLS, task_context=task_ctx
+            )
             if "error" in tool_call:
                 raise Exception(tool_call["error"])
             
@@ -47,8 +54,8 @@ def request_archivist(task_id: str, event_id: str):
             if isinstance(tool_result, dict) and "error" in tool_result:
                 raise Exception(f"Tool execution failed: {tool_result['error']}")
 
-            # Check if objective is reached
-            is_finish = is_event_finished(task_id, event_ctx, tool_result, Agents.ARCHIVIST)
+            # Check if objective is reached with full history
+            is_finish = is_event_finished(task_id, event_ctx, output, Agents.ARCHIVIST)
             current_input = output
 
         # Transition back to Courier

@@ -1,7 +1,7 @@
 # Tools/toolsets/tools/analysis/perform_column_discovery.py
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 
 from Tools.core.shared_db_instance import db
 from Tools.toolsets.tools.database.get_last_attempt import get_last_attempt
@@ -38,7 +38,7 @@ def _sanitize_identifier(name: str) -> str:
 
 def perform_column_discovery(
     ask_ai_func: Callable,
-    col_info: List[Any],
+    col_info: Any,
     build_id: int,
     build_version: str,
     version_context: str = "",
@@ -49,12 +49,30 @@ def perform_column_discovery(
 
     Args:
     - ask_ai_func: Function to call the AI for discovery.
-    - col_info: List containing column metadata [f_id, table, col, d_type, min, max].
+    - col_info: Metadata [f_id, table, col, d_type, min, max] or dict.
     - build_id: The internal ID of the build.
     - build_version: The version string of the build.
     - version_context: Textual context about version differences.
     """
-    f_id, table, col, d_type, v_min, v_max = col_info
+    # 0. Robust Unpacking
+    if isinstance(col_info, list) and len(col_info) > 0 and isinstance(col_info[0], dict):
+        # Handle list of dictionaries (what the AI actually sent)
+        info = col_info[0]
+        f_id, table, col, d_type, v_min, v_max = (
+            info.get("f_id"), info.get("table"), info.get("col"), 
+            info.get("d_type"), info.get("min"), info.get("max")
+        )
+    elif isinstance(col_info, dict):
+        # Handle direct dictionary
+        f_id, table, col, d_type, v_min, v_max = (
+            col_info.get("f_id"), col_info.get("table"), col_info.get("col"), 
+            col_info.get("d_type"), col_info.get("min"), col_info.get("max")
+        )
+    elif isinstance(col_info, list) and len(col_info) == 6:
+        # Handle legacy flat list
+        f_id, table, col, d_type, v_min, v_max = col_info
+    else:
+        raise ValueError(f"Unsupported col_info format: {type(col_info)} with length {len(col_info) if isinstance(col_info, list) else 'N/A'}")
 
     # 1. Fetch Samples and Context from DB
     safe_table = _sanitize_identifier(table)

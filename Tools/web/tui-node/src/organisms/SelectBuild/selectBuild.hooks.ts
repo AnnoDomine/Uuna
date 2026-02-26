@@ -12,19 +12,27 @@ const useSelectBuild = () => {
     const isLoadingBuilds = isLoading || isFetching || isUninitialised;
 
     const parsedBuilds = useMemo((): Item<(typeof builds)[number]>[] => {
-        addLog({
-            message: JSON.stringify(builds),
-            process: "useSelectBuild-parsedBuilds",
-            type: ELogTypes.INFO,
-        });
-        return (builds || []).map(
-            (b): Item<(typeof builds)[number]> => ({
-                id: b.version,
-                value: b.version,
-                label: b.version,
-                meta: b,
-            }),
-        );
+        return (builds || [])
+            .map(
+                (b): Item<(typeof builds)[number]> => ({
+                    id: b.version,
+                    value: b.version,
+                    label: b.version,
+                    meta: b,
+                }),
+            )
+            .reverse();
+    }, [builds]);
+
+    useEffect(() => {
+        const buildCount = (builds || []).length;
+        if (buildCount > 0) {
+            addLog({
+                message: `Parsed ${buildCount} builds for selection.`,
+                process: "useSelectBuild",
+                type: ELogTypes.DEBUG,
+            });
+        }
     }, [builds, addLog]);
 
     useEffect(() => {

@@ -16,7 +16,7 @@ type BuildsStore = {
     fetchBuilds: () => Promise<void>;
 };
 
-const useBuildsStore = create<LoadingStates<BuildsStore>>((set, get) => ({
+export const useBuildsStore = create<LoadingStates<BuildsStore>>((set, get) => ({
     ...DEFAULT_LOADING_STATES,
     builds: [],
     fetchBuilds: async () => {

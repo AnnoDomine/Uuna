@@ -6,16 +6,21 @@ import requests
 ORCHESTRA_API_URL = "http://127.0.0.1:8001"
 
 
-def query_vector_memory(role: str, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def query_vector_memory(role: str, query: str = None, limit: int = 5, term: str = None) -> List[Dict[str, Any]]:
     """
     Performs a semantic search in the long-term vector memory.
 
     Args:
     - role: The role name of the agent performing the search.
     - query: The natural language search query.
+    - term: Alias for query.
     - limit: Maximum number of results to return.
     """
-    payload = {"role": role, "query": query, "limit": limit}
+    search_query = query or term
+    if not search_query:
+        return []
+
+    payload = {"role": role, "query": search_query, "limit": limit}
 
     try:
         r = requests.post(f"{ORCHESTRA_API_URL}/memory/search", json=payload, timeout=30)

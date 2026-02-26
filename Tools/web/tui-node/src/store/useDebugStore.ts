@@ -35,8 +35,17 @@ const getChatLog = async (): Promise<LogChatItem[]> => {
             return [];
         }
 
-        const parsedData = JSON.parse(data);
-        return Array.isArray(parsedData) ? parsedData : [];
+        try {
+            const parsedData = JSON.parse(data);
+            return Array.isArray(parsedData) ? parsedData : [];
+        } catch (parseErr) {
+            // If JSON is corrupt, reset it to empty array to prevent constant crashes
+            if (process.env.NODE_ENV !== "test") {
+                console.error("Corrupt JSON detected in log.json, resetting...", parseErr);
+            }
+            await fsPromises.writeFile(chatLogPath, "[]");
+            return [];
+        }
     } catch (err) {
         // Silently recover for tests, but log error
         if (process.env.NODE_ENV !== "test") {

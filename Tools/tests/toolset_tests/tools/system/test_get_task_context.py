@@ -5,9 +5,9 @@ from Tools.toolsets.tools.system.get_task_context import get_task_context
 
 def test_get_task_context_success():
     with patch("Tools.toolsets.tools.system.get_task_context.db") as mock_db:
-        # Mock return for: task_id, query, status, event_id, target_role, output, confidence
+        # Mock return for: task_id, query, status, assigned_builds, event_id, target_role, output, confidence
         mock_db.execute.return_value.fetchall.return_value = [
-            ("tk-123", "User Query", "active", "ev-1", "Archivist", '{"res": 1}', 0.9)
+            ("tk-123", "User Query", "active", '["10.0.0"]', "ev-1", "Archivist", '{"res": 1}', 0.9)
         ]
 
         result = get_task_context("tk-123")

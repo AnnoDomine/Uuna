@@ -2,6 +2,7 @@ import { Box } from "ink";
 import type React from "react";
 import Header from "./atoms/Header/Header.js";
 import useBackend from "./hooks/useBackend.js";
+import useExpress from "./hooks/useExpress.js";
 import useTerminalDimensions from "./hooks/useTerminalDimensions.js";
 import CommandLine from "./organisms/CommandLine/CommandLine.js";
 import PageSwitcher from "./organisms/PageSwitcher/PageSwitcher.js";
@@ -13,6 +14,8 @@ import { APP_NAME } from "./utils/constants/globals.js";
 const App: React.FC = () => {
     // Initialize backend management
     useBackend();
+    // Initialize signal receiver for agent notifications
+    useExpress();
 
     const { width, height } = useTerminalDimensions();
     const { enabled: isDebugEnabled } = useDebugStore();

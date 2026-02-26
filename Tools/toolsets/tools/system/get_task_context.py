@@ -21,6 +21,7 @@ def get_task_context(task_id: str) -> Dict[str, Any]:
     - task_id: The UUID of the task to retrieve.
     """
     try:
+        import json
         sql = _load_query("get_history")
         res = db.execute(sql, [task_id]).fetchall()
 
@@ -28,12 +29,24 @@ def get_task_context(task_id: str) -> Dict[str, Any]:
             return {"error": f"Task ID {task_id} not found."}
 
         history = []
-        # Index 0: task_id, 1: original_query, 2: task_status
-        task_info = {"task_id": res[0][0], "original_query": res[0][1], "status": res[0][2]}
+        # Index 0: task_id, 1: original_query, 2: task_status, 3: assigned_builds
+        builds = res[0][3]
+        if isinstance(builds, str):
+            try:
+                builds = json.loads(builds)
+            except Exception:
+                pass
+
+        task_info = {
+            "task_id": res[0][0], 
+            "original_query": res[0][1], 
+            "status": res[0][2],
+            "assigned_builds": builds
+        }
 
         for row in res:
-            if row[3]:  # if event_id exists
-                history.append({"event_id": row[3], "agent": row[4], "output": row[5], "confidence": row[6]})
+            if row[4]:  # if event_id exists (index shifted by 1)
+                history.append({"event_id": row[4], "agent": row[5], "output": row[6], "confidence": row[7]})
 
         return {"task": task_info, "history": history}
     except Exception as e:

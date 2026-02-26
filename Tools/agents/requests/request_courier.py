@@ -1,11 +1,5 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.agent_models import SpecialistSelection
-from Tools.agents.requests.request_archivist import request_archivist
-from Tools.agents.requests.request_cartographer import request_cartographer
-from Tools.agents.requests.request_expedition_group import request_expedition_group
-from Tools.agents.requests.request_librarian import send_librarian_response
-from Tools.agents.requests.request_sages import ApprovalStatus, request_sages
-from Tools.agents.requests.request_tinker import request_tinker
+from Tools.agents.requests.agent_models import SpecialistSelection, ApprovalStatus
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
@@ -13,6 +7,7 @@ from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 def present_response(task_id):
     """Sends the task id to the librarian to present the research to the user."""
+    from Tools.agents.requests.request_librarian import send_librarian_response
     send_librarian_response(task_id)
 
 
@@ -22,6 +17,8 @@ def request_courier_from_sages(task_id, approval: str, context: str):
     - If approved, send the task id to the tinker to start scoring and the librarian to present the research to the user
     - If revoked, create a new event and restart the research queue
     """
+    from Tools.agents.requests.request_tinker import request_tinker
+
     if approval == ApprovalStatus.APPROVED:
         notify_frontend(task_id, "Courier: Task approved by Sages. Finalizing...", agent="Courier", type="research")
         present_response(task_id)
@@ -43,6 +40,11 @@ def request_courier(task_id: str, event_id: str):
     """
     Handles task routing and specialist selection.
     """
+    from Tools.agents.requests.request_archivist import request_archivist
+    from Tools.agents.requests.request_cartographer import request_cartographer
+    from Tools.agents.requests.request_expedition_group import request_expedition_group
+    from Tools.agents.requests.request_sages import request_sages
+
     notify_frontend(
         task_id, "Courier: Analyzing task chain for next routing decision...", agent="Courier", type="research"
     )
@@ -76,8 +78,17 @@ def request_courier(task_id: str, event_id: str):
             "messages": [
                 {
                     "role": "system",
-                    "content": f"Based on the current progress of the task ({task_ctx['task']}) and the events ({task_history}), select the next specialist.",
+                    "content": f"""
+                    You are the Courier. Based on the current progress of the task and the events, select the next specialist.
+                    
+                    TASK INFO:
+                    - Original Query: {task_ctx['task']['original_query']}
+                    - ASSIGNED BUILDS: {task_ctx['task']['assigned_builds']}
+                    
+                    IMPORTANT: You MUST ONLY research for the assigned builds. Do not hallucinate other versions.
+                    """,
                 },
+                {"role": "user", "content": f"TASK HISTORY:\n{task_history}"},
                 {"role": "user", "content": f"NEWEST EVENT:\n{event}"},
                 {
                     "role": "user",
@@ -85,7 +96,7 @@ def request_courier(task_id: str, event_id: str):
                 },
                 {
                     "role": "user",
-                    "context": """
+                    "content": """
                     SPECIALIST CONTEXT:\n
                     ARCHIVIST: The Archivist is responsible for reverse-engineering the semantics of the WoW database and establishing verified relationships between tables.\n
                     EXPEDITION_GROUP: As the research arm of the library, the expedition group is responsible for bridging the gap between raw database values and the rich history of Azeroth by performing targeted online research.\n
