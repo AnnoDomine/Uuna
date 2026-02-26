@@ -33,9 +33,16 @@ class DBClient:
         if params is None:
             params = []
 
-        # Determine endpoint
-        is_query = any(keyword in sql.upper() for keyword in ["SELECT", "PRAGMA", "SHOW", "DESCRIBE"])
-        endpoint = "/query" if is_query else "/execute"
+        # Determine endpoint: Modifying operations MUST go to /execute
+        # Even if they contain a SELECT (e.g., INSERT INTO ... SELECT)
+        modifying_keywords = ["INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "SET"]
+        is_modifying = any(keyword in sql.upper() for keyword in modifying_keywords)
+        
+        if is_modifying:
+            endpoint = "/execute"
+        else:
+            is_query = any(keyword in sql.upper() for keyword in ["SELECT", "PRAGMA", "SHOW", "DESCRIBE", "WITH", "EXPLAIN"])
+            endpoint = "/query" if is_query else "/execute"
 
         try:
             r = requests.post(f"{self.url}{endpoint}", json={"sql": sql, "params": params}, timeout=600)

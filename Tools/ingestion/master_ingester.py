@@ -129,9 +129,9 @@ def process_table_master(table, version, build_id):
         safe_table = sanitize_identifier(table)
         temp_table = sanitize_identifier(f"tmp_{safe_table}_{version.replace('.', '_')}")
 
-        sql_init_temp = load_query("init_temp_table").format(csv_path=csv_path, sep=sep, temp_table=temp_table)
+        sql_init_temp = load_query("init_temp_table").format(csv_path=csv_path, sep=sep, temp_table=f"archive.{temp_table}")
         t_log.info("Ensuring table exists...")
-        sql_ensure_table = load_query("ensure_archive_table").format(table=safe_table, temp_table=temp_table)
+        sql_ensure_table = load_query("ensure_archive_table").format(table=safe_table, temp_table=f"archive.{temp_table}")
         t_log.info("Inserting rows...")
         load_query("insert_unique_rows")
         t_log.info("Inserting build map...")
