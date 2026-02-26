@@ -1,5 +1,5 @@
 import duckdb
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Any
@@ -11,7 +11,7 @@ app = FastAPI(title="WoW Datamine DB Service")
 DB_PATH = os.getenv("WOW_DB_PATH", "Data/WoW_Master.duckdb")
 con = None
 
-@app.on_event("startup")
+@app.lifespan("startup")
 async def startup_event():
     global con
     try:
@@ -40,7 +40,7 @@ async def run_query(req: QueryRequest):
     global con
     if con is None:
         return JSONResponse(status_code=503, content={"detail": "Database not initialized"})
-    
+
     try:
         # Use a cursor for thread safety and to avoid side effects on the main connection
         cursor = con.cursor()
@@ -58,7 +58,7 @@ async def run_execute(req: QueryRequest):
     global con
     if con is None:
         return JSONResponse(status_code=503, content={"detail": "Database not initialized"})
-    
+
     try:
         cursor = con.cursor()
         cursor.execute(req.sql, req.params)
