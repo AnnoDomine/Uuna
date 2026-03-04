@@ -2,6 +2,7 @@ import sqlite3
 import os
 import re
 from Tools.core.security_utils import sanitize_identifier
+from Tools.core.shared_debugger import debugger
 
 
 def get_db_path(version):
@@ -48,25 +49,27 @@ def ensure_build_local(version):
     if os.path.exists(path):
         return True
 
+    debugger.add_log(f"Build {version} is missing locally.", agent="ANALYSIS", level="WARNING", process="CompareBuilds")
     print(f"\nBuild {version} is missing locally.")
     choice = input(f"Do you want to download build {version} now? (y/n): ").lower()
     if choice == "y":
         from sync_wow_db import fetch_and_import
 
-        print(f"Starting import for {version}...")
+        debugger.add_log(f"Starting import for {version}...", agent="ANALYSIS", process="CompareBuilds")
         fetch_and_import(version)
         return os.path.exists(path)
     return False
 
 
 def compare_builds(version_old, version_new):
+    debugger.add_log(f"Comparing {version_old} vs {version_new}", agent="ANALYSIS", process="CompareBuilds")
     path_old = get_db_path(version_old)
     path_new = get_db_path(version_new)
 
     if not os.path.exists(path_old) or not os.path.exists(path_new):
-        return {
-            "error": f"Missing database files: {version_old if not os.path.exists(path_old) else ''} {version_new if not os.path.exists(path_new) else ''}"
-        }
+        err = f"Missing database files: {version_old if not os.path.exists(path_old) else ''} {version_new if not os.path.exists(path_new) else ''}"
+        debugger.add_log(err, agent="ANALYSIS", level="ERROR", process="CompareBuilds")
+        return {"error": err}
 
     tables_old = get_tables(path_old)
     tables_new = get_tables(path_new)
@@ -103,6 +106,7 @@ def compare_builds(version_old, version_new):
             if changes:
                 diff["modified_tables"][table] = changes
 
+    debugger.add_log(f"Comparison complete. Added: {len(diff['added_tables'])}, Removed: {len(diff['removed_tables'])}, Modified: {len(diff['modified_tables'])}", agent="ANALYSIS", level="SUCCESS", process="CompareBuilds")
     return diff
 
 
@@ -114,11 +118,11 @@ def run_diff_chain(start_version, end_version, include_intermediate=False):
     available_online = get_available_builds()
 
     if not available_online:
-        print("Error: Build registry is empty. Run update_build_registry.py first.")
+        debugger.add_log("Build registry is empty. Run update_build_registry.py first.", agent="ANALYSIS", level="ERROR", process="CompareBuilds")
         return
 
     if start_version not in available_online or end_version not in available_online:
-        print(f"Error: One of the versions ({start_version}, {end_version}) is not in the build registry.")
+        debugger.add_log(f"One of the versions ({start_version}, {end_version}) is not in the build registry.", agent="ANALYSIS", level="ERROR", process="CompareBuilds")
         return
 
     idx_start = available_online.index(start_version)
@@ -129,7 +133,7 @@ def run_diff_chain(start_version, end_version, include_intermediate=False):
 
     build_range = available_online[idx_start : idx_end + 1]
 
-    print(f"Comparing build range: {start_version} to {end_version}")
+    debugger.add_log(f"Comparing build range: {start_version} to {end_version}", agent="ANALYSIS", process="CompareBuilds")
 
     if not include_intermediate:
         # Direct comparison
@@ -147,7 +151,7 @@ def run_diff_chain(start_version, end_version, include_intermediate=False):
                 res = compare_builds(v1, v2)
                 print_diff(v1, v2, res)
             else:
-                print(f"\n--- Skipping {v1} -> {v2} (Build data missing) ---")
+                debugger.add_log(f"Skipping {v1} -> {v2} due to missing data.", agent="ANALYSIS", level="WARNING", process="CompareBuilds")
 
 
 def print_diff(v1, v2, diff):

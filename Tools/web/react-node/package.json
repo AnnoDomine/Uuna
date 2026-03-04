@@ -1,0 +1,59 @@
+{
+    "name": "react-node",
+    "private": true,
+    "version": "1.1.0-rc",
+    "type": "module",
+    "main": "src/app/main.ts",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "biome check --write --unsafe",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@biomejs/biome": "^2.4.4",
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@fontsource/fira-code": "^5.2.7",
+        "@mui/icons-material": "^7.3.8",
+        "@mui/joy": "5.0.0-beta.52",
+        "@mui/material": "^7.3.8",
+        "@reduxjs/toolkit": "^2.11.2",
+        "@types/body-parser": "^1.19.6",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "body-parser": "^2.2.2",
+        "clsx": "^2.1.1",
+        "cors": "^2.8.6",
+        "electron": "^40.6.0",
+        "electron-devtools-installer": "^4.0.0",
+        "express": "^5.2.1",
+        "node": "^25.7.0",
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0",
+        "react-redux": "^9.2.0",
+        "vite-plugin-electron": "^0.29.0",
+        "vite-plugin-environment": "^1.1.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.1",
+        "@types/node": "^24.10.1",
+        "@types/react": "^19.2.7",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^5.1.1",
+        "babel-plugin-react-compiler": "^1.0.0",
+        "eslint": "^9.39.1",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-refresh": "^0.4.24",
+        "globals": "^16.5.0",
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.48.0",
+        "vite": "^7.3.1"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "electron",
+            "esbuild"
+        ]
+    }
+}

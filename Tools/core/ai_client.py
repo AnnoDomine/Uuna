@@ -2,10 +2,10 @@ import json
 from typing import Any, Dict
 
 import requests
-from loguru import logger
 
 from Tools.agents.get_agent_skill_set import Agents, get_skill_set
 from Tools.core.config_manager import get_config
+from Tools.core.shared_debugger import debugger
 
 
 class AIClient:
@@ -34,13 +34,13 @@ class AIClient:
             content = res["message"]["content"]
 
             if self.debug:
-                logger.debug(f"RAW RESPONSE:\n{content}\n{'=' * 80}")
+                debugger.add_log(f"RAW RESPONSE:\n{content}", agent="AI_CLIENT", level="DEBUG", process="AI:Request")
 
             parsed = json.loads(content)
             return self.robust_json_decode(parsed)
 
         except Exception as e:
-            logger.error(f"AI Call failed for role '{role}': {e}")
+            debugger.add_log(f"AI Call failed for role '{role}': {e}", agent="AI_CLIENT", level="ERROR", process="AI:Request")
             return {}
 
     def robust_json_decode(self, data):
@@ -62,7 +62,7 @@ class AIClient:
     def ask(self, role: Agents, prompt: str, temperature: float = 0.1) -> Dict[str, Any]:
         """Bridge to the local LLM via Ollama."""
         if self.debug:
-            logger.debug(f"\n{'=' * 80}\n[DEBUG] ROLE: {role}\nPROMPT:\n{prompt}\n{'-' * 80}")
+            debugger.add_log(f"ROLE: {role} | PROMPT: {prompt[:100]}...", agent="AI_CLIENT", level="DEBUG", process="AI:Ask")
 
         payload = {
             "messages": [
@@ -74,4 +74,4 @@ class AIClient:
             "format": "json",
         }
 
-        return self.make_request(payload, temperature)
+        return self.make_request(payload, role, temperature)

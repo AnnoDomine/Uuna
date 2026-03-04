@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+from Tools.core.shared_debugger import debugger
 
 
 def save_mermaid_diagram(name: str, content: str, build_version: Optional[str] = "N/A") -> str:
@@ -24,6 +25,5 @@ def save_mermaid_diagram(name: str, content: str, build_version: Optional[str] =
 
         return f"SUCCESS: Diagram saved to {file_path}"
     except Exception as e:
-        # In a real tool, we might use a logger here
-        print(f"ERROR: Failed to save mermaid diagram: {e}")
+        debugger.add_log(f"Failed to save mermaid diagram: {e}", agent="FILESYSTEM", level="ERROR", process="SaveMermaid")
         return f"ERROR: {e}"

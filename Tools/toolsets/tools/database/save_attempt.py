@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "save_attempt"
 
@@ -37,5 +38,5 @@ def save_attempt(
         db.execute(sql, params)
         return {"status": "success"}
     except Exception as e:
-        print(f"ERROR: Failed to save attempt: {e}")
+        debugger.add_log(f"Failed to save attempt: {e}", agent="CORE", level="ERROR", process="DB:SaveAttempt")
         return {"status": "error", "message": str(e)}

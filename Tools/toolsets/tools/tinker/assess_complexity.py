@@ -1,6 +1,7 @@
 # Tools/toolsets/tools/tinker/assess_complexity.py
 import re
 from typing import Dict, Any
+from Tools.core.shared_debugger import debugger
 
 
 def assess_complexity(query: str) -> Dict[str, Any]:
@@ -10,6 +11,7 @@ def assess_complexity(query: str) -> Dict[str, Any]:
     Args:
     - query: The research query string.
     """
+    debugger.add_log(f"Assessing complexity for query: {query[:50]}...", agent="TINKER", process="Tinker:AssessComplexity")
     if not query:
         return {"tier": 1, "factors": ["Empty query"]}
 
@@ -39,4 +41,6 @@ def assess_complexity(query: str) -> Dict[str, Any]:
     else:
         tier = 1
 
-    return {"complexity_tier": tier, "difficulty_factors": factors, "base_complexity_score": score}
+    result = {"complexity_tier": tier, "difficulty_factors": factors, "base_complexity_score": score}
+    debugger.add_log(f"Complexity assessment complete. Tier: {tier} (Score: {score}). Factors: {factors}", agent="TINKER", level="SUCCESS", process="Tinker:AssessComplexity")
+    return result

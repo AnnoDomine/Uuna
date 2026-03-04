@@ -2,6 +2,7 @@ import sqlite3
 import os
 import glob
 from Tools.core.security_utils import sanitize_identifier
+from Tools.core.shared_debugger import debugger
 
 
 def find_references(column_name, db_path=None):
@@ -12,11 +13,13 @@ def find_references(column_name, db_path=None):
         # Find the latest WoW_Data database
         dbs = glob.glob("Data/dbs/WoW_Data_*.db")
         if not dbs:
+            debugger.add_log("No database found in Data/dbs/WoW_Data_*.db", agent="ANALYSIS", level="ERROR", process="FindRefs")
             print("No database found in Data/dbs/WoW_Data_*.db")
             return
         else:
             db_path = max(dbs, key=os.path.getmtime)
 
+    debugger.add_log(f"Searching for column '{safe_column}' in {db_path}", agent="ANALYSIS", process="FindRefs")
     print(f"Using database: {db_path}")
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -37,6 +40,7 @@ def find_references(column_name, db_path=None):
 
     conn.close()
 
+    debugger.add_log(f"Search complete. Found in {len(found_in)} tables.", agent="ANALYSIS", level="SUCCESS", process="FindRefs")
     print(f"\nSearching for column: '{safe_column}'")
     print("-" * 40)
     for table, count in sorted(found_in, key=lambda x: x[1], reverse=True):

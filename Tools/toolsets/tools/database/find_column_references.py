@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 # Define paths to query directories
 QUERY_DIR_SPECIFIC = Path(__file__).parent / "queries" / "find_column_references"
@@ -47,7 +48,7 @@ def find_column_references(column_name: str) -> Dict[str, int]:
                 found_in[table] = count
 
         except Exception as e:
-            print(f"Skipping table '{table}' due to error: {e}")
+            debugger.add_log(f"Skipping table '{table}' due to error: {e}", agent="CORE", level="WARNING", process="DB:FindColRefs")
             continue
 
     # Sort by count descending, as in the original script

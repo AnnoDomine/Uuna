@@ -8,6 +8,7 @@ from typing import Dict, Any
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "check_build_status"
 
@@ -24,11 +25,13 @@ def check_build_status(build_version: str) -> Dict[str, Any]:
     Args:
     - build_version: The version string of the build (e.g. '10.0.0').
     """
+    debugger.add_log(f"Checking status for Build: {build_version}", agent="REGISTRY", process="Registry:CheckStatus")
     try:
         sql = _load_query("get_build_status")
         res = db.execute(sql, [build_version]).fetchone()
 
         if not res:
+            debugger.add_log(f"Build {build_version} is unknown.", agent="REGISTRY", level="WARNING", process="Registry:CheckStatus")
             return {
                 "version": build_version,
                 "exists": False,
@@ -38,12 +41,15 @@ def check_build_status(build_version: str) -> Dict[str, Any]:
             }
 
         version, is_downloaded, is_indexed = res
-        return {
+        result = {
             "version": version,
             "exists": True,
             "is_downloaded": bool(is_downloaded),
             "is_indexed": bool(is_indexed),
             "message": "Build is ready." if is_downloaded and is_indexed else "Build is not fully available yet.",
         }
+        debugger.add_log(f"Build {version} status: Downloaded={result['is_downloaded']}, Indexed={result['is_indexed']}", agent="REGISTRY", process="Registry:CheckStatus")
+        return result
     except Exception as e:
+        debugger.add_log(f"Failed to check build status: {e}", agent="REGISTRY", level="ERROR", process="Registry:CheckStatus")
         return {"error": str(e), "exists": False}

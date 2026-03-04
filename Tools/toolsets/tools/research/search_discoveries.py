@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "search_discoveries"
 
@@ -31,5 +32,5 @@ def search_discoveries(term: str, limit: int = 10) -> List[Dict[str, Any]]:
             results.append({"table": row[0], "column": row[1], "discovery": row[2], "confidence": row[3]})
         return results
     except Exception as e:
-        print(f"ERROR: Discovery search failed: {e}")
+        debugger.add_log(f"Discovery search failed: {e}", agent="RESEARCH", level="ERROR", process="SearchDiscoveries")
         return []

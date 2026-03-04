@@ -2,6 +2,7 @@
 import re
 from bs4 import BeautifulSoup
 from typing import Dict, Any
+from Tools.core.shared_debugger import debugger
 
 
 def sanitize_data(raw_content: str) -> Dict[str, Any]:
@@ -11,6 +12,7 @@ def sanitize_data(raw_content: str) -> Dict[str, Any]:
     Args:
     - raw_content: The raw string content (e.g. HTML) to sanitize.
     """
+    debugger.add_log("Starting data sanitization.", agent="SENTINEL", process="Sentinel:Sanitize")
     if not raw_content:
         return {"sanitized_content": "", "removed_elements_count": 0, "purity_score": 1.0}
 
@@ -45,4 +47,5 @@ def sanitize_data(raw_content: str) -> Dict[str, Any]:
     # Calculate a basic purity score (ratio of clean vs raw length)
     purity = min(1.0, len(sanitized) / max(1, len(raw_content)))
 
+    debugger.add_log(f"Sanitization complete. Removed {removed_count} elements. Purity: {purity:.2f}", agent="SENTINEL", level="SUCCESS", process="Sentinel:Sanitize")
     return {"sanitized_content": sanitized, "removed_elements_count": removed_count, "purity_score": round(purity, 2)}

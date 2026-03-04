@@ -5,7 +5,6 @@ import os
 import requests
 import time
 from concurrent.futures import ThreadPoolExecutor
-from loguru import logger
 
 # Ensure path resolution
 sys.path.append(os.getcwd())
@@ -13,6 +12,7 @@ sys.path.append(os.getcwd())
 # Project modules
 from Tools.core.db_client import DBClient
 from Tools.core.ai_client import AIClient
+from Tools.core.shared_debugger import debugger
 from Tools.toolsets.tools.analysis.generate_relationship_map import generate_relationship_map
 from Tools.toolsets.tools.analysis.extract_features import extract_features_for_build
 from Tools.toolsets.tools.analysis.perform_column_discovery import perform_column_discovery
@@ -29,35 +29,10 @@ AI_THREADS = 6
 AI_DEBUG = True
 AI_CONCURRENCY = 1
 
-# Configure Loguru
-logger.remove()
-LOG_FORMAT = "[{extra[run_worker]} - {extra[build_index]} - {extra[run_info]} - {time:YYYY-MM-DD HH:mm:ss} - {level} - {extra[process]} - {extra[build]}]: {message}"
-
-
-def sink_filter(record):
-    for key in ["run_worker", "build_index", "run_info", "process", "build"]:
-        if key not in record["extra"]:
-            record["extra"][key] = "N/A"
-    return True
-
-
-logger.add(sys.stderr, format=LOG_FORMAT, filter=sink_filter)
-session_ts = time.strftime("%Y%m%d_%H%M%S")
-logger.add(
-    f"Data/logs/ai_agent_{session_ts}.log",
-    format=LOG_FORMAT,
-    filter=sink_filter,
-    rotation="10 MB",
-)
-
-
-def get_safe_log(run_info="N/A", process="DB", build="N/A", run_worker="N/A", build_index="N/A"):
-    return logger.bind(run_info=run_info, process=process, build=build, run_worker=run_worker, build_index=build_index)
-
 
 def ask_ai_wrapper(ai_client: AIClient, role, prompt, build_ver, run_info, process_name, **kwargs):
     """Wrapper to maintain compatibility with existing tool signatures."""
-    get_safe_log(build=build_ver, run_info=run_info, process=process_name, **kwargs)
+    debugger.add_log(f"AI Request for {role}", agent="AI_CLIENT", process=process_name, build=build_ver, run_info=run_info, **kwargs)
     return ai_client.ask(role, prompt)
 
 
@@ -77,7 +52,8 @@ def analyze_column_task(
 ):
     """Coordination of Discovery and Mapping workflows for a single column."""
     f_id, table, col, d_type, v_min, v_max = col_info
-    log = get_safe_log(build=build_version, run_info=run_info, process="Analysis", **kwargs)
+    
+    debugger.add_log(f"Analyzing column: {table}.{col}", agent="RESEARCHER", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
 
     # Bridge to AIClient
     def ask_ai(r, p, bv, ri, pn, **kw):
@@ -89,7 +65,7 @@ def analyze_column_task(
             db_client, ask_ai, col_info, build_id, build_version, version_context, run_info=run_info, **kwargs
         )
     except Exception as e:
-        log.error(f"Discovery failed for {table}.{col}: {e}")
+        debugger.add_log(f"Discovery failed for {table}.{col}: {e}", agent="RESEARCHER", level="ERROR", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
         return
 
     # 2. Perform Column Mapping (Finding relationships)
@@ -100,30 +76,21 @@ def analyze_column_task(
 
         status = mapping_res.get("status")
         if status == "confirmed":
-            print(
-                f"[{kwargs.get('run_worker')} - {kwargs.get('build_index')}] [✅] {table}.{col} -> {mapping_res.get('target')}",
-                flush=True,
-            )
+            debugger.add_log(f"Confirmed mapping: {table}.{col} -> {mapping_res.get('target')}", agent="RESEARCHER", level="SUCCESS", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
         elif status == "vetoed":
-            print(
-                f"[{kwargs.get('run_worker')} - {kwargs.get('build_index')}] [❌] Vetoed: {table}.{col} -> {mapping_res.get('target')}",
-                flush=True,
-            )
+            debugger.add_log(f"Vetoed mapping: {table}.{col} -> {mapping_res.get('target')}", agent="RESEARCHER", level="WARNING", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
         else:
-            print(
-                f"[{kwargs.get('run_worker')} - {kwargs.get('build_index')}] [💡] {table}.{col}: {discovery_res.get('discovery')[:60]}...",
-                flush=True,
-            )
+            debugger.add_log(f"Discovery only: {table}.{col}", agent="RESEARCHER", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
 
     except Exception as e:
-        log.error(f"Mapping failed for {table}.{col}: {e}")
+        debugger.add_log(f"Mapping failed for {table}.{col}: {e}", agent="RESEARCHER", level="ERROR", process="ColAnalysis", build=build_version, run_info=run_info, **kwargs)
 
     time.sleep(AI_COOLDOWN)
 
 
 def process_build(db_client: DBClient, ai_client: AIClient, build_version, limit=5, prev_version=None):
     """Main loop for processing all columns of a specific build."""
-    print(f"\n>>> RESEARCHING BUILD: {build_version} <<<", flush=True)
+    debugger.add_log(f">>> RESEARCHING BUILD: {build_version} <<<", agent="RESEARCHER", process="BuildProcessing", build=build_version)
     version_context = get_version_context(build_version, prev_version)
 
     # Pre-run feature extraction if needed
@@ -131,6 +98,7 @@ def process_build(db_client: DBClient, ai_client: AIClient, build_version, limit
 
     res = db_client.execute("SELECT id FROM registry.builds WHERE version = ?", [build_version]).fetchone()
     if not res:
+        debugger.add_log(f"Build {build_version} not found in registry!", agent="RESEARCHER", level="ERROR", process="BuildProcessing", build=build_version)
         return
     build_id = res[0]
 
@@ -141,7 +109,7 @@ def process_build(db_client: DBClient, ai_client: AIClient, build_version, limit
     )
     cols = cols_res.fetchall()
 
-    print(f"Starting parallel analysis of {len(cols)} columns using {AI_CONCURRENCY} workers...", flush=True)
+    debugger.add_log(f"Starting parallel analysis of {len(cols)} columns...", agent="RESEARCHER", process="BuildProcessing", build=build_version)
     with ThreadPoolExecutor(max_workers=AI_CONCURRENCY) as executor:
         futures = []
         for i, col_info in enumerate(cols, 1):
@@ -165,28 +133,28 @@ def process_build(db_client: DBClient, ai_client: AIClient, build_version, limit
             try:
                 f.result()
             except Exception as e:
-                logger.error(f"Task failed: {e}")
+                debugger.add_log(f"Task failed: {e}", agent="RESEARCHER", level="ERROR", process="BuildProcessing", build=build_version)
 
     # Generate final build map diagram
     def ask_ai_simple(p):
         return ai_client.ask("Cartographer", p)
 
+    debugger.add_log(f"Generating relationship map for {build_version}...", agent="RESEARCHER", process="BuildProcessing", build=build_version)
     generate_relationship_map(db_client, ask_ai_simple, build_version)
 
 
 def main():
     # Wait for DB Service
-    print("Waiting for DB Service at " + DB_SERVICE_URL, flush=True)
     max_retries = 30
     for i in range(max_retries):
         try:
             r = requests.post(f"{DB_SERVICE_URL}/query", json={"sql": "SELECT 1"}, timeout=2)
             r.raise_for_status()
-            print("DB Service is ready!", flush=True)
+            debugger.add_log("DB Service is ready!", agent="RESEARCHER", level="SUCCESS", process="Init")
             break
         except Exception:
             if i == max_retries - 1:
-                print("DB Service unreachable. Exiting.", flush=True)
+                debugger.add_log("DB Service unreachable. Exiting.", agent="RESEARCHER", level="ERROR", process="Init")
                 sys.exit(1)
             time.sleep(1)
 
@@ -204,7 +172,7 @@ def main():
     res = db_client.execute("SELECT version FROM registry.builds WHERE is_downloaded = TRUE ORDER BY id ASC")
     all_local = [r[0] for r in res.fetchall()]
     if not all_local:
-        print("No local builds found in registry.")
+        debugger.add_log("No local builds found in registry.", agent="RESEARCHER", level="ERROR", process="Init")
         return
 
     s_idx = all_local.index(args.start) if args.start in all_local else 0
@@ -231,6 +199,6 @@ def main():
 
 
 if __name__ == "__main__":
-    print(">>> AGENT SCRIPT EXECUTION START <<<", flush=True)
+    debugger.add_log(">>> AGENT SCRIPT EXECUTION START <<<", agent="RESEARCHER", process="Lifecycle")
     main()
-    print(">>> AGENT SCRIPT EXECUTION END <<<", flush=True)
+    debugger.add_log(">>> AGENT SCRIPT EXECUTION END <<<", agent="RESEARCHER", process="Lifecycle")

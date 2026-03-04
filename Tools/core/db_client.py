@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+from Tools.core.shared_debugger import debugger
 
 
 class DBResult:
@@ -34,24 +35,36 @@ class DBClient:
             params = []
 
         # Determine endpoint: Modifying operations MUST go to /execute
-        # Even if they contain a SELECT (e.g., INSERT INTO ... SELECT)
-        modifying_keywords = ["INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "SET"]
-        is_modifying = any(keyword in sql.upper() for keyword in modifying_keywords)
+        # 1. Clean SQL (remove comments and whitespace for detection)
+        import re
+        clean_lines = [line.split('--')[0].split('#')[0].strip() for line in sql.splitlines()]
+        clean_sql_for_detect = " ".join([line for line in clean_lines if line]).upper()
         
-        if is_modifying:
+        words = clean_sql_for_detect.split()
+        first_word = words[0] if words else ""
+
+        modifying_keywords = ["INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "SET"]
+        query_keywords = ["SELECT", "PRAGMA", "SHOW", "DESCRIBE", "WITH", "EXPLAIN"]
+        
+        if first_word in modifying_keywords:
             endpoint = "/execute"
+        elif first_word in query_keywords:
+            endpoint = "/query"
         else:
-            is_query = any(keyword in sql.upper() for keyword in ["SELECT", "PRAGMA", "SHOW", "DESCRIBE", "WITH", "EXPLAIN"])
-            endpoint = "/query" if is_query else "/execute"
+            # Fallback: check if ANY modifying keyword exists as a full word
+            is_modifying = any(re.search(rf"\b{k}\b", clean_sql_for_detect) for k in modifying_keywords)
+            endpoint = "/execute" if is_modifying else "/query"
 
         try:
             r = requests.post(f"{self.url}{endpoint}", json={"sql": sql, "params": params}, timeout=600)
+            if r.status_code != 200:
+                debugger.add_log(f"DB API Error: {r.status_code} - {r.text} | SQL: {sql[:200]}", agent="DB_CLIENT", level="ERROR", no_db=True)
             r.raise_for_status()
             data = r.json()
             return DBResult(data)
         except Exception as e:
             # Use a simpler logger call without extra dependencies
-            print(f"DB API Error: {e} | SQL: {sql[:100]}...")
+            debugger.add_log(f"DB API Exception: {e} | SQL: {sql[:100]}...", agent="DB_CLIENT", level="ERROR", no_db=True)
             raise
 
     def close(self):

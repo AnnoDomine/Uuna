@@ -1,4 +1,5 @@
 from Tools.agents.get_agent_skill_set import Agents, get_skill_set
+from Tools.core.shared_debugger import debugger
 
 AGENT_DESCRIPTIONS = {
     Agents.ARCHIVIST: "You are the Archivist, an expert in Azeroth's history and game mechanics.",
@@ -20,6 +21,9 @@ def get_prompt_header(role: Agents) -> dict:
     Args:
     - role: The agent role enum.
     """
+    agent_name = role.value if hasattr(role, "value") else str(role)
+    debugger.add_log(f"Building prompt header for {agent_name}", agent=agent_name, process="Prompt:BuildHeader")
+    
     description = AGENT_DESCRIPTIONS.get(role, "You are a specialized agent in the Library.")
     skills = get_skill_set(role)
 

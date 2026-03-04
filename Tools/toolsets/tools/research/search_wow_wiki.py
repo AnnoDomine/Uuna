@@ -3,6 +3,7 @@ from typing import List
 
 import requests
 
+from Tools.core.shared_debugger import debugger
 from .fetch_web_content import _check_cache, _save_cache
 
 WIKI_BASE = "https://warcraft.wiki.gg"
@@ -24,10 +25,10 @@ def search_wow_wiki(query: str, use_cache: bool = True) -> List[str]:
     if use_cache:
         cached = _check_cache(cache_key)
         if cached:
-            print(f"INFO: Using cached Wiki search results for: {query}")
+            debugger.add_log(f"Using cached Wiki search results for: {query}", agent="RESEARCH", process="WikiSearch")
             return cached.split(",")
 
-    print(f"INFO: Searching Wiki API for: {query}")
+    debugger.add_log(f"Searching Wiki API for: {query}", agent="RESEARCH", process="WikiSearch")
     api_url = f"{WIKI_BASE}/api.php?action=opensearch&format=json&formatversion=2&search={query.replace(' ', '+')}&namespace=0&limit=5"
 
     try:
@@ -44,5 +45,5 @@ def search_wow_wiki(query: str, use_cache: bool = True) -> List[str]:
 
         return []
     except Exception as e:
-        print(f"ERROR: Wiki API search failed: {e}")
+        debugger.add_log(f"Wiki API search failed: {e}", agent="RESEARCH", level="ERROR", process="WikiSearch")
         return []

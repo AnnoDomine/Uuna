@@ -2,17 +2,10 @@ import duckdb
 import os
 import subprocess
 import time
-import sys
-from loguru import logger
+from Tools.core.shared_debugger import debugger
 
 MASTER_DB = "Data/WoW_Master.duckdb"
 QUERIES_DIR = "Tools/analysis/queries/mass_indexer"
-
-# UNIFIED LOG SCHEMA
-logger.remove()
-LOG_FORMAT = "[{extra[run_info]} - {time:YYYY-MM-DD HH:mm:ss} - {level} - {extra[process]} - {extra[build]}]: {message}"
-logger.add(sys.stderr, format=LOG_FORMAT, level="INFO")
-logger.add("Data/logs/migration.log", format=LOG_FORMAT, rotation="10 MB", level="DEBUG")
 
 
 def get_con():
@@ -26,8 +19,7 @@ def load_query(name):
 
 
 def run_mass_indexing(start_v=None, end_v=None):
-    base_log = logger.bind(run_info="INIT", process="MassIndexer", build="ALL")
-    base_log.info("Starting Batch Indexing...")
+    debugger.add_log("Starting Batch Indexing...", agent="ANALYSIS", process="MassIndexer", build="ALL")
 
     con = get_con()
     sql_get_pending = load_query("get_pending_builds")
@@ -35,7 +27,7 @@ def run_mass_indexing(start_v=None, end_v=None):
 
     all_pending = [r[0] for r in con.execute(sql_get_pending).fetchall()]
     if not all_pending:
-        base_log.bind(run_info="DONE").info("No pending builds found.")
+        debugger.add_log("No pending builds found.", agent="ANALYSIS", process="MassIndexer", build="ALL")
         con.close()
         return
 
@@ -47,11 +39,11 @@ def run_mass_indexing(start_v=None, end_v=None):
 
     to_process = [v for v in all_pending if v in all_versions[start_idx : end_idx + 1]]
     total = len(to_process)
-    base_log.info(f"Queue: {total} builds.")
+    debugger.add_log(f"Queue: {total} builds.", agent="ANALYSIS", process="MassIndexer", build="ALL")
 
     for idx, version in enumerate(to_process, 1):
         run_info = f"{idx}/{total}"
-        b_log = logger.bind(run_info=run_info, process="Indexing", build=version)
+        debugger.add_log(f"Starting Indexing for {version}", agent="ANALYSIS", process="MassIndexer", build=version, run_info=run_info)
 
         start_time = time.time()
         try:
@@ -61,13 +53,13 @@ def run_mass_indexing(start_v=None, end_v=None):
             )
             elapsed = time.time() - start_time
             if result.returncode == 0:
-                b_log.success(f"Build completed in {elapsed:.1f}s")
+                debugger.add_log(f"Build completed in {elapsed:.1f}s", agent="ANALYSIS", level="SUCCESS", process="MassIndexer", build=version, run_info=run_info)
             else:
-                b_log.error(f"Failed: {result.stderr}")
+                debugger.add_log(f"Failed: {result.stderr}", agent="ANALYSIS", level="ERROR", process="MassIndexer", build=version, run_info=run_info)
         except Exception as e:
-            b_log.error(f"Error: {e}")
+            debugger.add_log(f"Error indexing {version}: {e}", agent="ANALYSIS", level="ERROR", process="MassIndexer", build=version, run_info=run_info)
 
-    base_log.bind(run_info="DONE").info("All tasks finished.")
+    debugger.add_log("All tasks finished.", agent="ANALYSIS", level="SUCCESS", process="MassIndexer", build="ALL")
 
 
 if __name__ == "__main__":

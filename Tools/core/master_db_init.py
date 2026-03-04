@@ -1,5 +1,6 @@
 import duckdb
 import os
+from Tools.core.shared_debugger import debugger
 
 DB_PATH = "Data/WoW_Master.duckdb"
 
@@ -112,7 +113,7 @@ def init_master():
         )
     """)
 
-    print(f"Master DuckDB initialized with sequences at: {DB_PATH}")
+    debugger.add_log(f"Master DuckDB initialized with sequences at: {DB_PATH}", agent="CORE", process="Init:MasterDB")
     con.close()
 
 

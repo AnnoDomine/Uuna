@@ -2,8 +2,8 @@ import duckdb
 import os
 import uuid
 import json
-from loguru import logger
 from .embedding_handler import EmbeddingHandler
+from Tools.core.shared_debugger import debugger
 
 
 class VectorManager:
@@ -29,14 +29,14 @@ class VectorManager:
                             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                         )
                     """)
-                    logger.info(f"Vector Database initialized at {self.db_path}")
+                    debugger.add_log(f"Vector Database initialized at {self.db_path}", agent="MEMORY", process="VectorDB:Init")
             except Exception as e:
                 if "Could not set lock" in str(e):
-                    logger.warning(f"Vector DB locked, assuming initialized: {e}")
+                    debugger.add_log(f"Vector DB locked, assuming initialized: {e}", agent="MEMORY", level="WARNING", process="VectorDB:Init")
                 else:
                     raise e
         except Exception as e:
-            logger.error(f"Failed to initialize Vector DB: {e}")
+            debugger.add_log(f"Failed to initialize Vector DB: {e}", agent="MEMORY", level="ERROR", process="VectorDB:Init")
 
     def add_memory(self, role: str, content: str, metadata: dict = {}):
         embedding = self.embedding_handler.get_embedding(content)
@@ -51,9 +51,10 @@ class VectorManager:
                     "INSERT INTO memory (id, role, content, metadata, embedding) VALUES (?, ?, ?, ?, ?)",
                     (mem_id, role, content, json.dumps(metadata), embedding),
                 )
+            debugger.add_log(f"Added memory entry {mem_id[:8]} for role {role}", agent="MEMORY", level="SUCCESS", process="VectorDB:Add")
             return mem_id
         except Exception as e:
-            logger.error(f"Failed to add memory: {e}")
+            debugger.add_log(f"Failed to add memory: {e}", agent="MEMORY", level="ERROR", process="VectorDB:Add")
             return None
 
     def search_memory(self, role: str, query_text: str, limit: int = 5):
@@ -86,7 +87,8 @@ class VectorManager:
                             "score": row[4],
                         }
                     )
+                debugger.add_log(f"Vector search for role {role} returned {len(results)} results.", agent="MEMORY", process="VectorDB:Search")
                 return results
         except Exception as e:
-            logger.error(f"Failed to search memory: {e}")
+            debugger.add_log(f"Failed to search memory: {e}", agent="MEMORY", level="ERROR", process="VectorDB:Search")
             return []

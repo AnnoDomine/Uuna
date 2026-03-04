@@ -1,4 +1,4 @@
-# Grand Library - WoW Datamine Toolkit (V1.0.0-rc)
+# Grand Library - WoW Datamine Toolkit (V1.1.0-rc)
 
 Welcome to the **Grand Library**, a high-performance, AI-orchestrated research platform for World of Warcraft data analysis. This toolkit transforms raw database files (DB2) from Classic to Midnight into semantically meaningful game intelligence using a multi-agent "Relay-Race" system.
 

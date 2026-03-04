@@ -1,5 +1,12 @@
 # Project History - WoW Datamine Toolkit
 
+## [1.1.0-rc] - 2026-03-03 - "The Desktop Evolution"
+
+### Added
+- **Electron Client**: Introduced the modern desktop client built with Electron, React, and Redux Toolkit, offering a richer UI and better desktop integration.
+- **Grand Library API Enhancement**: Modularized the FastAPI backend and implemented automated DuckDB schema migrations based on Pydantic models.
+- **Legacy TUI Migration**: Formally deprecated the terminal-based user interface (TUI) in favor of the more powerful and user-friendly desktop client.
+
 ## [1.0.0-rc] - 2026-02-26 - "The Release Candidate"
 
 ### Added

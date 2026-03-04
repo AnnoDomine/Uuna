@@ -2,6 +2,7 @@ from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.agent_models import LibrarianResponse, LibrarianSummary
 from Tools.core.ai_schema_validator import request_with_schema
 from Tools.core.security_utils import sanitize_user_prompt
+from Tools.core.shared_debugger import debugger
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
@@ -26,12 +27,14 @@ def send_librarian_response(task_id):
         final_summary = request_with_schema(LibrarianSummary, payload, Agents.LIBRARIAN)
 
         if "summary" in final_summary:
+            debugger.add_log(final_summary["summary"], agent=Agents.LIBRARIAN, process="FinalSummary")
             notify_frontend(task_id, final_summary["summary"], agent="Librarian", type="response")
         else:
             raise Exception("Failed to generate summary.")
 
     except Exception as e:
         notify_frontend(task_id, f"Error in finalization: {e}", agent="Librarian", type="error", level="error")
+        debugger.add_log(f"CRITICAL ERROR: {e}", agent=Agents.LIBRARIAN, level="ERROR", process="Finalization")
         return {"error": str(e)}
 
 
@@ -106,5 +109,5 @@ def request_librarian(prompts, builds):
 
     except Exception as e:
         # We don't have a task_id yet if creation failed, but we should log it
-        print(f"CRITICAL ERROR: {e}")
+        debugger.add_log(f"CRITICAL ERROR: {e}", agent=Agents.LIBRARIAN, level="ERROR", process="RequestEntry")
         return {"error": str(e)}

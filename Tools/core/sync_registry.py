@@ -1,16 +1,9 @@
 import duckdb
 import os
-import sys
-from loguru import logger
+from Tools.core.shared_debugger import debugger
 
 DB_PATH = "Data/WoW_Master.duckdb"
 QUERIES_DIR = "Tools/core/queries/sync_registry"
-
-# UNIFIED LOG SCHEMA
-logger.remove()
-LOG_FORMAT = "[{extra[run_info]} - {time:YYYY-MM-DD HH:mm:ss} - {level} - {extra[process]} - {extra[build]}]: {message}"
-logger.add(sys.stderr, format=LOG_FORMAT, level="INFO")
-logger.add("Data/logs/migration.log", format=LOG_FORMAT, rotation="10 MB", level="DEBUG")
 
 
 def load_query(name):
@@ -20,11 +13,10 @@ def load_query(name):
 
 
 def sync_registry():
-    log = logger.bind(run_info="SYNC", process="RegistrySync", build="ALL")
-    log.info("Starting Registry Sync with Archive...")
+    debugger.add_log("Starting Registry Sync with Archive...", agent="CORE", process="RegistrySync")
 
     if not os.path.exists(DB_PATH):
-        log.error(f"Master DB not found at {DB_PATH}")
+        debugger.add_log(f"Master DB not found at {DB_PATH}", agent="CORE", level="ERROR", process="RegistrySync")
         return
 
     con = duckdb.connect(DB_PATH)
@@ -35,7 +27,7 @@ def sync_registry():
     stats = con.execute(sql_stats).fetchone()
 
     total, downloaded, indexed = stats
-    log.success(f"Sync OK: {downloaded}/{total} builds available, {indexed} indexed.")
+    debugger.add_log(f"Sync OK: {downloaded}/{total} builds available, {indexed} indexed.", agent="CORE", level="SUCCESS", process="RegistrySync")
     con.close()
 
 

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "update_global_knowledge"
 
@@ -36,8 +37,8 @@ def update_global_knowledge(
         sql = _load_query("upsert_global_knowledge")
         params = [column_pattern, source_table, target_table, confidence, ai_notes, build_version]
         db.execute(sql, params)
-        print(f"INFO: Global knowledge updated for {column_pattern} ({source_table} -> {target_table})")
+        debugger.add_log(f"Global knowledge updated for {column_pattern} ({source_table} -> {target_table})", agent="CORE", process="DB:UpdateGlobalKnowledge")
         return {"status": "success"}
     except Exception as e:
-        print(f"ERROR: Failed to update global knowledge: {e}")
+        debugger.add_log(f"Failed to update global knowledge: {e}", agent="CORE", level="ERROR", process="DB:UpdateGlobalKnowledge")
         return {"status": "error", "message": str(e)}

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from Tools.core.shared_debugger import debugger
 
 DB_PATH = "Data/dbs/WoW_Research_Knowledge.db"
 
@@ -99,7 +100,7 @@ def init_research_db():
 
     conn.commit()
     conn.close()
-    print(f"Research Knowledge DB initialized: {DB_PATH}")
+    debugger.add_log(f"Research Knowledge DB initialized: {DB_PATH}", agent="CORE", process="Init:ResearchDB")
 
 
 if __name__ == "__main__":

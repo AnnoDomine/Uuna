@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-rc] - 2026-03-03
+### Added
+- **Desktop UI Migration**: Switched from React (Ink) TUI to a modern Electron-based Desktop UI using MUI/Joy UI and Redux Toolkit.
+- **Grand Library API Enhancement**: Refined the FastAPI backend with modular routers and automated DuckDB schema migrations based on Pydantic models.
+
 ## [1.0.0-rc] - 2026-02-26
 ### Added
 - **V1 Milestone reached**: The system is now functionally complete and stable for production-level datamining.

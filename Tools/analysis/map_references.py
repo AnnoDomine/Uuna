@@ -4,6 +4,7 @@ import json
 import difflib
 import sys
 from Tools.core.security_utils import sanitize_identifier
+from Tools.core.shared_debugger import debugger
 
 GLOBAL_MAP_PATH = "Data/dbs/Global_Column_Map.json"
 SETTINGS_DB = "Data/dbs/Settings.db"
@@ -114,6 +115,7 @@ def resolve_table_name(
     auto_suggestions = difflib.get_close_matches(potential_name, tables, n=1, cutoff=0.85)
     if auto_suggestions and (headless_mode or get_setting("map_references_auto_accept_high_confidence", "1") == "1"):
         target_result = auto_suggestions[0]
+        debugger.add_log(f"Auto-mapped {mapping_key} -> {target_result} (High Confidence)", agent="ANALYSIS", level="SUCCESS", process="MapRefs")
         print(f"  [AUTO] {mapping_key} -> {target_result} (Confidence > 0.85)")
         user_mappings[mapping_key] = target_result
         if use_global:
@@ -128,6 +130,7 @@ def resolve_table_name(
 
     auto_skip_setting = get_setting("map_references_auto_skip_unidentifiable", "0") == "1"
     if auto_skip_setting:
+        debugger.add_log(f"Auto-skipping ambiguous reference: {mapping_key}", agent="ANALYSIS", level="WARNING", process="MapRefs")
         print(f"[!] Auto-skipping ambiguous reference: {current_table}.{current_col}")
         session_skip_all = True
         return None
@@ -155,6 +158,7 @@ def resolve_table_name(
             target_result = "NONE"
         elif choice == "0a":
             session_skip_all = True
+            debugger.add_log("User skipped all remaining ambiguous references.", agent="ANALYSIS", process="MapRefs")
             return None
         elif choice == "m":
             manual = input("    Enter table name: ").strip()
@@ -164,6 +168,7 @@ def resolve_table_name(
             target_result = suggestions[int(choice) - 1]
 
         if target_result:
+            debugger.add_log(f"User mapped {mapping_key} -> {target_result}", agent="ANALYSIS", level="SUCCESS", process="MapRefs")
             # Save locally
             user_mappings[mapping_key] = target_result
             save_json(mapping_path, user_mappings)
@@ -176,6 +181,7 @@ def resolve_table_name(
             return target_result if target_result != "NONE" else None
 
     except (EOFError, KeyboardInterrupt):
+        debugger.add_log("Mapping process aborted by user.", agent="ANALYSIS", level="WARNING", process="MapRefs")
         print("\nAborted.")
 
     return None
@@ -201,6 +207,7 @@ def get_previous_build(current_version):
 
 def map_references(db_path, use_global=True):
     build_version = os.path.basename(db_path).replace("WoW_Data_", "").replace(".db", "")
+    debugger.add_log(f"Starting Reference Mapping for Build {build_version}", agent="ANALYSIS", process="MapRefs")
     print(f"=== REFERENCE MAPPING - {build_version} (Global: {use_global}) ===")
 
     mapping_path = db_path.replace(".db", "_user_map.json")
@@ -216,6 +223,7 @@ def map_references(db_path, use_global=True):
                 if choice == "y":
                     user_mappings = load_json(prev_map_path)
                     save_json(mapping_path, user_mappings)
+                    debugger.add_log(f"Imported {len(user_mappings)} mappings from Build {prev_version}", agent="ANALYSIS", level="SUCCESS", process="MapRefs")
                     print(f"    Imported {len(user_mappings)} mappings from {prev_version}.")
 
     conn = sqlite3.connect(db_path)
@@ -277,6 +285,7 @@ def map_references(db_path, use_global=True):
     ref_path = db_path.replace(".db", "_refs.json")
     save_json(ref_path, references)
     conn.close()
+    debugger.add_log(f"Reference mapping complete. Saved to {ref_path}", agent="ANALYSIS", level="SUCCESS", process="MapRefs")
     print(f"\nReference map saved: {ref_path}")
 
 
@@ -299,16 +308,18 @@ if __name__ == "__main__":
         args.remove("--headless")
 
     build = args[0] if args else None
-    db = f"Data/dbs/WoW_Data_{build}.db" if build else get_latest_local_db()
+    db_file = f"Data/dbs/WoW_Data_{build}.db" if build else get_latest_local_db()
 
-    if db and os.path.exists(db):
-        map_references(db, use_global)
+    if db_file and os.path.exists(db_file):
+        map_references(db_file, use_global)
 
         # Save pending mappings if in headless mode
         if headless_mode and pending_mappings:
-            pending_path = db.replace(".db", "_pending_map.json")
+            pending_path = db_file.replace(".db", "_pending_map.json")
             save_json(pending_path, pending_mappings)
+            debugger.add_log(f"Saved {len(pending_mappings)} pending mappings to {pending_path}", agent="ANALYSIS", process="MapRefs")
             print(f"\n[!] {len(pending_mappings)} pending mappings saved to: {pending_path}")
             print("Run with interactive mode or use an AI to resolve these.")
     else:
+        debugger.add_log("No database found for mapping.", agent="ANALYSIS", level="ERROR", process="MapRefs")
         print("No DB found.")

@@ -4,15 +4,10 @@ import sys
 import sqlite3
 import gzip
 import shutil
-from loguru import logger
+from Tools.core.shared_debugger import debugger
 
 MASTER_DB = "Data/WoW_Master.duckdb"
 SQLITE_DIR = "Data/dbs"
-
-# Configure Loguru
-logger.remove()
-LOG_FORMAT = "[{extra[run_info]} - {time:YYYY-MM-DD HH:mm:ss} - {level} - {extra[process]} - {extra[build]}]: {message}"
-logger.add(sys.stderr, format=LOG_FORMAT)
 
 
 def get_con():
@@ -45,36 +40,37 @@ def select_build_interactively(df, prompt_text):
         elif choice == "p" and current_page > 0:
             current_page -= 1
         elif choice == "q":
+            debugger.add_log("User quit build selection.", agent="INGESTER", process="ArchiveSync:CLI")
             sys.exit(0)
         elif choice.isdigit():
             idx = int(choice) - 1
             if 0 <= idx < len(df):
-                return df.iloc[idx]["version"]
+                version = df.iloc[idx]["version"]
+                debugger.add_log(f"User selected Build {version} via CLI.", agent="INGESTER", process="ArchiveSync:CLI")
+                return version
         else:
             print("Invalid input.")
 
 
 def cleanup_local_db(version, run_info):
-    log = logger.bind(run_info=run_info, process="Cleanup", build=version)
     old_path = os.path.join(SQLITE_DIR, f"WoW_Data_{version}.db")
     backup_dir = "Data/backups/archived_sqlite"
     os.makedirs(backup_dir, exist_ok=True)
     new_path = os.path.join(backup_dir, f"WoW_Data_{version}.db.gz")
     if not os.path.exists(old_path):
         return
-    log.info(f"Archiving to {new_path}...")
+    debugger.add_log(f"Archiving to {new_path}...", agent="INGESTER", process="Cleanup", build=version, run_info=run_info)
     try:
         with open(old_path, "rb") as f_in:
             with gzip.open(new_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
         os.remove(old_path)
-        log.success("Legacy file removed successfully.")
+        debugger.add_log("Legacy file removed successfully.", agent="INGESTER", level="SUCCESS", process="Cleanup", build=version, run_info=run_info)
     except Exception as e:
-        log.error(f"Cleanup Error: {e}")
+        debugger.add_log(f"Cleanup Error: {e}", agent="INGESTER", level="ERROR", process="Cleanup", build=version, run_info=run_info)
 
 
 def process_table_local(con, table_name, sqlite_path, build_id, run_info, build_ver):
-    log = logger.bind(run_info=run_info, process="Archive", build=build_ver)
     try:
         archive_table = f"archive.data_{table_name}"
         con.execute(
@@ -110,7 +106,7 @@ def process_table_local(con, table_name, sqlite_path, build_id, run_info, build_
         )
         return True
     except Exception as e:
-        log.error(f"Error in {table_name}: {e}")
+        debugger.add_log(f"Error in {table_name}: {e}", agent="INGESTER", level="ERROR", process="Archive", build=build_ver, run_info=run_info)
         return False
 
 
@@ -118,19 +114,18 @@ def sync_build(row, all_builds, current_count, total_count, auto_migrate=False):
     version = row["version"]
     build_id = row["id"]
     run_info = f"{current_count}/{total_count}"
-    log = logger.bind(run_info=run_info, process="Sync", build=version)
     sqlite_path = os.path.join(SQLITE_DIR, f"WoW_Data_{version}.db")
 
-    log.info(f">>> Processing {version} ({row['product']}) <<<")
+    debugger.add_log(f">>> Processing {version} ({row['product']}) <<<", agent="INGESTER", process="Sync", build=version, run_info=run_info)
 
     use_local = False
     if os.path.exists(sqlite_path):
         size_kb = os.path.getsize(sqlite_path) // 1024
         if size_kb >= 24000 or auto_migrate:
-            log.info(f"Local DB used ({size_kb} KB).")
+            debugger.add_log(f"Local DB used ({size_kb} KB).", agent="INGESTER", process="Sync", build=version, run_info=run_info)
             use_local = True
         else:
-            log.warning(f"Local DB small ({size_kb} KB).")
+            debugger.add_log(f"Local DB small ({size_kb} KB).", agent="INGESTER", level="WARNING", process="Sync", build=version, run_info=run_info)
             if input(f"  [?] Use {version} anyway? [y/N]: ").lower() == "y":
                 use_local = True
 
@@ -145,12 +140,11 @@ def sync_build(row, all_builds, current_count, total_count, auto_migrate=False):
         ]
         lite_con.close()
         done = sum(1 for t in tables if process_table_local(con, t, sqlite_path, build_id, run_info, version))
-        log.info(f"Result: {done}/{len(tables)} tables migrated.")
+        debugger.add_log(f"Result: {done}/{len(tables)} tables migrated.", agent="INGESTER", level="SUCCESS", process="Sync", build=version, run_info=run_info)
         if done == len(tables) and len(tables) > 0:
             cleanup_local_db(version, run_info)
     else:
-        log.info("Downloading from Wago.tools (Not yet fully implemented for DuckDB)...")
-        # Placeholder for future remote logic
+        debugger.add_log("Downloading from Wago.tools (Not yet fully implemented)...", agent="INGESTER", process="Sync", build=version, run_info=run_info)
         pass
 
     con.execute("UPDATE registry.builds SET is_downloaded = TRUE WHERE id = ?", (build_id,))
@@ -165,20 +159,24 @@ def main():
     parser.add_argument("--end")
     parser.add_argument("--auto-migrate", action="store_true")
     args = parser.parse_args()
-    from master_db_init import init_master
-
+    
+    from Tools.core.master_db_init import init_master
     init_master()
+    
     df = get_all_builds_list()
     start_v = args.start if args.start else select_build_interactively(df, "Select START Build")
     end_v = args.end if args.end else select_build_interactively(df, "Select END Build")
+    
     start_idx = df[df["version"] == start_v].index[0]
     end_idx = df[df["version"] == end_v].index[0]
+    
     if start_idx > end_idx:
         start_idx, end_idx = end_idx, start_idx
+        
     target_builds = df.iloc[start_idx : end_idx + 1]
     total_to_process = len(target_builds)
-    log = logger.bind(run_info="INIT", process="Main", build="ALL")
-    log.info(f"Starting sync for {total_to_process} builds...")
+    
+    debugger.add_log(f"Starting sync for {total_to_process} builds...", agent="INGESTER", process="Main")
     for i, (_, row) in enumerate(target_builds.iterrows(), 1):
         sync_build(row, df, i, total_to_process, auto_migrate=args.auto_migrate)
 

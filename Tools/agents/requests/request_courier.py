@@ -1,6 +1,7 @@
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.agent_models import SpecialistSelection, ApprovalStatus
+from Tools.agents.requests.agent_models import ApprovalStatus, SpecialistSelection
 from Tools.core.ai_schema_validator import request_with_schema
+from Tools.core.config_manager import get_config
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
@@ -8,6 +9,7 @@ from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 def present_response(task_id):
     """Sends the task id to the librarian to present the research to the user."""
     from Tools.agents.requests.request_librarian import send_librarian_response
+
     send_librarian_response(task_id)
 
 
@@ -21,7 +23,6 @@ def request_courier_from_sages(task_id, approval: str, context: str):
 
     if approval == ApprovalStatus.APPROVED:
         notify_frontend(task_id, "Courier: Task approved by Sages. Finalizing...", agent="Courier", type="research")
-        present_response(task_id)
         request_tinker(task_id)
     else:
         notify_frontend(
@@ -50,13 +51,15 @@ def request_courier(task_id: str, event_id: str):
     )
     output = []
 
+    max_events = get_config().tasks.max_events_total
+
     try:
         task_ctx = global_tool_set.get_task_context(task_id=task_id)
         if "error" in task_ctx:
             raise Exception(task_ctx["error"])
 
         task_history = task_ctx.get("history", [])
-        if len(task_history) > 80:
+        if len(task_history) > max_events:
             notify_frontend(
                 task_id,
                 "Courier: History limit reached. Forcing Sages verification.",
@@ -80,11 +83,11 @@ def request_courier(task_id: str, event_id: str):
                     "role": "system",
                     "content": f"""
                     You are the Courier. Based on the current progress of the task and the events, select the next specialist.
-                    
+
                     TASK INFO:
-                    - Original Query: {task_ctx['task']['original_query']}
-                    - ASSIGNED BUILDS: {task_ctx['task']['assigned_builds']}
-                    
+                    - Original Query: {task_ctx["task"]["original_query"]}
+                    - ASSIGNED BUILDS: {task_ctx["task"]["assigned_builds"]}
+
                     IMPORTANT: You MUST ONLY research for the assigned builds. Do not hallucinate other versions.
                     """,
                 },
@@ -104,6 +107,7 @@ def request_courier(task_id: str, event_id: str):
                     SAGES: As the gatekeepers of truth,the sages is responsible for the final logical validation of all research before it is committed to the library's "permanent memory".\n
                     \n
                     If you think, the research is finished, the responsible specialist is the sages, as it finallize the research.\n
+                    If the user requests a research, the sages should not get selected at the first place. Only if at least 3 events are done, the sages should be selected.\n
                     """,
                 },
             ]

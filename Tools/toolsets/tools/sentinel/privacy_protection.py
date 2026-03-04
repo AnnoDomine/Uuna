@@ -1,6 +1,7 @@
 # Tools/toolsets/tools/sentinel/privacy_protection.py
 import re
 from typing import Dict, Any
+from Tools.core.shared_debugger import debugger
 
 # Common patterns for API keys and secrets
 SENSITIVE_PATTERNS = {
@@ -17,6 +18,7 @@ def privacy_protection(data: str) -> Dict[str, Any]:
     Args:
     - data: The input string to scan for sensitive information.
     """
+    debugger.add_log("Starting privacy scan on data.", agent="SENTINEL", process="Sentinel:Privacy")
     if not data:
         return {"protected_data": "", "leaks_detected": 0}
 
@@ -27,8 +29,14 @@ def privacy_protection(data: str) -> Dict[str, Any]:
         matches = re.findall(pattern, protected, re.IGNORECASE)
         if matches:
             leaks_count += len(matches)
+            debugger.add_log(f"Detected {len(matches)} potential leaks of type '{label}'. Masking...", agent="SENTINEL", level="WARNING", process="Sentinel:Privacy")
             # Mask the secret
             protected = re.sub(pattern, f"[MASKED_{label.upper()}]", protected, flags=re.IGNORECASE)
+
+    if leaks_count > 0:
+        debugger.add_log(f"Privacy protection complete. {leaks_count} secrets masked.", agent="SENTINEL", level="SUCCESS", process="Sentinel:Privacy")
+    else:
+        debugger.add_log("No secrets detected in data.", agent="SENTINEL", process="Sentinel:Privacy")
 
     return {
         "protected_data": protected,

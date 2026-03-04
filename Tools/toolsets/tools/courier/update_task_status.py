@@ -3,13 +3,15 @@ from pathlib import Path
 from typing import Any, Dict
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "update_task_status"
 
 
 def _load_query(name: str) -> str:
     """Loads a SQL query from the tool's query directory."""
-    with open(QUERY_DIR / f"{name}.sql", "r") as f:
+    path = QUERY_DIR / f"{name}.sql"
+    with open(path, "r") as f:
         return f.read().strip()
 
 
@@ -22,10 +24,13 @@ def update_task_status(task_id: str, status: str, location: str) -> Dict[str, An
     - status: The new status (e.g. 'active', 'finalized').
     - location: The role name where the task is currently located.
     """
+    debugger.add_log(f"Updating Task {task_id} status to '{status}' at location '{location}'", agent="COURIER", process="Task:StatusUpdate")
     try:
         sql = _load_query("update_status")
         db.execute(sql, [status, location, task_id])
 
+        debugger.add_log("Task status updated successfully.", agent="COURIER", level="SUCCESS", process="Task:StatusUpdate")
         return {"status": "success", "task_id": task_id, "new_status": status, "current_location": location}
     except Exception as e:
+        debugger.add_log(f"Failed to update task status: {e}", agent="COURIER", level="ERROR", process="Task:StatusUpdate")
         return {"status": "error", "error": str(e)}

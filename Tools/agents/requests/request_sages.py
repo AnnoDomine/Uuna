@@ -1,6 +1,7 @@
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.agents.requests.agent_models import ApprovalStatus, SageVerdict
 from Tools.core.ai_schema_validator import request_with_schema
+from Tools.core.config_manager import get_config
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
@@ -11,16 +12,24 @@ def request_sages(task_id: str):
     """
     from Tools.agents.requests.request_courier import request_courier_from_sages
 
+    max_events = get_config().tasks.max_events_total
+
     try:
         notify_frontend(task_id, "Sages: Reviewing task logic and consistency...", agent="Sages", type="research")
-        
+
         task_ctx = global_tool_set.get_task_context(task_id)
         if "error" in task_ctx:
             raise Exception(task_ctx["error"])
 
         history = task_ctx.get("history", [])
-        if len(history) > 50:
-            notify_frontend(task_id, "Sages: History limit reached. Auto-approving with notice.", agent="Sages", type="research", level="warning")
+        if len(history) > max_events:
+            notify_frontend(
+                task_id,
+                "Sages: History limit reached. Auto-approving with notice.",
+                agent="Sages",
+                type="research",
+                level="warning",
+            )
             request_courier_from_sages(
                 task_id, approval=ApprovalStatus.APPROVED, context="Aborted task due to high amount of research steps."
             )
@@ -41,12 +50,17 @@ def request_sages(task_id: str):
         }
 
         approval_response = request_with_schema(SageVerdict, payload, Agents.SAGES)
-        
+
         if "error" in approval_response:
             raise Exception(approval_response["error"])
 
         decision = approval_response["approval"]
-        notify_frontend(task_id, f"Sages: Verdict is '{decision.upper()}'. Reason: {approval_response['context']}", agent="Sages", type="research")
+        notify_frontend(
+            task_id,
+            f"Sages: Verdict is '{decision.upper()}'. Reason: {approval_response['context']}",
+            agent="Sages",
+            type="research",
+        )
 
         request_courier_from_sages(task_id, decision, approval_response["context"])
 

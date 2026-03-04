@@ -2,18 +2,12 @@ import os
 import time
 import sys
 import json
-from loguru import logger
 from Tools.core.db_client import DBClient
 from Tools.core.security_utils import sanitize_identifier
+from Tools.core.shared_debugger import debugger
 
 MASTER_DB = "Data/WoW_Master.duckdb"
 QUERIES_DIR = "Tools/analysis/queries/feature_extractor"
-
-# UNIFIED LOG SCHEMA
-logger.remove()
-LOG_FORMAT = "[{extra[run_info]} - {time:YYYY-MM-DD HH:mm:ss} - {level} - {extra[process]} - {extra[build]}]: {message}"
-logger.add(sys.stderr, format=LOG_FORMAT, level="INFO")
-logger.add("Data/logs/migration.log", format=LOG_FORMAT, rotation="10 MB", level="DEBUG")
 
 
 def get_con():
@@ -28,9 +22,7 @@ def load_query(name):
 
 def process_build_features(build_version):
     start_time = time.time()
-    # Initial bind
-    base_log = logger.bind(run_info="INIT", process="Indexer", build=build_version)
-    base_log.info(f">>> Analyzing Build: {build_version} <<< ")
+    debugger.add_log(f">>> Analyzing Build: {build_version} <<<", agent="ANALYSIS", process="FeatureExtractor", build=build_version)
 
     con = get_con()
     sql_init_infra = load_query("init_infrastructure")
@@ -48,7 +40,7 @@ def process_build_features(build_version):
 
     res = con.execute(sql_get_build_id, (build_version,)).fetchone()
     if not res:
-        base_log.error(f"Build {build_version} not in registry.")
+        debugger.add_log(f"Build {build_version} not in registry.", agent="ANALYSIS", level="ERROR", process="FeatureExtractor", build=build_version)
         return
     build_id = res[0]
 
@@ -58,14 +50,13 @@ def process_build_features(build_version):
     total_cols = 0
     for idx, table in enumerate(tables, 1):
         run_info = f"{idx}/{total_tables}"
-        t_log = logger.bind(run_info=run_info, process="Indexing", build=build_version)
         
         try:
             # Sanitize table name before use
             safe_table = sanitize_identifier(table)
             table_exists = con.execute(sql_check_table, (safe_table,)).fetchone()[0]
             if not table_exists:
-                t_log.warning(f"Table {safe_table} MISSING in archive. Logged for re-sync.")
+                debugger.add_log(f"Table {safe_table} MISSING in archive.", agent="ANALYSIS", level="WARNING", process="FeatureExtractor", build=build_version, run_info=run_info)
                 con.execute(sql_log_error, (build_id, safe_table, "MISSING_TABLE", "Missing in archive schema."))
                 continue
 
@@ -77,7 +68,7 @@ def process_build_features(build_version):
             build_rows = con.execute(sql_get_row_count, (build_id, safe_table)).fetchone()[0]
 
             if idx % 50 == 0 or idx == 1:
-                t_log.info(f"Processing: {safe_table} ({build_rows} rows)")
+                debugger.add_log(f"Processing: {safe_table} ({build_rows} rows)", agent="ANALYSIS", process="FeatureExtractor", build=build_version, run_info=run_info)
 
             for col in columns:
                 total_cols += 1
@@ -99,14 +90,12 @@ def process_build_features(build_version):
                     continue
 
         except Exception as e:
-            t_log.error(f"Error in {table}: {e}")
+            debugger.add_log(f"Error in {table}: {e}", agent="ANALYSIS", level="ERROR", process="FeatureExtractor", build=build_version, run_info=run_info)
             con.execute(sql_log_error, (build_id, table, "CRASH", str(e)))
 
     con.execute(sql_mark_indexed, (build_id,))
     elapsed = time.time() - start_time
-    logger.bind(run_info="DONE", process="Indexer", build=build_version).success(
-        f"Finished: {total_cols} columns in {elapsed:.1f}s"
-    )
+    debugger.add_log(f"Finished feature extraction for {build_version}: {total_cols} columns in {elapsed:.1f}s", agent="ANALYSIS", level="SUCCESS", process="FeatureExtractor", build=build_version)
     con.close()
 
 

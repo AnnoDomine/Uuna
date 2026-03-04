@@ -42,18 +42,32 @@ def _get_schema_for_build(build_version: str) -> Dict[str, Dict[str, Any]]:
             describe_sql = describe_table_template.format(table_name=table)
             cols_res = db.execute(describe_sql)
             columns = [row[0] for row in cols_res.fetchall()]
+            
+            col_names_lower = [c.lower() for c in columns]
+            has_hash = "_row_hash" in col_names_lower
+            has_build_id = "build_id" in col_names_lower
 
-            if "build_id" not in [c.lower() for c in columns]:
+            if has_hash:
+                # Modern architecture: use mapping table
+                count_sql = f"""
+                    SELECT COUNT(*) 
+                    FROM archive."{table}" d
+                    JOIN archive.build_data_map m ON d._row_hash = m.row_hash
+                    WHERE m.build_id = ? AND m.table_name = ?
+                """
+                count_res = db.execute(count_sql, [build_id, table])
+            elif has_build_id:
+                # Transition architecture: table has build_id
+                count_sql = get_count_template.format(table_name=table)
+                count_res = db.execute(count_sql, [build_id])
+            else:
+                # Table doesn't support build-specific filtering
                 continue
 
-            count_sql = get_count_template.format(table_name=table)
-            count_res = db.execute(count_sql, [build_id])
             count = count_res.fetchone()[0]
-
             if count > 0:
                 schema[table] = {"columns": columns, "count": count}
         except Exception:
-            # If a table fails, we just skip it for the comparison
             continue
 
     return schema

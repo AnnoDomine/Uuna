@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 from .guess_table_reference import guess_table_reference
 
 # --- Constants ---
@@ -69,7 +70,7 @@ def _resolve_table_name_headless(
     # 3. Auto-accept high confidence suggestions
     top_suggestion = suggestions[0]
     if top_suggestion["confidence"] >= CONFIDENCE_THRESHOLD:
-        print(f"  [AUTO] {mapping_key} -> {top_suggestion['table']} (Confidence: {top_suggestion['confidence']})")
+        debugger.add_log(f"[AUTO] {mapping_key} -> {top_suggestion['table']} (Confidence: {top_suggestion['confidence']})", agent="CORE", process="Analysis:MapRefs")
         # Update mappings in memory
         user_mappings[mapping_key] = top_suggestion["table"]
         global_mappings[current_col] = top_suggestion["table"]
@@ -95,7 +96,7 @@ def map_column_references_workflow(build_version: str, auto_import_previous: boo
     - build_version: The version string of the build.
     - auto_import_previous: Whether to import mappings from the previous build (defaults to True).
     """
-    print(f"=== REFERENCE MAPPING WORKFLOW - {build_version} ===")
+    debugger.add_log(f"=== REFERENCE MAPPING WORKFLOW - {build_version} ===", agent="CORE", process="Analysis:MapRefs")
 
     # --- Setup and Data Loading ---
     mapping_path = f"Data/dbs/WoW_Data_{build_version}_user_map.json"
@@ -111,10 +112,10 @@ def map_column_references_workflow(build_version: str, auto_import_previous: boo
                 prev_version = prev_res[0]
                 prev_map_path = f"Data/dbs/WoW_Data_{prev_version}_user_map.json"
                 if os.path.exists(prev_map_path):
-                    print(f"INFO: Importing mappings from previous build {prev_version}.")
+                    debugger.add_log(f"Importing mappings from previous build {prev_version}.", agent="CORE", process="Analysis:MapRefs")
                     user_mappings = _load_json(prev_map_path)
         except Exception as e:
-            print(f"WARNING: Could not import previous build mappings: {e}")
+            debugger.add_log(f"Could not import previous build mappings: {e}", agent="CORE", level="WARNING", process="Analysis:MapRefs")
 
     # --- Main Logic ---
     all_tables_res = db.execute(
@@ -161,7 +162,7 @@ def map_column_references_workflow(build_version: str, auto_import_previous: boo
                     newly_confirmed_references[table].append(
                         {"column": col, "target_table": match, "active_entries": val_count}
                     )
-                    print(f"  LINK: {table}.{col} -> {match} ({val_count})")
+                    debugger.add_log(f"LINK: {table}.{col} -> {match} ({val_count})", agent="CORE", process="Analysis:MapRefs")
 
     # --- Save results ---
     _save_json(mapping_path, user_mappings)
@@ -169,7 +170,7 @@ def map_column_references_workflow(build_version: str, auto_import_previous: boo
 
     ref_path = f"Data/dbs/WoW_Data_{build_version}_refs.json"
     _save_json(ref_path, newly_confirmed_references)
-    print(f"\nReference map saved: {ref_path}")
+    debugger.add_log(f"Reference map saved: {ref_path}", agent="CORE", process="Analysis:MapRefs")
 
     # --- Return summary ---
     return {

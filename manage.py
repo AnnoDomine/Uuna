@@ -29,7 +29,20 @@ def init():
 def serve(host, port):
     """Start the FastAPI Database Service."""
     click.echo(f"🚀 Starting DB Service on {host}:{port}...")
-    subprocess.run(["uv", "run", "python", "Tools/core/db_service.py"])
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd()
+    subprocess.run(["uv", "run", "python", "Tools/core/db_service.py"], env=env)
+
+
+@cli.command(name="ai")
+@click.option("--host", default="127.0.0.1", help="API Host")
+@click.option("--port", default=8001, help="API Port")
+def ai_service(host, port):
+    """Start the Grand Library AI Orchestra API."""
+    click.echo(f"🧠 Starting AI Orchestra Service on {host}:{port}...")
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd()
+    subprocess.run(["uv", "run", "uvicorn", "Tools.core.api.main:app", "--host", host, "--port", str(port)], env=env)
 
 
 @cli.command()

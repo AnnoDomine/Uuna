@@ -3,6 +3,8 @@ from typing import Any, Dict, Literal
 
 import httpx
 
+from Tools.core.shared_debugger import debugger
+
 from .get_task_context import get_task_context
 
 
@@ -24,7 +26,7 @@ def notify_frontend(
     - level: The severity level (info, warning, error).
     """
     port = os.getenv("TUI_SIGNAL_PORT", "3800")
-    url = f"http://localhost:{port}/update"
+    url = f"http://localhost:{port}/webhook"
 
     try:
         # Get full task context to provide meaningful updates to the frontend
@@ -42,11 +44,22 @@ def notify_frontend(
             "task_context": task_ctx,
         }
 
+        debugger.add_log(
+            f"Send notification to Frontend webhook with task id: {task_id} with context:\n{task_ctx}",
+            agent,
+            level="INFO",
+            process="NotifyFrontend",
+        )
+
         with httpx.Client(timeout=5.0) as client:
             response = client.post(url, json=payload)
             response.raise_for_status()
             return {"status": "success"}
 
+        debugger.add_log("Finished sending notification to Frontend", agent, level="INFO", process="NotifyFrontend")
+
     except Exception as e:
-        print(f"WARNING: Frontend notification failed: {e}")
+        debugger.add_log(
+            f"WARNING: Frontend notification failed: {e}", agent, level="WARNING", process="NotifyFrontend"
+        )
         return {"status": "error", "message": str(e)}

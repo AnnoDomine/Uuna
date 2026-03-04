@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "save_discovery"
 
@@ -29,8 +30,8 @@ def save_discovery(
         sql = _load_query("save_discovery")
         params = [build_id, table_name, column_name, discovery, confidence]
         db.execute(sql, params)
-        print(f"INFO: Discovery saved for {table_name}.{column_name}")
+        debugger.add_log(f"Discovery saved for {table_name}.{column_name}", agent="CORE", process="DB:SaveDiscovery")
         return {"status": "success"}
     except Exception as e:
-        print(f"ERROR: Failed to save discovery: {e}")
+        debugger.add_log(f"Failed to save discovery: {e}", agent="CORE", level="ERROR", process="DB:SaveDiscovery")
         return {"status": "error", "message": str(e)}

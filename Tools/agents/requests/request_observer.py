@@ -1,13 +1,13 @@
 from pathlib import Path
+
 from Tools.agents.get_agent_skill_set import Agents
-from Tools.agents.requests.agent_models import (
-    ObserverVerdict, ResearchLearning
-)
+from Tools.agents.requests.agent_models import ObserverVerdict, ResearchLearning
+from Tools.agents.requests.request_courier import present_response
+from Tools.core.ai_schema_validator import request_with_schema
+from Tools.core.shared_db_instance import db
 from Tools.toolsets import global_tool_set
 from Tools.toolsets.observer_tool_set import grant_final_verdict
-from Tools.core.ai_schema_validator import request_with_schema
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
-from Tools.core.shared_db_instance import db
 
 QUERY_DIR = Path("Tools/toolsets/tools/audit/queries/evaluate_agent_output")
 
@@ -24,18 +24,23 @@ def request_observer(task_id: str):
     """
     try:
         from Tools.core.api.managers.vector_manager import VectorManager
+
         vm = VectorManager()
 
-        notify_frontend(task_id, "Observer: Mercilessly auditing research quality...", agent="Observer", type="research")
-        
+        notify_frontend(
+            task_id, "Observer: Mercilessly auditing research quality...", agent="Observer", type="research"
+        )
+
         # 1. Get task context and history (including max_potential from Tinker)
         task_ctx = global_tool_set.get_task_context(task_id=task_id)
         if "error" in task_ctx:
             raise Exception(task_ctx["error"])
-            
+
         history = task_ctx.get("history", [])
         if not history:
-            notify_frontend(task_id, "Observer: No history to audit.", agent="Observer", type="research", level="warning")
+            notify_frontend(
+                task_id, "Observer: No history to audit.", agent="Observer", type="research", level="warning"
+            )
             return
 
         # 2. AI assessment of quality
@@ -50,7 +55,7 @@ def request_observer(task_id: str):
         }
 
         verdict = request_with_schema(ObserverVerdict, payload, Agents.OBSERVER)
-        
+
         if "error" in verdict:
             raise Exception(verdict["error"])
 
@@ -65,10 +70,10 @@ def request_observer(task_id: str):
             if event_data and event_data.get("max_potential", 0) > 0:
                 total_quality_points += eval_item["quality_score"]
                 total_max_potential += event_data["max_potential"]
-                
+
                 percent = (eval_item["quality_score"] / event_data["max_potential"]) * 100
                 percent = min(percent, 100.0)
-                
+
                 # Use the outsourced query
                 db.execute(sql_save_score, [task_id, eval_item["event_id"], percent])
 
@@ -79,40 +84,54 @@ def request_observer(task_id: str):
         grant_final_verdict(
             task_id=task_id,
             decision="APPROVE",  # Mark as complete in DB
-            summary=verdict["overall_summary"]
+            summary=verdict["overall_summary"],
         )
 
         # 5. Learning Phase: Extract and store lessons if quality is GOOD or better
         if overall_percent >= 60:
-            notify_frontend(task_id, "Observer: Quality sufficient. Extracting lessons for long-term memory...", agent="Observer", type="research")
-            
+            notify_frontend(
+                task_id,
+                "Observer: Quality sufficient. Extracting lessons for long-term memory...",
+                agent="Observer",
+                type="research",
+            )
+
             learning_payload = {
                 "messages": [
                     {
                         "role": "system",
                         "content": "You are the Observer. Analyze the research task and extract high-value 'Lessons Learned' for each involved agent. Focus on facts, table relations, or successful research strategies.",
                     },
-                    {"role": "user", "content": f"TASK: {task_ctx['task']}\n\nEVALUATIONS:\n{verdict.model_dump_json()}"},
+                    {
+                        "role": "user",
+                        "content": f"TASK: {task_ctx['task']}\n\nEVALUATIONS:\n{verdict.model_dump_json()}",
+                    },
                 ]
             }
 
             learnings = request_with_schema(ResearchLearning, learning_payload, Agents.OBSERVER)
-            
+
             if "lessons" in learnings:
                 for item in learnings["lessons"]:
                     vm.add_memory(
                         role=item["role"],
                         content=item["lesson"],
-                        metadata={"task_id": task_id, "quality_score": item["quality_score"], "type": "lesson_learned"}
+                        metadata={"task_id": task_id, "quality_score": item["quality_score"], "type": "lesson_learned"},
                     )
-                notify_frontend(task_id, f"Observer: Successfully stored {len(learnings['lessons'])} lessons in long-term memory.", agent="Observer", type="research")
+                notify_frontend(
+                    task_id,
+                    f"Observer: Successfully stored {len(learnings['lessons'])} lessons in long-term memory.",
+                    agent="Observer",
+                    type="research",
+                )
 
         notify_frontend(
-            task_id, 
-            f"Observer: Audit complete ({verdict['audit_status']}). Quality Score: {overall_percent:.1f}%", 
-            agent="Observer", 
-            type="research"
+            task_id,
+            f"Observer: Audit complete ({verdict['audit_status']}). Quality Score: {overall_percent:.1f}%",
+            agent="Observer",
+            type="research",
         )
+        present_response(task_id)
 
     except Exception as e:
         notify_frontend(task_id, f"Observer scoring error: {e}", agent="Observer", type="error", level="error")

@@ -8,6 +8,7 @@ from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "cache"
 
@@ -62,10 +63,10 @@ def fetch_web_content(url: str, use_cache: bool = True) -> str:
     if use_cache:
         cached = _check_cache(url)
         if cached:
-            print(f"INFO: Using cached content for: {url}")
+            debugger.add_log(f"Using cached content for: {url}", agent="RESEARCH", process="FetchWeb")
             return cached
 
-    print(f"INFO: Fetching web content via curl_cffi (impersonate=chrome): {url}")
+    debugger.add_log(f"Fetching web content via curl_cffi: {url}", agent="RESEARCH", process="FetchWeb")
     try:
         # Use headers that look like a real browser based on provided data
         headers = {
@@ -103,6 +104,6 @@ def fetch_web_content(url: str, use_cache: bool = True) -> str:
         return sanitized
             
     except Exception as e:
-        error_msg = f"ERROR: Could not fetch content from {url} - {e}"
-        print(error_msg)
+        error_msg = f"Could not fetch content from {url} - {e}"
+        debugger.add_log(error_msg, agent="RESEARCH", level="ERROR", process="FetchWeb")
         return error_msg

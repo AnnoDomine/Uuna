@@ -2,7 +2,7 @@
 
 Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
 
-This document serves as the technical context for AI agents and developers. The project is a universal toolkit for World of Warcraft datamining, utilizing a multi-agent orchestration system. **Currently in Version 1.0.0-rc (Release Candidate).**
+This document serves as the technical context for AI agents and developers. The project is a universal toolkit for World of Warcraft datamining, utilizing a multi-agent orchestration system. **Currently in Version 1.1.0-rc (Release Candidate).**
 
 ## Communication & Naming
 
@@ -33,7 +33,7 @@ This document serves as the technical context for AI agents and developers. The 
 - **Tools/toolsets/**: Role-based toolsets and specialized tools (Atomic design).
 - **Tools/agents/**: AI agent implementations and orchestration logic.
 - **Tools/analysis/**: Statistical features, mapping tools, and diagram generation.
-- **Tools/web/**: FastAPI web interface and TUI components.
+- **Tools/web/**: Modern Electron Desktop UI (`react-node/`) and legacy TUI components (`tui-node/`).
 - **Tools/tests/**: Pytest suite for all tools and core logic.
 - **Data/**: Central data storage (DuckDB, settings.json, Logs, temporary CSVs).
 
@@ -59,41 +59,47 @@ This document serves as the technical context for AI agents and developers. The 
     - **Zero Warning Policy**: Code MUST NOT produce any warnings in `pytest`, `vitest`, `ruff`, or `biome`. All warnings are treated as errors.
     - **No-Force-Push Policy**: `git push --force` or `git push --force-with-lease` are strictly forbidden on shared branches (`main`, `master`, `dev`, `stage`). Rebase and merge conflicts MUST be resolved locally.
 
-## Frontend Guidelines (Node.js/React)
+## Frontend Guidelines (Desktop / Electron / React)
 
-The Terminal User Interface (TUI) follows a strict Enterprise frontend architecture based on React (Ink), TypeScript, and Zustand.
+The Desktop User Interface (DUI) follows a strict Enterprise frontend architecture based on **Electron**, **React**, **TypeScript**, and **Redux Toolkit**.
 
-### 1. Interaction Model (Command-Driven)
+### 1. Interaction Model (Hybrid)
 
-The UI has transitioned from a traditional sidebar navigation to a **Vim-style Command-Line Interface**.
-- **Commands**: Start with `:` (e.g., `:goto:tasks`, `:settings:ai:num_gpu 50`).
-- **Mod System**: Third-party extensions can be integrated under the `:mod:` namespace.
-- **Auto-Completion**: Use `Ctrl+Tab` to cycle through dynamic suggestions generated from backend Pydantic classes.
+The UI combines a modern web interface with desktop capabilities.
+- **Communication**: Interacts with the Python backend via the **Grand Library API** (FastAPI).
+- **Auto-Completion**: Dynamic suggestions generated from backend Pydantic classes and Redux state.
+- **Legacy TUI**: The former React (Ink) based Terminal User Interface is no longer maintained and remains for documentation purposes only.
 
 ### 2. Architecture (Atomic Design)
 
 Components are divided into `Atoms`, `Molecules`, `Organisms`, and `Pages`. Each component resides in its own directory with the following schema:
 
 - `ComponentName.tsx` (UI / Render Logic)
-- `component_name.hooks.ts` (Business Logic / State)
+- `component_name.hooks.ts` (Business Logic / State / API Hooks)
 - `component_name.types.ts` (Interfaces & Types)
 - `component_name.constants.ts` (Static Data)
 - `component_name.helpers.ts` (Pure Functions)
 - `component_name.enums.ts` (Enums)
 
-### 2. State Management
+### 3. State Management
 
 - **Local**: Primitives use `useState`. Complex structures (objects/arrays) ALWAYS use `useImmer` for safe, mutable updates via `draft`.
-- **Global**: `zustand` manages app-wide data. Logic belongs in stores or dedicated services, not the UI.
+- **Global**: **Redux Toolkit** (RTK) manages app-wide data.
+- **API Cache**: **RTK Query** is used for efficient data fetching and caching from the Grand Library API.
 
-### 3. Quality & Tooling
+### 4. UI Library
+
+- **MUI (Material UI) / Joy UI**: Modern, accessible component library for a polished desktop experience.
+- **Icons**: Material Icons for consistent visual language.
+
+### 5. Quality & Tooling
 
 - **Linter/Formatter**: **Biome** is the mandatory tool for formatting and linting.
 - **Node.js**: **Node.js 24** is the mandatory runtime version.
 - **Package Management**: **pnpm** is the mandatory package manager. Use `pnpm add <package>` for new dependencies.
 - **TypeScript**: Strict typing is required. Avoid `any` (except in `global.types.ts`).
 - **No Shortcuts**: `@ts-ignore` or `@ts-nocheck` are strictly prohibited. Fix errors via correct typing or type guards.
-- **ESM**: The project uses ECMAScript Modules. Relative imports must include the `.js` extension.
+- **ESM**: The project uses ECMAScript Modules. Relative imports must include the `.js` extension where applicable.
 
 ## The Library System (Orchestration)
 

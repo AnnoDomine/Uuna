@@ -1,21 +1,14 @@
 import os
 import re
-import sys
 import zipfile
 import shutil
 import duckdb
-from loguru import logger
+from Tools.core.shared_debugger import debugger
 
 # Config
 DB_PATH = os.path.abspath("Data/WoW_Master.duckdb")
 DBS_DIR = os.path.abspath("Data/dbs")
 ARCHIVE_DIR = os.path.abspath("Data/backups/archived_sqlite")
-LOG_FILE = os.path.abspath("Data/logs/migration.log")
-
-# Configure Logger
-logger.remove()
-logger.add(sys.stderr, level="INFO")
-logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 
 
 def archive_database(file_path):
@@ -27,7 +20,7 @@ def archive_database(file_path):
     target_path = os.path.join(ARCHIVE_DIR, zip_name)
 
     try:
-        logger.info(f"  -> Archiving {base_name}...")
+        debugger.add_log(f"Archiving {base_name}...", agent="MIGRATOR", process="Archive")
         with zipfile.ZipFile(zip_temp_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             zipf.write(file_path, base_name)
         if os.path.exists(target_path):
@@ -39,12 +32,12 @@ def archive_database(file_path):
                 os.remove(f)
         return True
     except Exception as e:
-        logger.error(f"  -> Archive failed: {e}")
+        debugger.add_log(f"Archive failed for {base_name}: {e}", agent="MIGRATOR", level="ERROR", process="Archive")
         return False
 
 
 def migrate():
-    logger.info(">>> Starting Robust Sequential Migration <<<")
+    debugger.add_log(">>> Starting Robust Sequential Migration <<<", agent="MIGRATOR", process="Migration")
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
     files = [f for f in os.listdir(DBS_DIR) if re.match(r"WoW_Data_(\d+\.\d+\.\d+\.\d+)\.db$", f)]
@@ -61,7 +54,7 @@ def migrate():
         file_path = os.path.join(DBS_DIR, db_file)
         version = re.search(r"WoW_Data_(\d+\.\d+\.\d+\.\d+)\.db", db_file).group(1)
 
-        logger.info(f"Processing Build {version}...")
+        debugger.add_log(f"Processing Build {version}...", agent="MIGRATOR", process="Migration", build=version)
         alias = "src"
 
         try:
@@ -72,6 +65,7 @@ def migrate():
 
             res = con.execute("SELECT id FROM registry.builds WHERE version = ?", [version]).fetchone()
             if not res:
+                debugger.add_log(f"Build {version} not in registry. Skipping migration.", agent="MIGRATOR", level="WARNING", process="Migration", build=version)
                 con.execute(f"DETACH {alias}")
                 continue
             build_id = res[0]
@@ -95,9 +89,6 @@ def migrate():
                     con.execute(f"ALTER TABLE archive.{table_name} ADD COLUMN _row_hash VARCHAR")
 
                 # 4. Insert data using ONLY the common columns
-                # We assume SQLite has _row_hash because feature_extractor adds it.
-                # If not, the SELECT * from source would fail if we expect it.
-                # Let's check if source has it
                 if "_row_hash" in src_cols:
                     # Full deduplicated insert
                     con.execute(f"""
@@ -109,24 +100,25 @@ def migrate():
                         f"INSERT INTO archive.build_data_map (build_id, table_name, row_hash) SELECT {build_id}, '{table_name}', _row_hash FROM {alias}.{table_name}"
                     )
                 else:
-                    # Fallback if _row_hash is missing in source (should not happen normally)
-                    logger.warning(f"  [MISSING HASH] {table_name} in {version}")
+                    # Fallback if _row_hash is missing in source
+                    debugger.add_log(f"Missing hash for {table_name} in {version}", agent="MIGRATOR", level="WARNING", process="Migration", build=version)
                     con.execute(
                         f"INSERT INTO archive.{table_name} ({col_list}) SELECT {col_list} FROM {alias}.{table_name}"
                     )
 
             con.execute(f"DETACH {alias}")
             archive_database(file_path)
-            logger.success(f"  [OK] {version}")
+            debugger.add_log(f"Migration of Build {version} successful.", agent="MIGRATOR", level="SUCCESS", process="Migration", build=version)
 
         except Exception as e:
-            logger.error(f"  [FAIL] {version}: {e}")
+            debugger.add_log(f"Migration failed for {version}: {e}", agent="MIGRATOR", level="ERROR", process="Migration", build=version)
             try:
                 con.execute(f"DETACH {alias}")
-            except Exception as e:
+            except Exception:
                 pass
 
     con.close()
+    debugger.add_log("Robust migration finished.", agent="MIGRATOR", level="SUCCESS", process="Migration")
 
 
 if __name__ == "__main__":

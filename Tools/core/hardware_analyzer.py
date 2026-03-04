@@ -8,6 +8,7 @@ from typing import Any, Dict
 import psutil
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 
 def check_backend_availability():
@@ -15,6 +16,7 @@ def check_backend_availability():
     try:
         db.execute("SELECT 1")
     except Exception:
+        debugger.add_log("Database Backend is offline!", agent="CORE", level="ERROR", process="Hardware:Init")
         print("❌ Error: Database Backend is offline!")
         print("   Please start the backend service first using: uv run manage.py serve")
         sys.exit(1)
@@ -168,7 +170,7 @@ def calculate_optimal_settings() -> Dict[str, Any]:
 
 def apply_settings(settings: Dict[str, Any]):
     """Writes settings to DuckDB registry."""
-    print("\n💾 Applying Optimized Settings...")
+    debugger.add_log("Applying Optimized Settings...", agent="CORE", process="Hardware:Apply")
     for key, value in settings.items():
         # UPSERT into registry.settings
         db.execute(
@@ -179,8 +181,8 @@ def apply_settings(settings: Dict[str, Any]):
             """,
             [key, str(value)],
         )
-        print(f"   ✅ Set {key} = {value}")
-    print("\n✨ Settings saved to DuckDB registry successfully.")
+        debugger.add_log(f"Set {key} = {value}", agent="CORE", process="Hardware:Apply")
+    debugger.add_log("Settings saved to DuckDB registry successfully.", agent="CORE", level="SUCCESS", process="Hardware:Apply")
 
 
 def run_optimization():
@@ -190,20 +192,9 @@ def run_optimization():
     args = parser.parse_args()
 
     check_backend_availability()
-    print("\n🔍 Analyzing Hardware...")
+    debugger.add_log("Analyzing Hardware...", agent="CORE", process="Hardware:Analysis")
     
-    cpu = get_cpu_info()
-    print(f"   - CPU: {cpu['physical_cores']} Physical Cores ({cpu['logical_cores']} Logical)")
-    
-    ram = get_ram_info()
-    print(f"   - RAM: {ram['total_gb']} GB Total ({ram['available_gb']} GB Available)")
-    
-    gpu = get_gpu_info()
-    print(f"   - GPU: {gpu['vendor']} ({gpu['type']}) - VRAM: {gpu['vram_gb']} GB")
-
     recommendations, explanations = calculate_optimal_settings()
-    
-    print("\n💡 Recommended Settings:")
     
     # Helper for printing aligned
     def print_rec(label, key):
@@ -213,13 +204,13 @@ def run_optimization():
             val = val.upper()
         print(f"   - {label:<15} {val:<10}  ({expl})")
 
-    print_rec("Mode:", "ai_acceleration_mode")
-    print_rec("Threads:", "ai_num_thread")
-    print_rec("Context Size:", "ai_num_ctx")
-    print_rec("GPU Layers:", "ai_num_gpu")
-
     if args.dry_run:
-        print("\n🚫 Dry run mode active. No changes made.")
+        print("\n💡 Recommended Settings:")
+        print_rec("Mode:", "ai_acceleration_mode")
+        print_rec("Threads:", "ai_num_thread")
+        print_rec("Context Size:", "ai_num_ctx")
+        print_rec("GPU Layers:", "ai_num_gpu")
+        debugger.add_log("Dry run mode active. No changes made.", agent="CORE", process="Hardware:CLI")
         sys.exit(0)
 
     if args.yes:
@@ -227,20 +218,26 @@ def run_optimization():
     else:
         # Check if we are in an interactive terminal
         if not sys.stdin.isatty():
-            print("\n⚠️  Non-interactive mode detected. Use -y to apply settings automatically.")
+            debugger.add_log("Non-interactive mode detected without -y.", agent="CORE", level="ERROR", process="Hardware:CLI")
             sys.exit(1)
 
         # Interactive Prompt
+        print("\n💡 Recommended Settings:")
+        print_rec("Mode:", "ai_acceleration_mode")
+        print_rec("Threads:", "ai_num_thread")
+        print_rec("Context Size:", "ai_num_ctx")
+        print_rec("GPU Layers:", "ai_num_gpu")
+        
         try:
             print("\n❓ Do you want to apply these settings? [Y/n] ", end="", flush=True)
             response = sys.stdin.readline().strip().lower()
             if response in ["", "y", "yes"]:
                 apply_settings(recommendations)
             else:
-                print("\n❌ Cancelled by user. No changes made.")
+                debugger.add_log("Cancelled by user. No changes made.", agent="CORE", process="Hardware:CLI")
                 sys.exit(0)
         except KeyboardInterrupt:
-            print("\n❌ Cancelled by user.")
+            debugger.add_log("Interrupted by user.", agent="CORE", process="Hardware:CLI")
             sys.exit(0)
 
 

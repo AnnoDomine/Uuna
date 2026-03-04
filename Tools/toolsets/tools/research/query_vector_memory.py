@@ -2,6 +2,7 @@
 from typing import Any, Dict, List
 
 import requests
+from Tools.core.shared_debugger import debugger
 
 ORCHESTRA_API_URL = "http://127.0.0.1:8001"
 
@@ -28,5 +29,5 @@ def query_vector_memory(role: str, query: str = None, limit: int = 5, term: str 
         data = r.json()
         return data.get("results", [])
     except Exception as e:
-        print(f"ERROR: Vector memory search failed: {e}")
+        debugger.add_log(f"Vector memory search failed: {e}", agent="RESEARCH", level="ERROR", process="VectorMemory")
         return []

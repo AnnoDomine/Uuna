@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "find_value"
@@ -44,8 +45,6 @@ def find_value(search_term: str, build_version: Optional[str] = None) -> Dict[st
     count_with_build_template = _load_query("count_matches_with_build.sql")
 
     for table in tables:
-        if table == "build_data_map":
-            continue
         try:
             # 2. Get columns for the current table
             describe_sql = describe_template.format(table_name=table)
@@ -58,13 +57,18 @@ def find_value(search_term: str, build_version: Optional[str] = None) -> Dict[st
 
             params = [search_term] * len(columns)
 
-            if build_id:
-                if "build_id" in [c.lower() for c in columns]:
-                    query = count_with_build_template.format(table_name=table, where_clause=where_clause)
-                    params.append(build_id)
-                else:
-                    continue
+            # Check if table has _row_hash for mapping
+            has_hash = "_row_hash" in [c.lower() for c in columns]
+
+            if build_id and has_hash:
+                # Use mapping table for build-specific search
+                query = count_with_build_template.format(table_name=table, where_clause=where_clause)
+                params.extend([build_id])
+            elif build_id and not has_hash:
+                # Requested build-specific search but table doesn't support it
+                continue
             else:
+                # Global search in Master Archive
                 query = count_template.format(table_name=table, where_clause=where_clause)
 
             # 3. Execute the count query
@@ -74,7 +78,7 @@ def find_value(search_term: str, build_version: Optional[str] = None) -> Dict[st
             if count > 0:
                 found_in[table] = count
         except Exception as e:
-            print(f"Skipping table '{table}' due to error: {e}")
+            debugger.add_log(f"Skipping table '{table}' due to error: {e}", agent="CORE", level="WARNING", process="DB:FindValue")
             continue
 
     return found_in

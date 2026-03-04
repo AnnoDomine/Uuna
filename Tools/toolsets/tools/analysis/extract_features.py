@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 QUERY_DIR = Path(__file__).parent / "queries" / "extract_features"
 
@@ -23,7 +24,7 @@ def extract_features_for_build(build_version: str) -> dict:
     - build_version: The version string of the build (e.g. '10.0.0.12345').
     """
     start_time = time.time()
-    print(f"INFO: Feature extraction started for build: {build_version}")
+    debugger.add_log(f"Feature extraction started for build: {build_version}", agent="CORE", process="Analysis:ExtractFeatures")
 
     # Load all queries
     queries = {
@@ -58,7 +59,7 @@ def extract_features_for_build(build_version: str) -> dict:
             # Check if table exists in the main archive schema
             table_exists_res = db.execute(queries["check_table"], [table]).fetchone()
             if not table_exists_res or table_exists_res[0] == 0:
-                print(f"WARNING: Table {table} MISSING in archive. Logged for re-sync.")
+                debugger.add_log(f"Table {table} MISSING in archive. Logged for re-sync.", agent="CORE", level="WARNING", process="Analysis:ExtractFeatures")
                 db.execute(queries["log_error"], [build_id, table, "MISSING_TABLE", "Missing in archive schema."])
                 continue
 
@@ -72,7 +73,7 @@ def extract_features_for_build(build_version: str) -> dict:
             build_rows = build_rows_res[0] if build_rows_res else 0
 
             if idx % 50 == 0 or idx == 1:
-                print(f"INFO: Processing {idx}/{total_tables}: {table} ({build_rows} rows)")
+                debugger.add_log(f"Processing {idx}/{total_tables}: {table} ({build_rows} rows)", agent="CORE", process="Analysis:ExtractFeatures")
 
             for col in columns:
                 total_cols += 1
@@ -95,7 +96,7 @@ def extract_features_for_build(build_version: str) -> dict:
                     continue
 
         except Exception as e:
-            print(f"ERROR: Critical error in table {table}: {e}")
+            debugger.add_log(f"Critical error in table {table}: {e}", agent="CORE", level="ERROR", process="Analysis:ExtractFeatures")
             db.execute(queries["log_error"], [build_id, table, "CRASH", str(e)])
 
     # Mark build as indexed
@@ -108,5 +109,5 @@ def extract_features_for_build(build_version: str) -> dict:
         "processed_tables": total_tables,
         "duration_seconds": round(elapsed, 2),
     }
-    print(f"SUCCESS: Finished feature extraction for {build_version}. Processed {total_cols} columns in {elapsed:.1f}s")
+    debugger.add_log(f"Finished feature extraction for {build_version}. Processed {total_cols} columns in {elapsed:.1f}s", agent="CORE", level="SUCCESS", process="Analysis:ExtractFeatures")
     return summary

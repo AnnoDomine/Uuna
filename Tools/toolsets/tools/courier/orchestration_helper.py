@@ -1,10 +1,12 @@
 import inspect
 import json
 from typing import Any, Callable, Dict, List, Type, Union
+
 from pydantic import BaseModel, Field
 
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.core.ai_schema_validator import request_with_schema
+from Tools.core.shared_debugger import debugger
 from Tools.toolsets.tools.system.notify_frontend import notify_frontend
 
 
@@ -73,17 +75,21 @@ def parse_tools_to_prompt(tools: List[Callable]) -> str:
 
 
 def request_tool_selection(
-    task_id: str, 
-    event: Union[dict, list], 
-    role: Agents, 
+    task_id: str,
+    event: Union[dict, list],
+    role: Agents,
     tools: List[Callable],
     response_model: Type[BaseModel] = DefaultToolSelection,
-    task_context: dict = None
+    task_context: dict = None,
 ) -> dict:
     """
     Asks the agent to select the best tool for the current task context.
     """
-    notify_frontend(task_id, f"{role.value}: Selecting optimal tool...", agent=role.value, type="research")
+    agent_name = role.value if hasattr(role, "value") else str(role)
+    debugger.add_log(
+        f"Agent {agent_name} selecting tool for Task {task_id}", agent=agent_name, process="Orchestration:ToolSelection"
+    )
+    notify_frontend(task_id, f"{agent_name}: Selecting optimal tool...", agent=agent_name, type="research")
 
     try:
         # Handle both initial event (dict) and loop history (list)
@@ -95,7 +101,7 @@ def request_tool_selection(
 
         task_info = ""
         if task_context:
-            task_info = f"\nTASK CONTEXT:\n- Objective: {task_context.get('task', {}).get('original_query')}\n- BUILDS: {task_context.get('task', {}).get('assigned_builds')}\n"
+            task_info = f"\n\n======= ONLY CONTEXT, NOT FOR TOOL SELECTION START ======\nTASK CONTEXT:\n- Objective: {task_context.get('task', {}).get('original_query')}\n- BUILDS: {task_context.get('task', {}).get('assigned_builds')}\n======= ONLY CONTEXT, NOT FOR TOOL SELECTION END ======\n\n"
 
         tools_prompt = parse_tools_to_prompt(tools)
 
@@ -103,7 +109,7 @@ def request_tool_selection(
             "messages": [
                 {
                     "role": "system",
-                    "content": f"You are the {role.value}. Based on the EVENT INPUT and the TASK CONTEXT, select the best tool and provide the necessary parameters.{task_info}",
+                    "content": f"You are the {agent_name}. Based on the EVENT INPUT and the TASK CONTEXT, select the best tool and provide the necessary parameters.{task_info}",
                 },
                 {
                     "role": "user",
@@ -112,28 +118,38 @@ def request_tool_selection(
             ],
         }
 
+        notify_frontend(task_id, f"{agent_name} Tools: {tools_prompt}", agent=agent_name, type="research")
+
         result = request_with_schema(response_model, payload, role)
 
         if "tool" in result:
-            notify_frontend(task_id, f"{role.value}: Executing tool '{result['tool']}'", agent=role.value, type="research")
+            debugger.add_log(
+                f"Selected tool: {result['tool']}",
+                agent=agent_name,
+                level="SUCCESS",
+                process="Orchestration:ToolSelection",
+            )
+            notify_frontend(
+                task_id, f"{agent_name}: Executing tool '{result['tool']}'", agent=agent_name, type="research"
+            )
 
         return result
 
     except Exception as e:
-        notify_frontend(task_id, f"Error during tool selection: {e}", agent=role.value, type="error", level="error")
+        debugger.add_log(
+            f"Tool selection failed: {e}", agent=agent_name, level="ERROR", process="Orchestration:ToolSelection"
+        )
+        notify_frontend(task_id, f"Error during tool selection: {e}", agent=agent_name, type="error", level="error")
         return {"error": str(e)}
 
 
 def is_event_finished(
-    task_id: str, 
-    input_data: any, 
-    output_data: any, 
-    role: Agents,
-    response_model: Type[BaseModel] = DefaultEventStatus
+    task_id: str, input_data: any, output_data: any, role: Agents, response_model: Type[BaseModel] = DefaultEventStatus
 ) -> bool:
     """
     Asks the agent if the current event is fully resolved.
     """
+    agent_name = role.value if hasattr(role, "value") else str(role)
     try:
         # Format complex data for the prompt
         formatted_input = json.dumps(input_data, indent=2) if not isinstance(input_data, str) else input_data
@@ -152,11 +168,31 @@ def is_event_finished(
         res = request_with_schema(response_model, payload, role)
 
         finished = res.get("is_finished", False) in [True, "true", "1", 1]
-        
+
         if finished:
-            notify_frontend(task_id, f"{role.value}: Event completed. Reason: {res.get('reason', 'N/A')}", agent=role.value, type="research")
-            
+            debugger.add_log(
+                f"Event finished for {agent_name}. Reason: {res.get('reason', 'N/A')}",
+                agent=agent_name,
+                level="SUCCESS",
+                process="Orchestration:CompletionCheck",
+            )
+            notify_frontend(
+                task_id,
+                f"{agent_name}: Event completed. Reason: {res.get('reason', 'N/A')}",
+                agent=agent_name,
+                type="research",
+            )
+        else:
+            debugger.add_log(
+                f"Event continues for {agent_name}. Reason: {res.get('reason', 'N/A')}",
+                agent=agent_name,
+                process="Orchestration:CompletionCheck",
+            )
+
         return finished
 
-    except Exception:
+    except Exception as e:
+        debugger.add_log(
+            f"Completion check crashed: {e}", agent=agent_name, level="ERROR", process="Orchestration:CompletionCheck"
+        )
         return False

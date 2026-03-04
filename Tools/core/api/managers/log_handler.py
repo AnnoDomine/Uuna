@@ -82,6 +82,10 @@ class DatabaseLogHandler:
 
         # 5. Save to Database (STRICTLY NO DEBUG LOGS)
         if severity != SeverityLevel.DEBUG and task_id and event_id:
+            # Check for no_db flag to prevent recursion if the logger failure itself is being logged
+            if extra.get("no_db"):
+                return
+
             try:
                 with open(self.query_path_log, "r") as f:
                     sql_log = f.read().strip()

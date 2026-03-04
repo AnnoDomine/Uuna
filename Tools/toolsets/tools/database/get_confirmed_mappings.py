@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 from Tools.core.shared_db_instance import db
+from Tools.core.shared_debugger import debugger
 
 # Define the path to the queries for this specific tool
 QUERY_DIR = Path(__file__).parent / "queries" / "get_confirmed_mappings"
@@ -26,5 +27,5 @@ def get_confirmed_mappings(build_version: str) -> List[Tuple]:
         res = db.execute(sql, [build_version])
         return res.fetchall()
     except Exception as e:
-        print(f"ERROR: Failed to get confirmed mappings: {e}")
+        debugger.add_log(f"Failed to get confirmed mappings: {e}", agent="CORE", level="ERROR", process="DB:GetConfirmedMappings")
         return []

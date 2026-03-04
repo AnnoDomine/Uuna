@@ -1,6 +1,7 @@
 # Tools/toolsets/tools/research/get_wago_structure.py
 import requests
 
+from Tools.core.shared_debugger import debugger
 from .fetch_web_content import _check_cache, _save_cache
 
 USER_AGENT = (
@@ -22,10 +23,10 @@ def get_wago_structure(table_name: str, build_version: str, use_cache: bool = Tr
     if use_cache:
         cached = _check_cache(csv_url)
         if cached:
-            print(f"INFO: Using cached Wago structure for {table_name}")
+            debugger.add_log(f"Using cached Wago structure for {table_name}", agent="RESEARCH", process="WagoStructure")
             return cached
 
-    print(f"INFO: Fetching Wago structure for {table_name} (Build {build_version})")
+    debugger.add_log(f"Fetching Wago structure for {table_name} (Build {build_version})", agent="RESEARCH", process="WagoStructure")
     try:
         headers = {"User-Agent": USER_AGENT}
         with requests.get(csv_url, headers=headers, stream=True, timeout=15) as r:
@@ -42,8 +43,8 @@ def get_wago_structure(table_name: str, build_version: str, use_cache: bool = Tr
                     _save_cache(csv_url, result, "wago_structure")
                 return result
 
-        return f"INFO: Wago.tools: No headers found for {table_name} in build {build_version}."
+        return f"Wago.tools: No headers found for {table_name} in build {build_version}."
     except Exception as e:
-        error_msg = f"ERROR: Wago API error for {table_name} - {e}"
-        print(error_msg)
+        error_msg = f"Wago API error for {table_name} - {e}"
+        debugger.add_log(error_msg, agent="RESEARCH", level="ERROR", process="WagoStructure")
         return error_msg

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from Tools.core.shared_debugger import debugger
 
 DB_DIR = "Data/dbs"
 LOG_DIR = "Data/logs"
@@ -115,4 +116,4 @@ def init_registry():
 
 if __name__ == "__main__":
     init_all()
-    print("Project environment initialized successfully.")
+    debugger.add_log("Project environment initialized successfully.", agent="CORE", process="Init:Project")

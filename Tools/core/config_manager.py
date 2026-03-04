@@ -1,10 +1,13 @@
 import json
 import os
 from typing import Dict
-from pydantic import BaseModel, Field, field_validator
-from loguru import logger
 
-SETTINGS_PATH = "Data/settings.json"
+from pydantic import BaseModel, Field, field_validator
+
+from Tools.core.shared_debugger import debugger
+
+SETTINGS_PATH = "Tools/web/react-node/src/app/settings.json"
+
 
 class AISettings(BaseModel):
     num_thread: int = Field(default=6, ge=1, le=128)
@@ -20,15 +23,18 @@ class AISettings(BaseModel):
             raise ValueError("acceleration_mode must be 'cpu', 'gpu' or 'auto'")
         return v
 
+
 class IngestionSettings(BaseModel):
     workers: int = Field(default=4, ge=1, le=32)
     threads: int = Field(default=4, ge=1, le=64)
     limit_per_build: int = Field(default=0, ge=0)
     sync_builds_on_startup: bool = True
 
+
 class AnalysisSettings(BaseModel):
     use_global_mapping: bool = True
     auto_skip_unidentifiable: bool = False
+
 
 class SystemSettings(BaseModel):
     debug: bool = True
@@ -36,11 +42,22 @@ class SystemSettings(BaseModel):
     ui_theme: str = "dark"
     cooldown: float = Field(default=1.0, ge=0.0)
 
+
+class TasksSettings(BaseModel):
+    max_events_total: int = Field(default=80, ge=1, le=500)
+    max_tries_archivist: int = Field(default=6, ge=1, le=500)
+    max_tries_cartorapher: int = Field(default=3, ge=1, le=500)
+    max_tries_expedition_group: int = Field(default=5, ge=1, le=500)
+    max_tries_sentinel: int = Field(default=3, ge=1, le=500)
+
+
 class AppConfig(BaseModel):
     ai: AISettings = AISettings()
     ingestion: IngestionSettings = IngestionSettings()
     analysis: AnalysisSettings = AnalysisSettings()
     system: SystemSettings = SystemSettings()
+    tasks: TasksSettings = TasksSettings()
+
 
 class ConfigManager:
     @staticmethod
@@ -59,7 +76,12 @@ class ConfigManager:
     def load_config() -> AppConfig:
         """Reads and validates the settings from JSON file. Always read fresh."""
         if not os.path.exists(SETTINGS_PATH):
-            logger.warning(f"Settings file {SETTINGS_PATH} missing. Creating default.")
+            debugger.add_log(
+                f"Settings file {SETTINGS_PATH} missing. Creating default.",
+                agent="CORE",
+                level="WARNING",
+                process="Config:Load",
+            )
             ConfigManager.save_config(AppConfig())
             return AppConfig()
 
@@ -68,7 +90,12 @@ class ConfigManager:
                 data = json.load(f)
                 return AppConfig(**data)
         except Exception as e:
-            logger.error(f"Failed to load or validate config: {e}. Falling back to defaults.")
+            debugger.add_log(
+                f"Failed to load or validate config: {e}. Falling back to defaults.",
+                agent="CORE",
+                level="ERROR",
+                process="Config:Load",
+            )
             return AppConfig()
 
     @staticmethod
@@ -80,7 +107,8 @@ class ConfigManager:
                 # Pydantic V2 uses model_dump
                 json.dump(config.model_dump(), f, indent=4)
         except Exception as e:
-            logger.error(f"Failed to save config: {e}")
+            debugger.add_log(f"Failed to save config: {e}", agent="CORE", level="ERROR", process="Config:Save")
+
 
 # Global Accessor
 def get_config() -> AppConfig:

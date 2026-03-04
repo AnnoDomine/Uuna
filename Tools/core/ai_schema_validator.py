@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from Tools.agents.get_agent_skill_set import Agents
 from Tools.core.ai_client import AIClient
 from Tools.core.prompt_builder import get_prompt_header
+from Tools.core.shared_debugger import debugger
 
 
 class SchemaErrorCodes:
@@ -42,6 +43,9 @@ def request_with_schema(
     ai = AIClient()
     vm = VectorManager()
     
+    agent_name = role.value if hasattr(role, "value") else str(role)
+    debugger.add_log(f"Requesting schema-validated output for {agent_name}", agent=agent_name, process="AI:SchemaRequest")
+
     # 1. RAG: Search Memory for relevant context
     from Tools.core.config_manager import get_config
     config = get_config()
@@ -53,7 +57,7 @@ def request_with_schema(
     memory_context = ""
     if search_query:
         # Search enough to allow quality filtering
-        raw_memories = vm.search_memory(role.value, search_query, limit=limit * 2)
+        raw_memories = vm.search_memory(agent_name, search_query, limit=limit * 2)
         # Sort by quality_score in metadata (DESC)
         sorted_memories = sorted(
             raw_memories, 
@@ -66,17 +70,16 @@ def request_with_schema(
         if top_memories:
             ctx_lines = [f"- {m['content']} (Quality: {m['metadata'].get('quality_score', 'N/A')}%)" for m in top_memories]
             memory_context = "LONG-TERM MEMORY (HIGH QUALITY PREVIOUS FINDINGS):\n" + "\n".join(ctx_lines)
+            debugger.add_log(f"Injected {len(top_memories)} high-quality memories into context.", agent=agent_name, process="AI:RAG")
 
     # 2. Schema Generation
     if isinstance(obj, type) and issubclass(obj, BaseModel):
-        # Use Pydantic's built-in schema generation
         schema_dict = obj.model_json_schema()
         schema_dict["additionalProperties"] = False
         if optional_parser:
             schema_dict = optional_parser(schema_dict)
         schema = json.dumps(schema_dict, indent=2)
     else:
-        # Fallback to legacy dictionary-based schema
         schema = get_json_schema(obj, optional_parser)
 
     header = get_prompt_header(role)
@@ -105,11 +108,13 @@ def request_with_schema(
 
         while not is_valid and validation_tries < max_retries:
             validation_tries += 1
+            debugger.add_log(f"Schema validation failed! Retry {validation_tries}/{max_retries}...", agent=agent_name, level="WARNING", process="AI:SchemaValidation")
             # Re-request with error context
             res = ai.ask_direct(_get_invalid_schema_payload(schema, str(res)))
             is_valid = validate_ai_response(res, schema)
 
         if not is_valid:
+            debugger.add_log("Schema could not be validated after all retries.", agent=agent_name, level="ERROR", process="AI:SchemaValidation")
             return {
                 "error": "Schema could not be validated after retries.",
                 "schema": schema,
@@ -117,9 +122,11 @@ def request_with_schema(
                 "code": SchemaErrorCodes.SCHEMA_COULD_NOT_VALIDATED,
             }
 
+        debugger.add_log("AI response validated successfully.", agent=agent_name, level="SUCCESS", process="AI:SchemaValidation")
         return res
 
     except Exception as e:
+        debugger.add_log(f"Request crashed during validation: {e}", agent=agent_name, level="ERROR", process="AI:SchemaValidation")
         return {
             "error": str(e),
             "schema": schema,
